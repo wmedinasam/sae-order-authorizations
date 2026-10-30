@@ -1,0 +1,78 @@
+﻿<Window x:Class="ORD_SAE.VIEW.OrdenDetalle"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ORD_SAE.VIEW"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        AllowsTransparency="True" Background="{x:Null}"
+        Height="450" Width="800" FontFamily="Century Gothic" FontSize="14" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Border Margin="10" BorderThickness="0.5" BorderBrush="Black">
+        <!--<Border.Effect>
+            <DropShadowEffect Color="Black"
+                          Direction="320"
+                          BlurRadius="15"
+                          ShadowDepth="3" />
+        </Border.Effect>-->
+        <DockPanel LastChildFill="True" Background="White">
+            <Grid DockPanel.Dock="Top" Height="25">
+                <TextBlock Text="{Binding Path=Title, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                       HorizontalAlignment="Center" />
+                <Rectangle Name="titleBar" Height="30"
+                       Fill="Transparent"
+                       MouseLeftButtonDown="titleBar_MouseLeftButtonDown"/>
+                <Button Name="minButton"
+                    HorizontalAlignment="Right"
+                    Width="30" Margin="0,2,37.4,-7" Height="30"
+                    Click="minButton_Click" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0,0,1,1">
+                    <Image x:Name="image1" Height="26" Width="26" Source="/ORD_SAE;component/PICTURES/Minimize.png"/>
+                </Button>
+                <Button x:Name="closeButton"
+                    HorizontalAlignment="Right"
+                    Width="30" Margin="0,2,5.4,-7" Height="30"
+                    Click="closeButton_Click" Background="{x:Null}" BorderBrush="{x:Null}" Padding="0,0,1,1">
+                    <Image x:Name="image" Height="26" Width="26" Source="/ORD_SAE;component/PICTURES/Close.png"/>
+                </Button>
+            </Grid>
+            <Grid x:Name="Contenido" Margin="0,5.2,0,0">
+                <Label x:Name="Titulo" Content="Detalles de la Orden" Margin="10,-29,573.4,398" FontSize="18" FontWeight="Bold"/>
+                <Label x:Name="lblClave" Content="No." Margin="10,43,633.4,326" FontSize="18"/>
+                <Label x:Name="lblProveedor" Content="Proveedor" Margin="150,45,222.4,323" FontSize="18"/>
+                <Label x:Name="lblFecha" Content="Fecha" Margin="667,43,10.4,324" FontSize="18" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                <Label x:Name="lblTotal" Content="Total" Margin="561,43,116.4,323" FontSize="18" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="txtIdOrder" IsReadOnly="True" Height="30" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Margin="10,78,633.4,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0,0,0,1"/>
+                <TextBox x:Name="txtSupplier" IsReadOnly="True"  Height="30" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Margin="150,78,222.4,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0,0,0,1"/>
+                <TextBox x:Name="txtTotal" IsReadOnly="True" Height="30" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Margin="561,78,116.4,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0,0,0,1"/>
+                <TextBox x:Name="txtDate"  IsReadOnly="True"  Height="30" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Margin="667,78,10.4,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0,0,0,1"/>
+                <DataGrid x:Name="dgDetail" IsReadOnly="True" AutoGenerateColumns="False" Height="246" VerticalAlignment="Top" Margin="10,142,10.4,0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Articulo" Binding="{Binding IdProd}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Descripción" Binding="{Binding Description}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Cantidad" Binding="{Binding Quantity}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Moneda de OC" Binding="{Binding Currency}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="TC de OC" Binding="{Binding ExchangeRate}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Costo" Binding="{Binding Price}" FontFamily="Century Gothic" />
+                        <DataGridTextColumn Header="IVA" Binding="{Binding VAT}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Descuento" Binding="{Binding Disscount}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Total" Binding="{Binding TotalItem}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Total Cotizado" Binding="{Binding QuotedTotal}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Precio Cotizado" Binding="{Binding QuotedPrice}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="TC de Cotización" Binding="{Binding QuotedExchangeRate}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Moneda Cotización" Binding="{Binding QuotedCurrency}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Existencia Actual" Binding="{Binding CurrentStock}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Precio Actual" Binding="{Binding ActualPrice}" FontFamily="Century Gothic"/>
+                        <DataGridTextColumn Header="Margen" Binding="{Binding Edge}" FontFamily="Century Gothic"/>
+                        
+                        
+                        
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Label x:Name="lblDetalles" Content="Productos" Margin="10,113,666.4,256" FontSize="18" FontWeight="Bold"/>
+            </Grid>
+
+
+
+        </DockPanel>
+    </Border>
+</Window>

@@ -1,0 +1,54 @@
+﻿<Window x:Class="ORD_SAE.VIEW.Empresas"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ORD_SAE.VIEW"
+        mc:Ignorable="d"
+         Title="Empresas" Height="450" Width="750" FontFamily="Century Gothic" FontWeight="Bold" FontSize="14"  WindowStartupLocation="CenterScreen"  Icon="/ORD_SAE;component/PICTURES/box.png">
+    <Grid>
+        <Label x:Name="lblEmpresas" Content="Empresas" Margin="0,10,99,0" VerticalAlignment="Top" Height="68" FontSize="36" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Opacity="0.2" HorizontalAlignment="Right" Width="189"/>
+        <Image x:Name="imgEmpresa" HorizontalAlignment="Right" Height="80" Margin="0,10,14,0" VerticalAlignment="Top" Width="80" Source="/ORD_SAE;component/PICTURES/office-building.png" Opacity="0.2"/>
+
+        <DataGrid x:Name="dgEmpresas" Margin="287,71,14,20" CanUserAddRows="False" AutoGenerateColumns="False" FontWeight="Normal" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Acción">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <Button Content="Editar" Click="button_Click" Background="White" BorderBrush="Black"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Nombre Empresa" Binding="{Binding Nombre}"/>
+                <DataGridTextColumn Header="Empre SAE" Binding="{Binding  DB_SAE}"/>
+                <DataGridTextColumn Header="Estado" Binding="{Binding  EstadoGrid}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <GroupBox x:Name="gprBox" Header="Datos Empresa" HorizontalAlignment="Left" Height="381" Margin="10,20,0,0" VerticalAlignment="Top" Width="262"/>
+        <Label x:Name="lblNuevo" Content="Nueva" Margin="287,8,0,0" VerticalAlignment="Top" FontWeight="Bold" Height="18" Padding="0" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Width="60"/>
+        <Button x:Name="btnNueva" Margin="287,31,0,0" VerticalAlignment="Top" Height="35" Background="{x:Null}" BorderBrush="{x:Null}" Click="btnNueva_Click" HorizontalAlignment="Left" Width="60" >
+            <Image x:Name="imgAdd" Source="/ORD_SAE;component/PICTURES/company.png" Width="40" Height="30"/>
+        </Button>
+        <Label x:Name="lblCancelar" Content="Cancelar" Margin="374,8,0,0" VerticalAlignment="Top" FontWeight="Bold" Height="18" Padding="0" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Width="71"/>
+        <Button x:Name="bntCancelar" Margin="381,31,0,0" VerticalAlignment="Top" Height="35" Background="{x:Null}" BorderBrush="{x:Null}" Click="bntCancelar_Click" HorizontalAlignment="Left" Width="60" >
+            <Image x:Name="imgCancel" Source="/ORD_SAE;component/PICTURES/close.png" Width="40" Height="30"/>
+        </Button>
+        <Label x:Name="lblNombre" Content="Nombre de la Empresa:" HorizontalAlignment="Left" Margin="18,51,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+        <TextBox x:Name="txtNombreEmpresa" HorizontalAlignment="Left" Height="23" Margin="20,83,0,0" VerticalAlignment="Top" Width="240" FontWeight="Normal" BorderThickness="0,0,0,1" />
+        <Label x:Name="lblDireccion" Content="Direccion de la Empresa:" HorizontalAlignment="Left" Margin="18,112,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+        <TextBox x:Name="txtDireccionEmpresa" HorizontalAlignment="Left" Height="23" Margin="20,144,0,0" VerticalAlignment="Top" Width="240" FontWeight="Normal" BorderThickness="0,0,0,1" />
+        <Label x:Name="lblEmpreSAE" Content="Empresa SAE:" HorizontalAlignment="Left" Margin="18,175,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+        <TextBox x:Name="txtEmpreSAE" HorizontalAlignment="Left" Height="23" Margin="20,207,0,0" VerticalAlignment="Top" Width="158" FontWeight="Normal" BorderThickness="0,0,0,1" />
+        <Label x:Name="lblSufijo" Content="Sufijo SAE:" HorizontalAlignment="Left" Margin="183,175,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+        <TextBox x:Name="txtSufijo" HorizontalAlignment="Left" Height="23" Margin="183,207,0,0" VerticalAlignment="Top" Width="77" FontWeight="Normal" BorderThickness="0,0,0,1" />
+        <Label x:Name="lblEstado" Content="Estado Empresa:" HorizontalAlignment="Left" Margin="20,235,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+        <CheckBox x:Name="chkEstado"  HorizontalAlignment="Left" Margin="26,267,0,0" VerticalAlignment="Top" FontWeight="Normal" Checked="chkEstado_Checked" Unchecked="chkEstado_Unchecked"/>
+        <Button x:Name="btnGuardar" HorizontalAlignment="Left" Margin="105,333,0,0" VerticalAlignment="Top" Width="47" Height="51" BorderBrush="{x:Null}" Background="{x:Null}" Click="btnGuardar_Click">
+            <Image x:Name="imgGuardar" HorizontalAlignment="Left" Height="43" VerticalAlignment="Top" Width="41" Source="/ORD_SAE;component/PICTURES/save.png"/>
+        </Button>
+
+    </Grid>
+</Window>

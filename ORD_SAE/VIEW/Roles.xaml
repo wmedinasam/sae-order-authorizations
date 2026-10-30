@@ -1,0 +1,58 @@
+﻿<Window x:Class="ORD_SAE.VIEW.Roles"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ORD_SAE.VIEW"
+        mc:Ignorable="d"
+       Title="Roles" Height="476.322" Width="520" FontFamily="Century Gothic" FontWeight="Bold" FontSize="14"  WindowStartupLocation="CenterScreen"  Icon="/ORD_SAE;component/PICTURES/box.png">
+    <Grid>
+        <GroupBox x:Name="gprbx" Header="Rol" HorizontalAlignment="Left" Margin="10,27,0,28" Width="200" Background="White"/>
+        <Label x:Name="lblNombre" Content="Nombre del Rol:" HorizontalAlignment="Left" Margin="18,51,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+        <Label x:Name="lblDescripcion" Content="Descripcion del Rol:" HorizontalAlignment="Left" Margin="18,122,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+        <Label x:Name="lblEsAdministrador" Content="Es administrador:" HorizontalAlignment="Left" Margin="18,197,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+        <Label x:Name="lblEstado" Content="Estado del Rol:" HorizontalAlignment="Left" Margin="21,255,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+
+        <DataGrid x:Name="dgRoles" Margin="215,91,17,28" FontWeight="Normal" FontSize="12" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Acción">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <Button Content="Editar" Click="button_Click" Background="White" BorderBrush="Black"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Acción">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <Button x:Name="btnAsignar" Click="btnAsignar_Click" Content="Asignar" Background="White" BorderBrush="Black"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}"/>
+                <DataGridCheckBoxColumn Header="Estado" Binding="{Binding Estado}"/>
+
+            </DataGrid.Columns>
+        </DataGrid>
+        <Label x:Name="lblNuevo" Content="Nuevo" HorizontalAlignment="Left" Margin="215,28,0,0" VerticalAlignment="Top" FontWeight="Bold" Height="18" Padding="0" Width="60" HorizontalContentAlignment="Center"/>
+        <Button x:Name="btnNuevo"  HorizontalAlignment="Left" Margin="215,51,0,0" VerticalAlignment="Top" Width="60" Height="35" Background="{x:Null}" BorderBrush="{x:Null}" Click="btnNuevo_Click">
+            <Button.Content>
+                <Image x:Name="imgAdd" Source="/ORD_SAE;component/PICTURES/role.png" Width="40" Height="30"/>
+            </Button.Content>
+        </Button>
+        <Label x:Name="lblRoles" Content="Roles" Margin="0,3,89,0" VerticalAlignment="Top" Height="68" FontSize="36" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Opacity="0.2" HorizontalAlignment="Right" Width="111"/>
+        <Image x:Name="imgRoles" HorizontalAlignment="Right" Height="80" Margin="0,3,4,0" VerticalAlignment="Top" Width="80" Source="/ORD_SAE;component/PICTURES/role.png" Opacity="0.2"/>
+        <TextBox x:Name="txtNombre" HorizontalAlignment="Left" Height="23" Margin="20,83,0,0" VerticalAlignment="Top" Width="180" FontWeight="Normal" BorderThickness="0,0,0,1" PreviewTextInput="txtNombre_PreviewTextInput" PreviewKeyDown="txtNombre_PreviewKeyDown"/>
+        <TextBox x:Name="txtDescripcion" HorizontalAlignment="Left" Height="23" Margin="20,154,0,0" VerticalAlignment="Top" Width="180" FontWeight="Normal" BorderThickness="0,0,0,1"/>
+        <CheckBox x:Name="chkEsAdministrador"  HorizontalAlignment="Left" Margin="25,229,0,0" VerticalAlignment="Top" FontWeight="Normal" Checked="chkEsAdministrador_Checked" Unchecked="chkEsAdministrador_Unchecked"/>
+        <CheckBox x:Name="chkEstado"  HorizontalAlignment="Left" Margin="25,292,0,0" VerticalAlignment="Top" FontWeight="Normal" Checked="chkEstado_Checked" Unchecked="chkEstado_Unchecked"/>
+        <Button x:Name="btnGuardar" HorizontalAlignment="Left" Margin="90,0,0,36" Width="47" BorderBrush="{x:Null}" Background="{x:Null}" Click="btnGuardar_Click" Height="51" VerticalAlignment="Bottom">
+            <Image x:Name="imgGuardar" HorizontalAlignment="Left" Height="43" VerticalAlignment="Top" Width="41" Source="/ORD_SAE;component/PICTURES/save.png"/>
+        </Button>
+    </Grid>
+</Window>

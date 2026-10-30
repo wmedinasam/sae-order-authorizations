@@ -1,0 +1,61 @@
+﻿<Window x:Class="ORD_SAE.VIEW.Usuarios"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ORD_SAE.VIEW"
+        mc:Ignorable="d"
+        Title="Usuarios" Height="550" Width="800" FontFamily="Century Gothic" FontWeight="Bold" FontSize="14"  WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Icon="/ORD_SAE;component/PICTURES/box.png">
+    <Grid>
+        <Image x:Name="imgUsuarios" HorizontalAlignment="Right" Height="100" Margin="0,10,8,0" VerticalAlignment="Top" Width="100" Source="/ORD_SAE;component/PICTURES/man.png" Opacity="0.2"/>
+        <Label x:Name="lblUsuarios" Content="Usuarios" Margin="0,10,113,0" VerticalAlignment="Top" Height="68" FontSize="36" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Opacity="0.2" HorizontalAlignment="Right" Width="405"/>
+        <GroupBox x:Name="grpBoxUsuarios" Header="Datos del Usuario" HorizontalAlignment="Left" Height="492" Margin="10,10,0,0" VerticalAlignment="Top" Width="351" FontFamily="Microsoft JhengHei" FontWeight="Bold" FontSize="14"/>
+        <DataGrid x:Name="dataGrid" IsReadOnly="true" Margin="366,106,10,10" AutoGenerateColumns="False"  CanUserAddRows="False" FontWeight="Normal">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Acción">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <Button Content="Editar" Click="Button_Click" Background="White" BorderBrush="Black"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Nombre" Binding="{Binding FullName}"/>
+                <DataGridTextColumn Header="Usuario" Binding="{Binding Nick}"/>
+                <DataGridTextColumn Header="Correo" Binding="{Binding Mail}"/>
+                <DataGridTextColumn Header="ROL" Binding="{Binding Rol}"/>
+                <DataGridCheckBoxColumn Header="Envia Correo" Binding="{Binding SendMail }"></DataGridCheckBoxColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Grid Margin="20,24,432.6,25.8" x:Name="grdNuevo">
+            <Label x:Name="lblNombre" Content="Nombre y Apellido:" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+            <TextBox x:Name="txtNombre" HorizontalAlignment="Left" Height="23" Margin="0,49,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="330" FontWeight="Normal" BorderThickness="0,0,0,1" TabIndex="1" BorderBrush="Black"/>
+            <Label x:Name="lblUsuario" Content="Usuario:" HorizontalAlignment="Left" Margin="0,84,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+            <TextBox x:Name="txtUsuario" HorizontalAlignment="Left" Height="23" Margin="0,118,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="330" FontWeight="Normal" BorderThickness="0,0,0,1" TabIndex="2" BorderBrush="Black"/>
+            <Label x:Name="lblContraseña" Content="Contraseña:" HorizontalAlignment="Left" Margin="0,153,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+            <PasswordBox x:Name="pwdPassword" HorizontalAlignment="Left" Margin="0,187,0,0" VerticalAlignment="Top" Width="330" TabIndex="3" LostFocus="PwdPassword_LostFocus" BorderBrush="Black"/>
+            <Label x:Name="lblContraseña2" Content="Ingrese nuevamente la Contraseña:" HorizontalAlignment="Left" Margin="0,218,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+            <PasswordBox x:Name="pwdPasswordConfirm" HorizontalAlignment="Left" Margin="0,252,0,0" VerticalAlignment="Top" Width="330" LostFocus="PwdPasswordConfirm_LostFocus" TabIndex="4" BorderBrush="Black"/>
+            <Label x:Name="lblCorreo" Content="Correo:" HorizontalAlignment="Left" Margin="0,280,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+            <TextBox x:Name="txtCorreo" HorizontalAlignment="Left" Height="23" Margin="0,314,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="330" FontWeight="Normal" BorderThickness="0,0,0,1" TabIndex="5" BorderBrush="Black"/>
+            <Label x:Name="lblRol" Content="Rol:" HorizontalAlignment="Left" Margin="0,342,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+            <ComboBox x:Name="cmbRol" HorizontalAlignment="Left" Margin="0,377,0,0" VerticalAlignment="Top" Width="170" TabIndex="6" BorderBrush="Black"/>
+            <Label x:Name="lblCorreos" Content="Recibe Correo:" HorizontalAlignment="Left" Margin="173,342,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+            <RadioButton x:Name="rbtnSi" Content="Si" HorizontalAlignment="Left" Margin="247,371,0,0" VerticalAlignment="Top" FontWeight="Normal" TabIndex="7"/>
+            <RadioButton x:Name="rbtnNo" Content="No" HorizontalAlignment="Left" Margin="247,394,0,0" VerticalAlignment="Top" FontWeight="Normal" TabIndex="8"/>
+            <Button x:Name="btnGuardarUsuario" HorizontalAlignment="Left" Margin="140,420,0,0" VerticalAlignment="Top" Width="47" Height="51" BorderBrush="{x:Null}" Background="{x:Null}" Click="BtnGuardarUsuario_Click">
+                <Image x:Name="imgGuardar1" HorizontalAlignment="Left" Height="43" VerticalAlignment="Top" Width="41" Source="/ORD_SAE;component/PICTURES/save.png"/>
+            </Button>
+            <Image x:Name="imgSAE" HorizontalAlignment="Left" Height="39" Margin="289,0,0,0" VerticalAlignment="Top" Width="41" Source="/ORD_SAE;component/PICTURES/name.png"/>
+            <Image x:Name="imgUser" HorizontalAlignment="Left" Height="36" Margin="294,77,0,0" VerticalAlignment="Top" Width="36" Source="/ORD_SAE;component/PICTURES/man.png"/>
+            <Image x:Name="imgPassword" HorizontalAlignment="Left" Height="36" Margin="292,146,0,0" VerticalAlignment="Top" Width="38" Source="/ORD_SAE;component/PICTURES/pin-code.png"/>
+            <Image x:Name="imgPassword_Copy" HorizontalAlignment="Left" Height="36" Margin="289,278,0,0" VerticalAlignment="Top" Width="38" Source="/ORD_SAE;component/PICTURES/email.png" RenderTransformOrigin="0.509,0.237"/>
+        </Grid>
+        <Button x:Name="btn_Add" Margin="366,54,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75" Click="Btn_Add_Click" FontWeight="Normal" Height="47" Background="{x:Null}" BorderBrush="{x:Null}">
+            <Image x:Name="image" Height="47" Width="48" Source="/ORD_SAE;component/PICTURES/man.png"/>
+        </Button>
+        <Label x:Name="lblNuevo" Content="Nuevo" HorizontalAlignment="Left" Margin="366,24,0,0" VerticalAlignment="Top" Width="75" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+
+    </Grid>
+</Window>

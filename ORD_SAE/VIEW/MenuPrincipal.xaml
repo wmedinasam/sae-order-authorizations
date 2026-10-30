@@ -1,0 +1,59 @@
+﻿<Window x:Class="ORD_SAE.VIEW.MenuPrincipal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ORD_SAE.VIEW"
+        mc:Ignorable="d"
+        Title="Menu Principal" Height="682" Width="800" FontFamily="Microsoft JhengHei" FontWeight="Bold" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Icon="/ORD_SAE;component/PICTURES/box.png" Closed="Window_Closed">
+    <Grid>
+
+        <Image x:Name="image" HorizontalAlignment="Left" Margin="10,0,0,77" Width="390" Source="/ORD_SAE;component/PICTURES/sys.png" Height="100" VerticalAlignment="Bottom"/>
+
+   
+            <StackPanel Margin="30,41,29.6,199.4" Orientation="Vertical">
+                <StackPanel Margin="20 0">
+                    <ItemsControl x:Name="ListMenu">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="3,3,3,3">
+                                    <TextBlock Margin="5 0" HorizontalAlignment="Center" Text="{Binding Display}" FontSize="18" FontFamily="Century Gothic"/>
+                                    <Button Tag="{Binding Url}"  Height="174" Width="157" BorderBrush="#FF8B8B8B" Padding="15" Background="{x:Null}" Click="Button_Click">
+                                        <Image  Stretch="Fill" Source="{Binding Image}" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </StackPanel>
+
+        <Label x:Name="lblRegistro" Content="Label" HorizontalAlignment="Left" Margin="10,0,0,12" Width="456" FontFamily="Century Gothic" FontSize="14" Height="27" VerticalAlignment="Bottom"/>
+        <Image x:Name="imgAspel" HorizontalAlignment="Left" Margin="405,0,0,77" Width="260" Source="/ORD_SAE;component/PICTURES/DistIntegralAspel.png" Height="72" VerticalAlignment="Bottom"/>
+        <Label x:Name="lblLogedUser" Content="Label" Margin="0,10,29.6,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="222" FontFamily="Century Gothic" FontSize="14"/>
+        <Label x:Name="lblRegistredCustomer" Content="Datos del cliente:" HorizontalAlignment="Left" Margin="10,0,0,38" FontFamily="Century Gothic" FontSize="14" Height="29" VerticalAlignment="Bottom"/>
+        <Label x:Name="lblVersion" Content="Label" HorizontalAlignment="Left" Margin="448,0,0,12" Width="336" FontFamily="Century Gothic" FontSize="14" HorizontalContentAlignment="Right" Height="27" VerticalAlignment="Bottom"/>
+        <!--<Button x:Name="btnAutorizaciones" HorizontalAlignment="Left" Margin="50,65,0,0" VerticalAlignment="Top" Width="167" Height="214" BorderBrush="#FF8B8B8B" Background="{x:Null}" Click="BtnAutorizaciones_Click">
+            <Image x:Name="imgAutorizaciones" Height="174" Width="157" Source="/ORD_SAE;component/PICTURES/check-list.png" Stretch="Fill"/>
+        </Button>
+        <Button x:Name="btnUsuarios" HorizontalAlignment="Left" Margin="222,65,0,0" Width="167" BorderBrush="#FF8B8B8B" Background="{x:Null}" Click="BtnUsuarios_Click" Height="214" VerticalAlignment="Top">
+            <Image x:Name="imgUsuarios" Height="170" Width="157" Source="/ORD_SAE;component/PICTURES/man.png"/>
+        </Button>
+        <Button x:Name="btnBitacora" HorizontalAlignment="Left" Margin="394,65,0,0" VerticalAlignment="Top" Width="167" Height="214" BorderBrush="#FF8B8B8B" Background="{x:Null}" Click="BtnBitacora_Click">
+            <Image x:Name="imgBitacora" Height="154" Width="157" Source="/ORD_SAE;component/PICTURES/history-clock-button.png"/>
+        </Button>
+        <Button x:Name="btnConfiguracion" HorizontalAlignment="Left" Margin="566,65,0,0" VerticalAlignment="Top" Width="167" Height="214" BorderBrush="#FF8B8B8B" Background="{x:Null}" Click="BtnConfiguracion_Click">
+            <Image x:Name="imgConfiguracion" Height="166" Width="157" Source="/ORD_SAE;component/PICTURES/settings.png"/>
+        </Button>-->
+        <!--<Label x:Name="lblAutorizaciones" Content="Autorizaciones" HorizontalAlignment="Left" Margin="50,34,0,0" VerticalAlignment="Top" Width="167" FontSize="18" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Century Gothic"/>
+        <Label x:Name="lblUsuarios" Content="Usuarios" HorizontalAlignment="Left" Margin="222,34,0,0" VerticalAlignment="Top" Width="167" FontSize="18" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Century Gothic"/>
+        <Label x:Name="lblBitacora" Content="Bitacora" HorizontalAlignment="Left" Margin="394,34,0,0" VerticalAlignment="Top" Width="167" FontSize="18" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Century Gothic"/>
+        <Label x:Name="lblConfiguraciones" Content="Configuraciones" HorizontalAlignment="Left" Margin="566,34,0,0" VerticalAlignment="Top" Width="167" FontSize="18" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Century Gothic"/>-->
+
+    </Grid>
+</Window>

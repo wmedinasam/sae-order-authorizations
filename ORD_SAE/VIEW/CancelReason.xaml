@@ -1,0 +1,14 @@
+﻿<Window x:Class="ORD_SAE.VIEW.CancelReason"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ORD_SAE.VIEW"
+        mc:Ignorable="d"
+        Title="Motivo de rechazo" WindowStartupLocation="CenterScreen" FontFamily="Microsoft JhengHei" FontSize="14" FontWeight="Bold"  Height="250" Width="530" Icon="/ORD_SAE;component/PICTURES/box.png" WindowStyle="None">
+    <Grid>
+        <Label Margin="25,8,129,151">Motivo del Rechazo de la Orden de Compra:</Label>
+        <TextBox x:Name="txtMotivo" Margin="25,43,0,0"  Height="118" VerticalAlignment="Top" HorizontalAlignment="Left" Width="468"></TextBox>
+        <Button x:Name="btnGrabarMotivo" Margin="406,166,29,24" Click="btnGrabarMotivo_Click">Aceptar</Button>
+    </Grid>
+</Window>
