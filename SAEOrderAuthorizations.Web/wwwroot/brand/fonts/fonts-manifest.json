@@ -1,0 +1,615 @@
+{
+  "package": "WIS Dev Code — tipografías",
+  "created_at_utc": "2026-10-09T03:56:29.863454+00:00",
+  "source_policy": "TTF/OTF y las fuentes web de Inter son binarios originales de fuentes oficiales. Los WOFF2 variables de Montserrat y JetBrains Mono se obtuvieron por conversión de formato desde sus TTF variables oficiales, sin subsetting; se verificaron contornos, métricas, mapa de caracteres, ejes y tablas de metadatos. Solo se normalizaron nombres externos de archivo.",
+  "validation": "Se abrió cada TTF, OTF y WOFF2 con fontTools; la descompresión Brotli usa la implementación estándar de Node.js. Se comprobaron los caracteres españoles áéíóúÁÉÍÓÚñÑüÜ¿¡.",
+  "families": [
+    {
+      "family": "Montserrat",
+      "folder": "Montserrat",
+      "role": "Titulares y encabezados",
+      "official_url": "https://github.com/JulietaUla/Montserrat",
+      "recommended_weights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "files": [
+        {
+          "file": "Montserrat/Montserrat-Regular.ttf",
+          "family": "Montserrat",
+          "style": "Regular",
+          "version": "Version 9.000; ttfautohint (v1.8.4.7-5d5b)",
+          "format": "TTF",
+          "variable": false,
+          "axes": [],
+          "weight": 400,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Regular.ttf",
+          "license": "OFL-1.1",
+          "bytes": 445928,
+          "sha256": "3e8abe50c44c82e2242e97d1ec8c0d385c4890cdc50447bcdb8605c81a38cfb2",
+          "glyph_count": 2747,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Montserrat/Montserrat-Medium.ttf",
+          "family": "Montserrat",
+          "style": "Medium",
+          "version": "Version 9.000; ttfautohint (v1.8.4.7-5d5b)",
+          "format": "TTF",
+          "variable": false,
+          "axes": [],
+          "weight": 500,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Medium.ttf",
+          "license": "OFL-1.1",
+          "bytes": 447320,
+          "sha256": "dae47428bb041f9716604e0e07b5b0c8585b3bdd8183362f75c69fe7bb3cfaf4",
+          "glyph_count": 2747,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Montserrat/Montserrat-SemiBold.ttf",
+          "family": "Montserrat",
+          "style": "SemiBold",
+          "version": "Version 9.000; ttfautohint (v1.8.4.7-5d5b)",
+          "format": "TTF",
+          "variable": false,
+          "axes": [],
+          "weight": 600,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-SemiBold.ttf",
+          "license": "OFL-1.1",
+          "bytes": 454716,
+          "sha256": "b4e1563393d73fdff491a869441245aef31add2ec03d9c97a6dae4de07c52fd0",
+          "glyph_count": 2747,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Montserrat/Montserrat-Bold.ttf",
+          "family": "Montserrat",
+          "style": "Bold",
+          "version": "Version 9.000; ttfautohint (v1.8.4.7-5d5b)",
+          "format": "TTF",
+          "variable": false,
+          "axes": [],
+          "weight": 700,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Bold.ttf",
+          "license": "OFL-1.1",
+          "bytes": 454864,
+          "sha256": "bc6e854971cea46b463be6f9eef4d9cd52f51cfc1fc0dd90c9d3e6483dc0ec61",
+          "glyph_count": 2747,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Montserrat/Montserrat-Variable.ttf",
+          "family": "Montserrat",
+          "style": "Thin",
+          "version": "Version 9.000",
+          "format": "TTF",
+          "variable": true,
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 100.0,
+              "max": 900.0
+            }
+          ],
+          "weight": 100,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/variable/Montserrat%5Bwght%5D.ttf",
+          "license": "OFL-1.1",
+          "bytes": 744936,
+          "sha256": "1e2c44ef8c956ed66998649d8c832d221e22c04eaab63c044f18eb05d1c63b7c",
+          "glyph_count": 2747,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Montserrat/Montserrat-VariableItalic.ttf",
+          "family": "Montserrat",
+          "style": "Thin Italic",
+          "version": "Version 9.000",
+          "format": "TTF",
+          "variable": true,
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 100.0,
+              "max": 900.0
+            }
+          ],
+          "weight": 100,
+          "italic": true,
+          "source_url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/variable/Montserrat-Italic%5Bwght%5D.ttf",
+          "license": "OFL-1.1",
+          "bytes": 762376,
+          "sha256": "985bf47b7763a0d81c7defda5ad52771f2b36c2756db644e41b5184f1fab784f",
+          "glyph_count": 2791,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Montserrat/Montserrat-Variable.woff2",
+          "family": "Montserrat",
+          "style": "Thin",
+          "version": "Version 9.000",
+          "format": "WOFF2",
+          "variable": true,
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 100.0,
+              "max": 900.0
+            }
+          ],
+          "weight": 100,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/variable/Montserrat%5Bwght%5D.ttf",
+          "license": "OFL-1.1",
+          "bytes": 215592,
+          "sha256": "ce90b2477a6c3781bc9546550487c91001297d1a8ca30727e3096916fa091e65",
+          "glyph_count": 2747,
+          "spanish_characters_verified": true,
+          "derived_from": "Montserrat/Montserrat-Variable.ttf",
+          "source_sha256": "1e2c44ef8c956ed66998649d8c832d221e22c04eaab63c044f18eb05d1c63b7c",
+          "format_conversion": {
+            "method": "TrueType to WOFF2; sin subsetting ni cambios de nombres internos",
+            "tools": "fontTools 4.61.1 y Brotli estándar de Node.js",
+            "glyph_outlines_identical": true,
+            "character_map_identical": true,
+            "horizontal_metrics_identical": true,
+            "metadata_tables_identical": [
+              "name",
+              "fvar",
+              "gvar",
+              "HVAR",
+              "MVAR",
+              "STAT",
+              "OS/2",
+              "GSUB",
+              "GPOS",
+              "GDEF"
+            ],
+            "original_modified_timestamp_preserved": true
+          }
+        }
+      ],
+      "license": "OFL-1.1",
+      "license_name": "SIL Open Font License 1.1",
+      "license_file": "Montserrat/OFL.txt",
+      "license_source_url": "https://raw.githubusercontent.com/JulietaUla/Montserrat/master/OFL.txt",
+      "license_sha256": "8b7141c03fa4f8d44e6345d5d4931709290f0f67875e452e95ac1fd3a027802e",
+      "copyright_notice": "Copyright 2024 The Montserrat.Git Project Authors (https://github.com/JulietaUla/Montserrat.git)"
+    },
+    {
+      "family": "Inter",
+      "folder": "Inter",
+      "role": "Texto, interfaces y documentos",
+      "official_url": "https://rsms.me/inter/",
+      "release": "4.1",
+      "recommended_weights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "files": [
+        {
+          "file": "Inter/Inter-Bold.otf",
+          "family": "Inter",
+          "style": "Bold",
+          "version": "Version 4.001;git-9221beed3",
+          "format": "OTF",
+          "variable": false,
+          "axes": [],
+          "weight": 700,
+          "italic": false,
+          "source_url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+          "license": "OFL-1.1",
+          "bytes": 631880,
+          "sha256": "9fc6261e817d0b1b2bf1953d8799bb1c837d11aeebbf83ae352e7b4d6de6425d",
+          "glyph_count": 2937,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Inter/Inter-Medium.otf",
+          "family": "Inter",
+          "style": "Medium",
+          "version": "Version 4.001;git-9221beed3",
+          "format": "OTF",
+          "variable": false,
+          "axes": [],
+          "weight": 500,
+          "italic": false,
+          "source_url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+          "license": "OFL-1.1",
+          "bytes": 627988,
+          "sha256": "6c222ed2c3660524dd0c14fb745e00fee65c5361ab28f60fba6730bf4e648763",
+          "glyph_count": 2937,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Inter/Inter-Regular.otf",
+          "family": "Inter",
+          "style": "Regular",
+          "version": "Version 4.001;git-9221beed3",
+          "format": "OTF",
+          "variable": false,
+          "axes": [],
+          "weight": 400,
+          "italic": false,
+          "source_url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+          "license": "OFL-1.1",
+          "bytes": 609600,
+          "sha256": "d4f2b9e148059a15f014cb0f0b8fea8cd11bfa447dd483bedf1b0adc0e2ba799",
+          "glyph_count": 2937,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Inter/Inter-SemiBold.otf",
+          "family": "Inter",
+          "style": "SemiBold",
+          "version": "Version 4.001;git-9221beed3",
+          "format": "OTF",
+          "variable": false,
+          "axes": [],
+          "weight": 600,
+          "italic": false,
+          "source_url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+          "license": "OFL-1.1",
+          "bytes": 629912,
+          "sha256": "0a4d30778fa2dc239368d90fd854b88b27e7ede737450da72686a90eca66f02c",
+          "glyph_count": 2937,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Inter/InterVariable-Italic.ttf",
+          "family": "Inter Variable",
+          "style": "Italic",
+          "version": "Version 4.001;git-9221beed3",
+          "format": "TTF",
+          "variable": true,
+          "axes": [
+            {
+              "tag": "opsz",
+              "min": 14.0,
+              "default": 14.0,
+              "max": 32.0
+            },
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 400.0,
+              "max": 900.0
+            }
+          ],
+          "weight": 400,
+          "italic": true,
+          "source_url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+          "license": "OFL-1.1",
+          "bytes": 910252,
+          "sha256": "d6f1f6a172d9e588438db9f986fd5cfad7b30f644374080a8a9d4d91e344586f",
+          "glyph_count": 2901,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Inter/InterVariable.ttf",
+          "family": "Inter Variable",
+          "style": "Regular",
+          "version": "Version 4.001;git-9221beed3",
+          "format": "TTF",
+          "variable": true,
+          "axes": [
+            {
+              "tag": "opsz",
+              "min": 14.0,
+              "default": 14.0,
+              "max": 32.0
+            },
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 400.0,
+              "max": 900.0
+            }
+          ],
+          "weight": 400,
+          "italic": false,
+          "source_url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+          "license": "OFL-1.1",
+          "bytes": 879708,
+          "sha256": "4989b125924991b90d05b2d16e0e388c48f7d5bb8b30539bbf9c755278d0ccaf",
+          "glyph_count": 2937,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "Inter/Inter-Variable.woff2",
+          "family": "Inter Variable",
+          "style": "Regular",
+          "version": "Version 4.001;git-9221beed3",
+          "format": "WOFF2",
+          "variable": true,
+          "axes": [
+            {
+              "tag": "opsz",
+              "min": 14.0,
+              "default": 14.0,
+              "max": 32.0
+            },
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 400.0,
+              "max": 900.0
+            }
+          ],
+          "weight": 400,
+          "italic": false,
+          "source_url": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+          "license": "OFL-1.1",
+          "bytes": 352240,
+          "sha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+          "glyph_count": 2937,
+          "spanish_characters_verified": true,
+          "file_name_note": "Se normalizó únicamente el nombre externo del archivo; el binario oficial no se modificó."
+        },
+        {
+          "file": "Inter/InterVariable-Italic.woff2",
+          "family": "Inter Variable",
+          "style": "Italic",
+          "version": "Version 4.001;git-9221beed3",
+          "format": "WOFF2",
+          "variable": true,
+          "axes": [
+            {
+              "tag": "opsz",
+              "min": 14.0,
+              "default": 14.0,
+              "max": 32.0
+            },
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 400.0,
+              "max": 900.0
+            }
+          ],
+          "weight": 400,
+          "italic": true,
+          "source_url": "https://raw.githubusercontent.com/rsms/inter/v4.1/docs/font-files/InterVariable-Italic.woff2",
+          "license": "OFL-1.1",
+          "bytes": 387976,
+          "sha256": "e564f652916db6c139570fefb9524a77c4d48f30c92928de9db19b6b5c7a262a",
+          "glyph_count": 2901,
+          "spanish_characters_verified": true
+        }
+      ],
+      "optional_notes": [],
+      "license": "OFL-1.1",
+      "license_name": "SIL Open Font License 1.1",
+      "license_file": "Inter/LICENSE.txt",
+      "license_source_url": "https://raw.githubusercontent.com/rsms/inter/v4.1/LICENSE.txt",
+      "license_sha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a",
+      "copyright_notice": "Copyright (c) 2016 The Inter Project Authors (https://github.com/rsms/inter)"
+    },
+    {
+      "family": "JetBrains Mono",
+      "folder": "JetBrainsMono",
+      "role": "Opcional: código y contenido técnico",
+      "official_url": "https://github.com/JetBrains/JetBrainsMono",
+      "recommended_weights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "files": [
+        {
+          "file": "JetBrainsMono/JetBrainsMono-Regular.ttf",
+          "family": "JetBrains Mono",
+          "style": "Regular",
+          "version": "Version 2.305; ttfautohint (v1.8.4.7-5d5b)",
+          "format": "TTF",
+          "variable": false,
+          "axes": [],
+          "weight": 400,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/fonts/ttf/JetBrainsMono-Regular.ttf",
+          "license": "OFL-1.1",
+          "bytes": 270224,
+          "sha256": "e6fd0d7e91550b3ed2b735d4312474362c4716edc4fc0577a0f61ed782d5aed1",
+          "glyph_count": 1754,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "JetBrainsMono/JetBrainsMono-Medium.ttf",
+          "family": "JetBrains Mono",
+          "style": "Medium",
+          "version": "Version 2.305; ttfautohint (v1.8.4.7-5d5b)",
+          "format": "TTF",
+          "variable": false,
+          "axes": [],
+          "weight": 436,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/fonts/ttf/JetBrainsMono-Medium.ttf",
+          "license": "OFL-1.1",
+          "bytes": 270316,
+          "sha256": "d16e6dc99672734698d629705f617c79f6eb6040f5113efe3a145204dc988109",
+          "glyph_count": 1754,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "JetBrainsMono/JetBrainsMono-SemiBold.ttf",
+          "family": "JetBrains Mono",
+          "style": "SemiBold",
+          "version": "Version 2.305; ttfautohint (v1.8.4.7-5d5b)",
+          "format": "TTF",
+          "variable": false,
+          "axes": [],
+          "weight": 472,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/fonts/ttf/JetBrainsMono-SemiBold.ttf",
+          "license": "OFL-1.1",
+          "bytes": 273504,
+          "sha256": "12d4b18fe6e1af528e4bea69cb0997aeff22f9e52fccffcf66342dd88aa32ab8",
+          "glyph_count": 1754,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "JetBrainsMono/JetBrainsMono-Bold.ttf",
+          "family": "JetBrains Mono",
+          "style": "Bold",
+          "version": "Version 2.305; ttfautohint (v1.8.4.7-5d5b)",
+          "format": "TTF",
+          "variable": false,
+          "axes": [],
+          "weight": 558,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/fonts/ttf/JetBrainsMono-Bold.ttf",
+          "license": "OFL-1.1",
+          "bytes": 274096,
+          "sha256": "d22c4f3821d725eb01210d278d95dfcfcaadc34699a06658d47c8a5cc5830ada",
+          "glyph_count": 1754,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "JetBrainsMono/JetBrainsMono-Variable.ttf",
+          "family": "JetBrains Mono",
+          "style": "Regular",
+          "version": "Version 2.305",
+          "format": "TTF",
+          "variable": true,
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 400.0,
+              "max": 800.0
+            }
+          ],
+          "weight": 400,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/fonts/variable/JetBrainsMono%5Bwght%5D.ttf",
+          "license": "OFL-1.1",
+          "bytes": 300144,
+          "sha256": "3cfafa86e28b87184d592fef82846e8c10cb48653c62efcda34f082da225ec34",
+          "glyph_count": 1754,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "JetBrainsMono/JetBrainsMono-VariableItalic.ttf",
+          "family": "JetBrains Mono",
+          "style": "Italic",
+          "version": "Version 2.305",
+          "format": "TTF",
+          "variable": true,
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 400.0,
+              "max": 800.0
+            }
+          ],
+          "weight": 400,
+          "italic": true,
+          "source_url": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/fonts/variable/JetBrainsMono-Italic%5Bwght%5D.ttf",
+          "license": "OFL-1.1",
+          "bytes": 308832,
+          "sha256": "c5c2a1d29297d2a40ec4a0114447c6b7a1477678ab2d9aa4b755356e1a02cead",
+          "glyph_count": 1741,
+          "spanish_characters_verified": true
+        },
+        {
+          "file": "JetBrainsMono/JetBrainsMono-Variable.woff2",
+          "family": "JetBrains Mono",
+          "style": "Regular",
+          "version": "Version 2.305",
+          "format": "WOFF2",
+          "variable": true,
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100.0,
+              "default": 400.0,
+              "max": 800.0
+            }
+          ],
+          "weight": 400,
+          "italic": false,
+          "source_url": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/fonts/variable/JetBrainsMono%5Bwght%5D.ttf",
+          "license": "OFL-1.1",
+          "bytes": 113704,
+          "sha256": "2351228fa6d146e978e6a2dea44aab054d7e472545f97fe5ed99726901ff38b7",
+          "glyph_count": 1754,
+          "spanish_characters_verified": true,
+          "derived_from": "JetBrainsMono/JetBrainsMono-Variable.ttf",
+          "source_sha256": "3cfafa86e28b87184d592fef82846e8c10cb48653c62efcda34f082da225ec34",
+          "format_conversion": {
+            "method": "TrueType to WOFF2; sin subsetting ni cambios de nombres internos",
+            "tools": "fontTools 4.61.1 y Brotli estándar de Node.js",
+            "glyph_outlines_identical": true,
+            "character_map_identical": true,
+            "horizontal_metrics_identical": true,
+            "metadata_tables_identical": [
+              "name",
+              "fvar",
+              "gvar",
+              "HVAR",
+              "STAT",
+              "OS/2",
+              "GSUB",
+              "GPOS",
+              "GDEF"
+            ],
+            "original_modified_timestamp_preserved": true
+          }
+        }
+      ],
+      "license": "OFL-1.1",
+      "license_name": "SIL Open Font License 1.1",
+      "license_file": "JetBrainsMono/OFL.txt",
+      "license_source_url": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/master/OFL.txt",
+      "license_sha256": "a76abf002c49097d146e86740a3105a5d00450b1592e820a1109a8c5680cd697",
+      "copyright_notice": "Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)"
+    }
+  ],
+  "errors": [],
+  "web_stylesheet": "fonts.css",
+  "updated_at_utc": "2026-10-09T03:59:45.915751+00:00",
+  "primary_web_faces": [
+    {
+      "family": "Montserrat",
+      "file": "Montserrat/Montserrat-Variable.woff2",
+      "weight_range": "100 900",
+      "style": "normal"
+    },
+    {
+      "family": "Inter",
+      "file": "Inter/Inter-Variable.woff2",
+      "weight_range": "100 900",
+      "style": "normal"
+    },
+    {
+      "family": "JetBrains Mono",
+      "file": "JetBrainsMono/JetBrainsMono-Variable.woff2",
+      "weight_range": "100 800",
+      "style": "normal"
+    }
+  ],
+  "removed_redundant_static_webfonts": [
+    "Montserrat/Montserrat-Regular.woff2",
+    "Montserrat/Montserrat-Medium.woff2",
+    "Montserrat/Montserrat-SemiBold.woff2",
+    "Montserrat/Montserrat-Bold.woff2",
+    "JetBrainsMono/JetBrainsMono-Regular.woff2",
+    "JetBrainsMono/JetBrainsMono-Medium.woff2",
+    "JetBrainsMono/JetBrainsMono-SemiBold.woff2",
+    "JetBrainsMono/JetBrainsMono-Bold.woff2"
+  ]
+}

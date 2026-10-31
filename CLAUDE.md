@@ -66,3 +66,10 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 - `Components/Pages/Login.razor` valida contra `Usuarios` + `Roles` (rol con `Estado = true`) y firma la cookie. Login es SSR estático (`ExcludeFromInteractiveRouting`) porque `SignInAsync` necesita `HttpContext`.
 - `POST /auth/logout` cierra la sesión. El dashboard es `Components/Pages/Home.razor`.
 - **Deuda temporal:** la contraseña se compara en claro (`WIS_USER.PASSWORD`). Pendiente: hash. El admin semilla usa `123` (migración `SeedAdminPasswordClaro`).
+
+## Marca y tema visual (proyecto nuevo)
+
+- Fuente: skill `wis-brand-kit` (`~/.claude/skills/wis-brand-kit/brand/`). Assets copiados a `SAEOrderAuthorizations.Web/wwwroot/brand/` (web, fonts, logos, web-icons).
+- Tema **oscuro por defecto**: `App.razor` fija `data-theme="dark"` y el `body` usa `wis-brand`. Las vistas usan las clases `wis-*` (`wis-card`, `wis-button`, `wis-input`, `wis-h2`…) y tokens `--wis-*` de `brand-tokens.css`.
+- Logo en fondo oscuro: `brand/logos/svg/wis-logo-horizontal-on-dark.svg`.
+- `UseStaticFiles()` va antes de `UseAuthentication()` para que los assets de marca sean públicos; el resto de rutas sigue protegido.

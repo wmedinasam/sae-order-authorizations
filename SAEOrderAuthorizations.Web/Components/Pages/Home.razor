@@ -1,12 +1,40 @@
-@using Microsoft.AspNetCore.Authorization
 @page "/"
 @attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 
-<PageTitle>Inicio</PageTitle>
+<PageTitle>Inicio · WIS Dev Code</PageTitle>
 
-<h1>Dashboard</h1>
+<header class="wis-logo-header">
+    <img src="brand/logos/svg/wis-logo-horizontal-on-dark.svg" width="240" height="72" alt="WIS Dev Code" />
+</header>
 
-<form method="post" action="/auth/logout">
-    <AntiforgeryToken />
-    <button type="submit" class="btn btn-outline-secondary">Cerrar sesión</button>
-</form>
+<main class="wis-container" style="padding-top: var(--wis-space-7);">
+    <section class="wis-card wis-stack">
+        <div class="wis-user-bar">
+            <div>
+                <h1 class="wis-h2">Dashboard</h1>
+                <p class="wis-muted wis-small" style="margin: 0;">
+                    @nombre
+                </p>
+            </div>
+            <form method="post" action="/auth/logout">
+                <AntiforgeryToken />
+                <button type="submit" class="wis-button wis-button--secondary">Cerrar sesión</button>
+            </form>
+        </div>
+    </section>
+</main>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private string nombre = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthState is not null)
+        {
+            nombre = (await AuthState).User.Identity?.Name ?? string.Empty;
+        }
+    }
+}

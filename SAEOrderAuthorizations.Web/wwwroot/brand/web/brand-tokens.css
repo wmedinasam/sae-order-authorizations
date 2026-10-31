@@ -1,0 +1,316 @@
+/* WIS Dev Code · Brand kit 1.0
+ * Install this folder at /brand/web and its sibling fonts at /brand/fonts.
+ * Select a theme with <html data-theme="light|dark|auto">.
+ * No data-theme also follows the operating system.
+ * The CSS classes are opt-in: add .wis-brand to a page or a section.
+ */
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("../fonts/Montserrat/Montserrat-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/Inter/Inter-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* Optional: omit this face if your page has no code samples. */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../fonts/JetBrainsMono/JetBrainsMono-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+}
+
+:root {
+  /* Identity colors: do not use their names as semantic UI roles. */
+  --wis-navy: #101E2A;
+  --wis-ink: #172F42;
+  --wis-azure: #079EF3;
+  --wis-coral: #FF654F;
+  --wis-white: #FFFFFF;
+  --wis-offwhite: #F6F8FB;
+
+  --wis-font-display: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --wis-font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --wis-font-code: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  --wis-weight-regular: 400;
+  --wis-weight-medium: 500;
+  --wis-weight-semibold: 600;
+  --wis-weight-bold: 700;
+
+  --wis-text-h1: 2.5rem;
+  --wis-leading-h1: 2.75rem;
+  --wis-text-h2: 2rem;
+  --wis-leading-h2: 2.5rem;
+  --wis-text-h3: 1.5rem;
+  --wis-leading-h3: 2rem;
+  --wis-text-body: 1rem;
+  --wis-leading-body: 1.625rem;
+  --wis-text-small: 0.875rem;
+  --wis-leading-small: 1.375rem;
+  --wis-text-caption: 0.75rem;
+  --wis-leading-caption: 1.125rem;
+  --wis-tracking-display: -0.025em;
+
+  --wis-space-1: 0.25rem;
+  --wis-space-2: 0.5rem;
+  --wis-space-3: 0.75rem;
+  --wis-space-4: 1rem;
+  --wis-space-5: 1.5rem;
+  --wis-space-6: 2rem;
+  --wis-space-7: 3rem;
+  --wis-space-8: 4rem;
+  --wis-space-9: 6rem;
+  --wis-radius-small: 0.5rem;
+  --wis-radius-medium: 0.875rem;
+  --wis-radius-large: 1.25rem;
+  --wis-radius-pill: 999px;
+  --wis-container: 77.5rem;
+  --wis-reading-width: 68ch;
+  --wis-page-gutter: clamp(1.25rem, 4vw, 3rem);
+  --wis-duration-fast: 140ms;
+  --wis-duration-standard: 220ms;
+  --wis-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Light is the fallback for browsers without prefers-color-scheme. */
+:root,
+[data-theme="light"],
+[data-theme="auto"] {
+  color-scheme: light;
+  --wis-bg: #F6F8FB;
+  --wis-surface: #FFFFFF;
+  --wis-surface-subtle: #EEF3F8;
+  --wis-text: #172F42;
+  --wis-text-muted: #526579;
+  --wis-border: #D9E2EC;
+  --wis-border-control: #7D8EA0;
+  --wis-action: #0068A8;
+  --wis-action-hover: #005A91;
+  --wis-on-action: #FFFFFF;
+  --wis-link: #0068A8;
+  --wis-link-hover: #005A91;
+  --wis-focus: #0068A8;
+  --wis-selection: #101E2A;
+  --wis-on-selection: #FFFFFF;
+  --wis-shadow: 0 12px 36px rgb(16 30 42 / 8%);
+  --wis-logo-light-display: block;
+  --wis-logo-dark-display: none;
+}
+
+/* A system preference never overrides an explicit light theme. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]),
+  [data-theme="auto"] {
+    color-scheme: dark;
+    --wis-bg: #101E2A;
+    --wis-surface: #172B3B;
+    --wis-surface-subtle: #21384A;
+    --wis-text: #FFFFFF;
+    --wis-text-muted: #B4C2D0;
+    --wis-border: #365064;
+    --wis-border-control: #71869A;
+    --wis-action: #079EF3;
+    --wis-action-hover: #49B9FA;
+    --wis-on-action: #101E2A;
+    --wis-link: #67C5FF;
+    --wis-link-hover: #A3DEFF;
+    --wis-focus: #FF654F;
+    --wis-selection: #079EF3;
+    --wis-on-selection: #101E2A;
+    --wis-shadow: 0 12px 36px rgb(0 0 0 / 24%);
+    --wis-logo-light-display: none;
+    --wis-logo-dark-display: block;
+  }
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --wis-bg: #101E2A;
+  --wis-surface: #172B3B;
+  --wis-surface-subtle: #21384A;
+  --wis-text: #FFFFFF;
+  --wis-text-muted: #B4C2D0;
+  --wis-border: #365064;
+  --wis-border-control: #71869A;
+  --wis-action: #079EF3;
+  --wis-action-hover: #49B9FA;
+  --wis-on-action: #101E2A;
+  --wis-link: #67C5FF;
+  --wis-link-hover: #A3DEFF;
+  --wis-focus: #FF654F;
+  --wis-selection: #079EF3;
+  --wis-on-selection: #101E2A;
+  --wis-shadow: 0 12px 36px rgb(0 0 0 / 24%);
+  --wis-logo-light-display: none;
+  --wis-logo-dark-display: block;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --wis-text-h1: 4rem;
+    --wis-leading-h1: 4.25rem;
+    --wis-text-h2: 2.5rem;
+    --wis-leading-h2: 3rem;
+  }
+}
+
+.wis-brand {
+  color: var(--wis-text);
+  background: var(--wis-bg);
+  font-family: var(--wis-font-body);
+  font-size: var(--wis-text-body);
+  line-height: var(--wis-leading-body);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.wis-brand,
+.wis-brand *,
+.wis-brand *::before,
+.wis-brand *::after {
+  box-sizing: border-box;
+}
+
+.wis-brand ::selection {
+  background: var(--wis-selection);
+  color: var(--wis-on-selection);
+}
+
+.wis-container {
+  width: 100%;
+  max-width: var(--wis-container);
+  margin-inline: auto;
+  padding-inline: var(--wis-page-gutter);
+}
+
+.wis-h1,
+.wis-h2,
+.wis-h3 {
+  margin: 0;
+  font-family: var(--wis-font-display);
+  font-weight: var(--wis-weight-bold);
+  color: var(--wis-text);
+  overflow-wrap: break-word;
+}
+
+.wis-h1 { font-size: var(--wis-text-h1); line-height: var(--wis-leading-h1); letter-spacing: var(--wis-tracking-display); }
+.wis-h2 { font-size: var(--wis-text-h2); line-height: var(--wis-leading-h2); letter-spacing: -0.02em; }
+.wis-h3 { font-size: var(--wis-text-h3); line-height: var(--wis-leading-h3); letter-spacing: -0.015em; font-weight: var(--wis-weight-semibold); }
+.wis-body { font-size: var(--wis-text-body); line-height: var(--wis-leading-body); }
+.wis-small { font-size: var(--wis-text-small); line-height: var(--wis-leading-small); }
+.wis-muted { color: var(--wis-text-muted); }
+.wis-code { font-family: var(--wis-font-code); font-size: 0.875em; font-weight: 400; }
+.wis-measure { max-width: var(--wis-reading-width); }
+
+.wis-link {
+  color: var(--wis-link);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.2em;
+}
+
+.wis-link:hover { color: var(--wis-link-hover); }
+
+.wis-card {
+  color: var(--wis-text);
+  background: var(--wis-surface);
+  border: 1px solid var(--wis-border);
+  border-radius: var(--wis-radius-large);
+  padding: var(--wis-space-6);
+  box-shadow: var(--wis-shadow);
+}
+
+.wis-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wis-space-2);
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--wis-radius-small);
+  background: var(--wis-action);
+  color: var(--wis-on-action);
+  font: 600 1rem/1.25 var(--wis-font-body);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--wis-duration-fast) var(--wis-ease), color var(--wis-duration-fast) var(--wis-ease);
+}
+
+.wis-button:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--wis-action-hover); }
+.wis-button--secondary { background: transparent; color: var(--wis-text); border-color: var(--wis-border-control); }
+.wis-button--secondary:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--wis-surface-subtle); }
+.wis-button:disabled { cursor: not-allowed; opacity: 0.6; }
+
+.wis-field-label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+.wis-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--wis-border-control);
+  border-radius: var(--wis-radius-small);
+  color: var(--wis-text);
+  background: var(--wis-surface);
+  font: inherit;
+}
+.wis-input::placeholder { color: var(--wis-text-muted); opacity: 1; }
+
+.wis-button:focus-visible,
+.wis-link:focus-visible,
+.wis-input:focus-visible,
+.wis-brand a:focus-visible,
+.wis-brand button:focus-visible,
+.wis-brand select:focus-visible {
+  outline: 3px solid var(--wis-focus);
+  outline-offset: 3px;
+}
+
+/* The two SVGs share one accessible name. CSS chooses the visible one. */
+.wis-logo {
+  display: inline-block;
+  max-width: 100%;
+  flex-shrink: 0;
+  vertical-align: middle;
+  line-height: 0;
+}
+.wis-logo img { width: 100%; height: auto; vertical-align: middle; }
+.wis-logo__on-light { display: var(--wis-logo-light-display); }
+.wis-logo__on-dark { display: var(--wis-logo-dark-display); }
+.wis-logo[data-logo-theme="light"] { --wis-logo-light-display: block; --wis-logo-dark-display: none; }
+.wis-logo[data-logo-theme="dark"] { --wis-logo-light-display: none; --wis-logo-dark-display: block; }
+
+.wis-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --wis-duration-fast: 0ms; --wis-duration-standard: 0ms; }
+  .wis-brand, .wis-brand * { scroll-behavior: auto; }
+}
+
+@media (forced-colors: active) {
+  .wis-button { border-color: ButtonText; }
+  .wis-button:focus-visible,
+  .wis-link:focus-visible,
+  .wis-input:focus-visible { outline-color: Highlight; }
+}

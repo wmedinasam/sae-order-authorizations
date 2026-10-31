@@ -1,0 +1,94 @@
+{
+  "brand": "WIS Dev Code",
+  "version": "1.0.0",
+  "format": "Portable descriptive token map; not a framework preset",
+  "colorSpace": "sRGB",
+  "palette": {
+    "navy": "#101E2A",
+    "ink": "#172F42",
+    "azure": "#079EF3",
+    "coral": "#FF654F",
+    "white": "#FFFFFF",
+    "offwhite": "#F6F8FB"
+  },
+  "typography": {
+    "display": {
+      "family": "Montserrat",
+      "fallback": "system-ui, -apple-system, Segoe UI, sans-serif",
+      "weights": [600, 700],
+      "fontFile": "/brand/fonts/Montserrat/Montserrat-Variable.woff2"
+    },
+    "body": {
+      "family": "Inter",
+      "fallback": "system-ui, -apple-system, Segoe UI, sans-serif",
+      "weights": [400, 500, 600],
+      "fontFile": "/brand/fonts/Inter/Inter-Variable.woff2"
+    },
+    "code": {
+      "family": "JetBrains Mono",
+      "fallback": "ui-monospace, SFMono-Regular, Consolas, monospace",
+      "weights": [400],
+      "optional": true,
+      "fontFile": "/brand/fonts/JetBrainsMono/JetBrainsMono-Variable.woff2"
+    },
+    "scale": {
+      "h1": { "mobileRem": 2.5, "mobileLineHeightRem": 2.75, "desktopRem": 4, "desktopLineHeightRem": 4.25, "weight": 700, "letterSpacingEm": -0.025 },
+      "h2": { "mobileRem": 2, "mobileLineHeightRem": 2.5, "desktopRem": 2.5, "desktopLineHeightRem": 3, "weight": 700, "letterSpacingEm": -0.02 },
+      "h3": { "sizeRem": 1.5, "lineHeightRem": 2, "weight": 600, "letterSpacingEm": -0.015 },
+      "body": { "sizeRem": 1, "lineHeightRem": 1.625, "weight": 400 },
+      "small": { "sizeRem": 0.875, "lineHeightRem": 1.375, "weight": 400 },
+      "caption": { "sizeRem": 0.75, "lineHeightRem": 1.125, "weight": 500 }
+    },
+    "desktopBreakpointRem": 48
+  },
+  "themes": {
+    "light": {
+      "bg": "#F6F8FB",
+      "surface": "#FFFFFF",
+      "surfaceSubtle": "#EEF3F8",
+      "text": "#172F42",
+      "textMuted": "#526579",
+      "border": "#D9E2EC",
+      "borderControl": "#7D8EA0",
+      "action": "#0068A8",
+      "actionHover": "#005A91",
+      "onAction": "#FFFFFF",
+      "link": "#0068A8",
+      "linkHover": "#005A91",
+      "focus": "#0068A8",
+      "selection": "#101E2A",
+      "onSelection": "#FFFFFF",
+      "shadow": "0 12px 36px rgb(16 30 42 / 8%)"
+    },
+    "dark": {
+      "bg": "#101E2A",
+      "surface": "#172B3B",
+      "surfaceSubtle": "#21384A",
+      "text": "#FFFFFF",
+      "textMuted": "#B4C2D0",
+      "border": "#365064",
+      "borderControl": "#71869A",
+      "action": "#079EF3",
+      "actionHover": "#49B9FA",
+      "onAction": "#101E2A",
+      "link": "#67C5FF",
+      "linkHover": "#A3DEFF",
+      "focus": "#FF654F",
+      "selection": "#079EF3",
+      "onSelection": "#101E2A",
+      "shadow": "0 12px 36px rgb(0 0 0 / 24%)"
+    }
+  },
+  "spacingRem": { "1": 0.25, "2": 0.5, "3": 0.75, "4": 1, "5": 1.5, "6": 2, "7": 3, "8": 4, "9": 6 },
+  "radiusRem": { "small": 0.5, "medium": 0.875, "large": 1.25 },
+  "radiusPillPx": 999,
+  "layout": { "maxWidthRem": 77.5, "readingWidthCh": 68, "pageGutter": "clamp(1.25rem, 4vw, 3rem)", "interactiveMinHeightPx": 44 },
+  "motion": { "fastMs": 140, "standardMs": 220, "easing": "cubic-bezier(0.2, 0.8, 0.2, 1)", "reducedMotionDurationMs": 0 },
+  "logo": {
+    "assetBasePath": "/brand/logos/svg",
+    "horizontal": { "viewBox": [0, 0, 1200, 360], "minimumWidthPx": 160, "sizesPx": { "sm": 180, "md": 240, "lg": 360 } },
+    "stacked": { "viewBox": [0, 0, 800, 800], "minimumWidthPx": 140, "sizesPx": { "sm": 160, "md": 240, "lg": 360 } },
+    "icon": { "viewBox": [0, 0, 800, 800], "minimumWidthPx": 24, "sizesPx": { "sm": 32, "md": 48, "lg": 80 } },
+    "themes": ["light", "dark", "auto"]
+  }
+}

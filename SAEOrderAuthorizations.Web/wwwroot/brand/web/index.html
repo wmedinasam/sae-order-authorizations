@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es" data-theme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#F6F8FB" data-wis-theme-color>
+  <title>WIS Dev Code — Catálogo de marca</title>
+  <link rel="icon" type="image/svg+xml" href="../web-icons/favicon.svg">
+  <script src="theme-init.js"></script>
+  <link rel="stylesheet" href="brand-tokens.css">
+  <style>
+    body { margin: 0; }
+    .catalog-header { border-bottom: 1px solid var(--wis-border); background: var(--wis-surface); }
+    .catalog-top { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding-block: 1.25rem; flex-wrap: wrap; }
+    .catalog-theme { display: flex; align-items: center; gap: 0.75rem; }
+    .catalog-theme select { width: auto; min-width: 9rem; }
+    .catalog-hero { padding-block: 4.5rem 3rem; }
+    .catalog-eyebrow { font: 500 0.75rem/1.5 var(--wis-font-code); text-transform: uppercase; letter-spacing: 0.1em; color: var(--wis-text-muted); margin: 0 0 1.5rem; }
+    .catalog-lead { margin: 1.5rem 0 0; max-width: 54ch; color: var(--wis-text-muted); }
+    .catalog-section { padding-block: 2rem 3rem; }
+    .catalog-section-head { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem; }
+    .catalog-index { font: 400 0.875rem/1.5 var(--wis-font-code); color: var(--wis-text-muted); }
+    .catalog-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+    .catalog-board { margin: 0; border: 1px solid var(--wis-border); border-radius: 1.25rem; overflow: hidden; color: var(--wis-text); background: var(--wis-surface); }
+    .catalog-board[data-theme="dark"] { background: #101E2A; }
+    .catalog-board[data-theme="light"] { background: #FFFFFF; }
+    .catalog-art { display: grid; place-items: center; min-height: 240px; padding: 2rem; }
+    .catalog-art img { display: block; max-width: 100%; height: auto; }
+    .catalog-art--stacked { min-height: 280px; }
+    .catalog-caption { display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: 1rem 1.5rem; border-top: 1px solid var(--wis-border); font-size: 0.75rem; line-height: 1.5; }
+    .catalog-caption span { color: var(--wis-text-muted); }
+    .catalog-symbols { display: flex; align-items: center; justify-content: center; gap: 2rem; min-height: 160px; flex-wrap: wrap; }
+    .catalog-symbols figure { margin: 0; text-align: center; }
+    .catalog-symbols figcaption { font: 400 0.6875rem/1.5 var(--wis-font-code); color: var(--wis-text-muted); margin-top: 1rem; }
+    .catalog-swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+    .catalog-swatch { border: 1px solid var(--wis-border); border-radius: 0.875rem; overflow: hidden; background: var(--wis-surface); }
+    .catalog-chip { min-height: 120px; }
+    .catalog-swatch p { margin: 0; padding: 1rem 1rem 0; font-weight: 600; }
+    .catalog-swatch code { display: block; padding: 0.375rem 1rem 1rem; color: var(--wis-text-muted); font: 400 0.75rem/1.5 var(--wis-font-code); }
+    .catalog-note { margin: 1.25rem 0 0; color: var(--wis-text-muted); font-size: 0.875rem; line-height: 1.6; }
+    .catalog-type { padding: 2rem; background: var(--wis-surface); border: 1px solid var(--wis-border); border-radius: 1.25rem; }
+    .catalog-type-label { font: 500 0.75rem/1.5 var(--wis-font-code); color: var(--wis-text-muted); margin: 0 0 1rem; }
+    .catalog-type + .catalog-type { margin-top: 1.25rem; }
+    .catalog-alphabet { margin: 1rem 0 0; color: var(--wis-text-muted); overflow-wrap: anywhere; }
+    .catalog-components { display: grid; gap: 1.25rem; }
+    .catalog-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .catalog-status { min-height: 1.375rem; margin: 0; color: var(--wis-text-muted); }
+    .catalog-footer { margin-top: 1rem; padding-block: 2rem; border-top: 1px solid var(--wis-border); color: var(--wis-text-muted); font-size: 0.75rem; }
+    @media (max-width: 42rem) {
+      .catalog-grid, .catalog-swatches { grid-template-columns: 1fr; }
+      .catalog-swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .catalog-hero { padding-top: 3rem; }
+      .catalog-art { min-height: 190px; padding: 1.5rem; }
+      .catalog-caption { padding-inline: 1rem; }
+      .catalog-type { padding: 1.5rem; }
+    }
+    @media print {
+      .catalog-theme { display: none; }
+      .catalog-board, .catalog-type, .catalog-swatch { break-inside: avoid; }
+      .catalog-hero { padding-block: 2rem; }
+    }
+  </style>
+</head>
+<body class="wis-brand">
+  <header class="catalog-header">
+    <div class="wis-container catalog-top">
+      <span class="wis-logo" role="img" aria-label="WIS Dev Code" style="width: 210px; aspect-ratio: 10 / 3;">
+        <img class="wis-logo__on-light" src="../logos/svg/wis-logo-horizontal-on-light.svg" width="1200" height="360" alt="">
+        <img class="wis-logo__on-dark" src="../logos/svg/wis-logo-horizontal-on-dark.svg" width="1200" height="360" alt="">
+      </span>
+      <div class="catalog-theme">
+        <label class="wis-small" for="catalog-theme">Apariencia</label>
+        <select class="wis-input" id="catalog-theme">
+          <option value="auto">Sistema</option>
+          <option value="light">Claro</option>
+          <option value="dark">Oscuro</option>
+        </select>
+      </div>
+    </div>
+  </header>
+  <main class="wis-container">
+    <section class="catalog-hero">
+      <p class="catalog-eyebrow">WIS Dev Code / Brand kit / 1.0</p>
+      <h1 class="wis-h1">Sistema de<br>identidad visual.</h1>
+      <p class="catalog-lead">Logotipos, color y tipografía. Una referencia para integrar la marca en tu sitio con una presencia consistente en claro y oscuro.</p>
+    </section>
+
+    <section class="catalog-section" id="assets" aria-labelledby="logos-title">
+      <div class="catalog-section-head"><span class="catalog-index">01</span><h2 class="wis-h3" id="logos-title">La marca en su forma principal</h2></div>
+      <div class="catalog-grid">
+        <figure class="catalog-board" data-theme="light">
+          <div class="catalog-art"><img src="../logos/svg/wis-logo-horizontal-on-light.svg" width="1200" height="360" alt="WIS Dev Code, logo horizontal sobre fondo claro" style="width: 400px;"></div>
+          <figcaption class="catalog-caption">Horizontal · claro <span>SVG transparente</span></figcaption>
+        </figure>
+        <figure class="catalog-board" data-theme="dark">
+          <div class="catalog-art"><img src="../logos/svg/wis-logo-horizontal-on-dark.svg" width="1200" height="360" alt="WIS Dev Code, logo horizontal sobre fondo oscuro" style="width: 400px;"></div>
+          <figcaption class="catalog-caption">Horizontal · oscuro <span>SVG transparente</span></figcaption>
+        </figure>
+        <figure class="catalog-board" data-theme="light">
+          <div class="catalog-art catalog-art--stacked"><img src="../logos/svg/wis-logo-stacked-on-light.svg" width="800" height="800" alt="WIS Dev Code, composición vertical sobre fondo claro" style="width: 240px;"></div>
+          <figcaption class="catalog-caption">Vertical · claro <span>SVG transparente</span></figcaption>
+        </figure>
+        <figure class="catalog-board" data-theme="dark">
+          <div class="catalog-art catalog-art--stacked"><img src="../logos/svg/wis-logo-stacked-on-dark.svg" width="800" height="800" alt="WIS Dev Code, composición vertical sobre fondo oscuro" style="width: 240px;"></div>
+          <figcaption class="catalog-caption">Vertical · oscuro <span>SVG transparente</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="catalog-section" aria-labelledby="symbol-title">
+      <div class="catalog-section-head"><span class="catalog-index">02</span><h2 class="wis-h3" id="symbol-title">El símbolo, a distintas escalas</h2></div>
+      <div class="catalog-grid">
+        <div class="catalog-board catalog-art catalog-symbols" data-theme="light">
+          <figure><img src="../logos/svg/wis-symbol-on-light.svg" width="32" height="32" alt="Símbolo WIS"><figcaption>32 px</figcaption></figure>
+          <figure><img src="../logos/svg/wis-symbol-on-light.svg" width="48" height="48" alt="Símbolo WIS"><figcaption>48 px</figcaption></figure>
+          <figure><img src="../logos/svg/wis-symbol-on-light.svg" width="80" height="80" alt="Símbolo WIS"><figcaption>80 px</figcaption></figure>
+        </div>
+        <div class="catalog-board catalog-art catalog-symbols" data-theme="dark">
+          <figure><img src="../logos/svg/wis-symbol-on-dark.svg" width="32" height="32" alt="Símbolo WIS"><figcaption>32 px</figcaption></figure>
+          <figure><img src="../logos/svg/wis-symbol-on-dark.svg" width="48" height="48" alt="Símbolo WIS"><figcaption>48 px</figcaption></figure>
+          <figure><img src="../logos/svg/wis-symbol-on-dark.svg" width="80" height="80" alt="Símbolo WIS"><figcaption>80 px</figcaption></figure>
+        </div>
+      </div>
+      <p class="catalog-note">Para la pestaña del navegador utiliza el favicon específico. Conserva la proporción y el espacio incluido en los archivos maestros.</p>
+    </section>
+
+    <section class="catalog-section" aria-labelledby="palette-title">
+      <div class="catalog-section-head"><span class="catalog-index">03</span><h2 class="wis-h3" id="palette-title">Paleta de identidad</h2></div>
+      <div class="catalog-swatches">
+        <article class="catalog-swatch"><div class="catalog-chip" style="background: #101E2A;"></div><p>Navy</p><code>#101E2A</code></article>
+        <article class="catalog-swatch"><div class="catalog-chip" style="background: #079EF3;"></div><p>Azure</p><code>#079EF3</code></article>
+        <article class="catalog-swatch"><div class="catalog-chip" style="background: #FF654F;"></div><p>Coral</p><code>#FF654F</code></article>
+        <article class="catalog-swatch"><div class="catalog-chip" style="background: #FFFFFF;"></div><p>Blanco</p><code>#FFFFFF</code></article>
+      </div>
+      <p class="catalog-note">En interfaces claras, el azul funcional #0068A8 permite botones con texto blanco legible. En interfaces oscuras, Azure lleva texto Navy. Los colores originales del símbolo se conservan.</p>
+    </section>
+
+    <section class="catalog-section" aria-labelledby="type-title">
+      <div class="catalog-section-head"><span class="catalog-index">04</span><h2 class="wis-h3" id="type-title">Tipografía con jerarquía</h2></div>
+      <article class="catalog-type">
+        <p class="catalog-type-label">Montserrat / Títulos / 600–700</p>
+        <p class="wis-h2">Jerarquía, ritmo y claridad.</p>
+        <p class="catalog-alphabet" style="font-family: var(--wis-font-display);">ABCDEFGHIJKLMNÑOPQRSTUVWXYZ<br>abcdefghijklmnñopqrstuvwxyz · 0123456789</p>
+      </article>
+      <article class="catalog-type">
+        <p class="catalog-type-label">Inter / Texto y controles / 400–600</p>
+        <p class="wis-body wis-measure">Una estructura fácil de recorrer da espacio a cada idea. Usa párrafos breves, títulos concretos y acciones que indiquen con claridad qué sucede al seleccionarlas.</p>
+        <p class="catalog-alphabet">ÁÉÍÓÚ · áéíóú · ¿Cómo empezamos? · ¡Vamos!</p>
+      </article>
+      <article class="catalog-type">
+        <p class="catalog-type-label">JetBrains Mono / Código / 400 / Opcional</p>
+        <code class="wis-code" style="font-size: 1rem;">const brand = "WIS Dev Code";</code>
+      </article>
+    </section>
+
+    <section class="catalog-section" aria-labelledby="ui-title">
+      <div class="catalog-section-head"><span class="catalog-index">05</span><h2 class="wis-h3" id="ui-title">Componentes para la web</h2></div>
+      <div class="wis-card catalog-components">
+        <div class="catalog-actions">
+          <button class="wis-button" type="button" data-demo="principal">Botón principal</button>
+          <button class="wis-button wis-button--secondary" type="button" data-demo="secundario">Botón secundario</button>
+        </div>
+        <div style="max-width: 32rem;">
+          <label for="project-demo" class="wis-field-label">Nombre del proyecto</label>
+          <input class="wis-input" id="project-demo" type="text" placeholder="Ejemplo: portafolio" aria-describedby="project-help">
+          <p id="project-help" class="wis-small wis-muted">Campo de muestra; la información no se envía ni se guarda.</p>
+        </div>
+        <a class="wis-link" href="#assets">Ver variantes de logotipo</a>
+        <p class="wis-small catalog-status" role="status" id="demo-status">Puedes probar el foco con la tecla Tab y alternar la apariencia desde la cabecera.</p>
+      </div>
+    </section>
+  </main>
+  <footer class="catalog-footer"><div class="wis-container">WIS Dev Code · Catálogo de marca 1.0 · Referencia de uso e integración</div></footer>
+  <script>
+    const themePicker = document.getElementById("catalog-theme");
+    if (window.WISBrandTheme) {
+      themePicker.value = window.WISBrandTheme.get();
+      themePicker.addEventListener("change", () => window.WISBrandTheme.set(themePicker.value));
+    }
+    document.querySelectorAll("[data-demo]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.getElementById("demo-status").textContent = "Seleccionaste el botón " + button.dataset.demo + ". Esta es una vista de ejemplo.";
+      });
+    });
+  </script>
+</body>
+</html>
