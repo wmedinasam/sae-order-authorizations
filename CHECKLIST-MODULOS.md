@@ -20,3 +20,17 @@ Reglas: solo create y update; soft delete (`Estado = false`), nunca `DELETE`. So
 - [ ] I2 Build integrado + recorrido en navegador (admin) de los 4 módulos
 - [ ] I3 Accesos denegados para operador/aprobador; pruebas cruzadas (usuario/rol/empresa inactivos)
 - [ ] I4 `CLAUDE.md` actualizado
+
+## Fase 3 · Pulido de UI
+- [ ] U1 Componente `IconButton` + tokens de color y tooltip
+- [ ] U2 Íconos en Empresas, Roles, Usuarios y Configuración (Nuevo, Editar, Inactivar/Reactivar, Guardar)
+- [ ] U3 Órdenes: Consultar con ícono; Autorizar y Rechazar con ícono + texto + color
+- [ ] U4 Cerrar del `WisModal` con ícono
+- [ ] U5 Logo responsivo en el sidebar (no excede el ancho del panel, también en móvil)
+- [ ] U6 Verificación visual: escritorio y móvil, tooltips, teclado
+
+Datos de prueba conservados en la BD (inactivos, no se borran):
+- Empresa `TEST-M1-Empresa` (base `TEST_M1_BASE`, sufijo `TM1`)
+- Rol `TEST-M2-rol` (con su fila en `ROL_EMPRESA`)
+- Usuario `test-u1` (nombre `TEST-U1 Editado`, rol Operador)
+- Clave de configuración `TEST-K1`
