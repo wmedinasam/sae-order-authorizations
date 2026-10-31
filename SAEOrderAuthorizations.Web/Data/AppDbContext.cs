@@ -23,6 +23,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Direccion).HasMaxLength(50);
             e.Property(x => x.DbSae).HasColumnName("DB_SAE").HasMaxLength(50);
             e.Property(x => x.Sufijo).HasMaxLength(10);
+            e.HasData(new Empresa { Id = 1, Nombre = "Empresa 01", DbSae = "SAE80Empre01", Sufijo = "01", Estado = true });
         });
 
         modelBuilder.Entity<Rol>(e =>
@@ -31,6 +32,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Nombre).HasMaxLength(50);
             e.Property(x => x.Descripcion).HasMaxLength(50);
             e.Property(x => x.EsAdministrador).HasColumnName("EsAdministrador");
+            e.HasData(new Rol { Id = 1, Nombre = "Admin", Descripcion = "Administrador", EsAdministrador = true, Estado = true });
         });
 
         // Legacy no define clave primaria en ROL_EMPRESA; se usa la pareja como clave compuesta.
@@ -38,6 +40,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             e.ToTable("ROL_EMPRESA");
             e.HasKey(x => new { x.RolId, x.EmpresaId });
+            e.HasData(new RolEmpresa { RolId = 1, EmpresaId = 1 });
         });
 
         modelBuilder.Entity<Usuario>(e =>
@@ -51,6 +54,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.RolId).HasColumnName("ROL_ID");
             e.Property(x => x.ActivatedDate).HasColumnName("ACTIVATED_DATE");
             e.Property(x => x.UserActivates).HasColumnName("USER_ACTIVATES");
+            // Contraseña en claro (temporal). El script maestro traía el cifrado AES legacy.
+            e.HasData(new Usuario
+            {
+                Id = 1, FullName = "administrador", NickName = "admin", Password = "123",
+                Email = "admin@admin.com", SendMail = false, RolId = 1, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1
+            });
         });
 
         modelBuilder.Entity<Configuracion>(e =>
@@ -58,6 +67,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.ToTable("WIS_CONFIGURATION");
             e.Property(x => x.Key).HasColumnName("KEY").HasMaxLength(25);
             e.Property(x => x.Value).HasColumnName("VALUE").HasMaxLength(255);
+            e.HasData(
+                new Configuracion { Id = 1, Key = "MailFrom", Value = "" },
+                new Configuracion { Id = 2, Key = "MailPassword", Value = "" },
+                new Configuracion { Id = 3, Key = "MailSubject", Value = "" },
+                new Configuracion { Id = 4, Key = "MailBody", Value = "" });
         });
 
         modelBuilder.Entity<OrdenCompra>(e =>

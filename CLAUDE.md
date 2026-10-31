@@ -30,7 +30,7 @@ Legacy: solo Windows + Visual Studio; sin tests, linter ni CI. Depende de `Newto
 
 ## Estado del proyecto nuevo
 
-`Data/AppDbContext.cs` mapea las 7 tablas legacy de `ORDENES_COMPRA` (`EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USER`, `WIS_CONFIGURATION`, `WIS_Orders`, `WIS_WorkLog`) con entidades en `Data/Entities/`. La migración `InicialLegacy` crea esas tablas; se aplicó sobre una BD vacía. Pendiente: vistas y SPs legacy (`WIS_viewLogView`, `Sp_GetOrders`, `Sp_OrderHeader`, `Sp_OrderDetail`), datos semilla (rol Admin, usuario administrador), autenticación, páginas y correo.
+`Data/AppDbContext.cs` mapea las 7 tablas legacy de `ORDENES_COMPRA` (`EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USER`, `WIS_CONFIGURATION`, `WIS_Orders`, `WIS_WorkLog`) con entidades en `Data/Entities/`. La migración `InicialLegacy` crea esas tablas y `AgregarSemillaLegacy` inserta la semilla del script maestro (rol Admin, usuario `administrador` y 4 claves de correo vacías). `SemillaEmpresa` agrega la empresa 01 (`DB_SAE` = `SAE80Empre01`, sufijo `01`) y la asocia al rol Admin en `ROL_EMPRESA`. Ambas se aplicaron sobre una BD vacía. Pendiente: vistas y SPs legacy (`WIS_viewLogView`, `Sp_GetOrders`, `Sp_OrderHeader`, `Sp_OrderDetail`), autenticación (la contraseña semilla es el cifrado AES legacy, no un hash), páginas y correo.
 - El script maestro es la fuente de verdad del esquema; los `SCRIPTS/TABLE/*.sql` apuntan a `SAE70Empre01` y no coinciden (p. ej. `WIS_USER` usa `ROL` ahí, `ROL_ID` en el maestro).
 - Una BD legacy con tablas ya existentes no puede correr `InicialLegacy` tal cual: fallaría al crear tablas. Antes de aplicarla ahí, marcarla como aplicada en `__EFMigrationsHistory` o añadir guardas.
 
@@ -59,3 +59,10 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 - Credenciales de BD y de correo en un archivo local cifrado → mover a configuración de .NET (`appsettings` + secretos).
 - Lógica de datos dentro de los `MODEL` y code-behind → separar en servicios/componentes Blazor.
 - Nombres con typos heredados (`PurshaseOrderModel`, `SystemConfugurationModel`): no copiarlos.
+
+## Autenticación (proyecto nuevo)
+
+- Cookie auth (`AddCookie`, `LoginPath = /login`) con `FallbackPolicy` que exige sesión: todo endpoint requiere login salvo `[AllowAnonymous]`.
+- `Components/Pages/Login.razor` valida contra `Usuarios` + `Roles` (rol con `Estado = true`) y firma la cookie. Login es SSR estático (`ExcludeFromInteractiveRouting`) porque `SignInAsync` necesita `HttpContext`.
+- `POST /auth/logout` cierra la sesión. El dashboard es `Components/Pages/Home.razor`.
+- **Deuda temporal:** la contraseña se compara en claro (`WIS_USER.PASSWORD`). Pendiente: hash. El admin semilla usa `123` (migración `SeedAdminPasswordClaro`).

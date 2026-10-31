@@ -1,7 +1,12 @@
-﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
+@page "/"
+@attribute [Authorize]
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Inicio</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Dashboard</h1>
 
-Welcome to your new app.
+<form method="post" action="/auth/logout">
+    <AntiforgeryToken />
+    <button type="submit" class="btn btn-outline-secondary">Cerrar sesión</button>
+</form>

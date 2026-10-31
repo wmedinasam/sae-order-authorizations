@@ -85,6 +85,32 @@ namespace SAEOrderAuthorizations.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WIS_CONFIGURATION", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Key = "MailFrom",
+                            Value = ""
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Key = "MailPassword",
+                            Value = ""
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Key = "MailSubject",
+                            Value = ""
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Key = "MailBody",
+                            Value = ""
+                        });
                 });
 
             modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.Empresa", b =>
@@ -118,6 +144,16 @@ namespace SAEOrderAuthorizations.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EMPRESA", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DbSae = "SAE80Empre01",
+                            Estado = true,
+                            Nombre = "Empresa 01",
+                            Sufijo = "01"
+                        });
                 });
 
             modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.OrdenCompra", b =>
@@ -183,6 +219,16 @@ namespace SAEOrderAuthorizations.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ROL", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Descripcion = "Administrador",
+                            EsAdministrador = true,
+                            Estado = true,
+                            Nombre = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.RolEmpresa", b =>
@@ -196,6 +242,13 @@ namespace SAEOrderAuthorizations.Web.Migrations
                     b.HasKey("RolId", "EmpresaId");
 
                     b.ToTable("ROL_EMPRESA", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            RolId = 1,
+                            EmpresaId = 1
+                        });
                 });
 
             modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.Usuario", b =>
@@ -245,6 +298,20 @@ namespace SAEOrderAuthorizations.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WIS_USER", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ActivatedDate = new DateTime(2026, 10, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@admin.com",
+                            FullName = "administrador",
+                            NickName = "admin",
+                            Password = "123",
+                            RolId = 1,
+                            SendMail = false,
+                            UserActivates = 1
+                        });
                 });
 #pragma warning restore 612, 618
         }
