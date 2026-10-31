@@ -73,3 +73,11 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 - Tema **oscuro por defecto**: `App.razor` fija `data-theme="dark"` y el `body` usa `wis-brand`. Las vistas usan las clases `wis-*` (`wis-card`, `wis-button`, `wis-input`, `wis-h2`…) y tokens `--wis-*` de `brand-tokens.css`.
 - Logo en fondo oscuro: `brand/logos/svg/wis-logo-horizontal-on-dark.svg`.
 - `UseStaticFiles()` va antes de `UseAuthentication()` para que los assets de marca sean públicos; el resto de rutas sigue protegido.
+
+## Menú y autorización por rol (proyecto nuevo)
+
+- Política `Administrador` = claim `EsAdministrador` = `True` (lo emite `Login.razor` desde `Rol.EsAdministrador`). Las páginas de administración (`Empresas`, `Usuarios`, `Roles`, `Configuracion`) llevan `[Authorize(Policy = "Administrador")]`. Un usuario sin permiso va a `/acceso-denegado`.
+- Layouts: `AuthLayout` (login, solo cabecera con logo) y `MainLayout` (barra lateral `NavMenu` + contenido). Todo módulo nuevo usa `MainLayout` por defecto.
+- El claim se fija al iniciar sesión: si cambia el rol de un usuario, debe volver a ingresar.
+- El menú oculta los enlaces de administración, pero la protección real está en la política de cada página.
+- Usuarios de prueba (dev, contraseña `123` en claro): `admin` (rol Admin, acceso total) y `operador` (rol Operador, sin acceso a módulos de administración). Ambos asignados a la empresa 01 en `ROL_EMPRESA`. Migración `SemillaOperador`.

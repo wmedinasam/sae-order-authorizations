@@ -16,14 +16,20 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(o =>
     {
         o.LoginPath = "/login";
+        o.AccessDeniedPath = "/acceso-denegado";
         o.Cookie.HttpOnly = true;
         o.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     });
 
 // Todo requiere sesión por defecto; solo lo marcado con [AllowAnonymous] es público.
-builder.Services.AddAuthorization(o => o.FallbackPolicy = new AuthorizationPolicyBuilder()
-    .RequireAuthenticatedUser()
-    .Build());
+builder.Services.AddAuthorization(o =>
+{
+    o.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    // Módulos de administración. El claim EsAdministrador se fija al iniciar sesión.
+    o.AddPolicy("Administrador", p => p.RequireClaim("EsAdministrador", "True"));
+});
 
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));

@@ -61,3 +61,85 @@ html, body {
     z-index: 1000;
 }
 #blazor-error-ui .dismiss { cursor: pointer; position: absolute; right: 0.75rem; top: 0.5rem; }
+
+/* Estructura de la app autenticada: barra lateral + contenido. */
+.wis-app {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 15rem 1fr;
+}
+
+.wis-sidebar {
+    background: var(--wis-surface);
+    border-right: 1px solid var(--wis-border);
+    padding: var(--wis-space-5) var(--wis-space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--wis-space-5);
+}
+
+.wis-sidebar-brand { padding: 0 var(--wis-space-2); }
+
+.wis-nav { display: flex; flex-direction: column; gap: var(--wis-space-1); }
+
+.wis-nav-section {
+    margin: var(--wis-space-4) 0 0;
+    padding: 0 var(--wis-space-3);
+    font-size: var(--wis-text-caption);
+    color: var(--wis-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.wis-nav-link {
+    padding: var(--wis-space-2) var(--wis-space-3);
+    border-radius: var(--wis-radius-small);
+    color: var(--wis-text);
+    text-decoration: none;
+}
+.wis-nav-link:hover { background: var(--wis-surface-subtle); }
+.wis-nav-link.active {
+    background: var(--wis-surface-subtle);
+    color: var(--wis-link);
+    font-weight: var(--wis-weight-semibold);
+}
+
+.wis-sidebar-footer { margin-top: auto; }
+.wis-sidebar-footer .wis-button { width: 100%; }
+
+.wis-main { min-width: 0; padding: var(--wis-space-7) var(--wis-page-gutter); }
+
+/* Menú hamburguesa: solo en pantallas pequeñas, sin JavaScript. */
+.wis-nav-toggle,
+.wis-nav-button { display: none; }
+
+@media (max-width: 48rem) {
+    .wis-app { grid-template-columns: 1fr; }
+
+    .wis-nav-button {
+        display: inline-flex;
+        position: fixed;
+        top: var(--wis-space-3);
+        left: var(--wis-space-3);
+        z-index: 20;
+        padding: var(--wis-space-2) var(--wis-space-3);
+        border-radius: var(--wis-radius-small);
+        background: var(--wis-action);
+        color: var(--wis-on-action);
+        font-weight: var(--wis-weight-semibold);
+        cursor: pointer;
+    }
+
+    .wis-sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 15rem;
+        z-index: 10;
+        transform: translateX(-100%);
+        transition: transform var(--wis-duration-standard) var(--wis-ease);
+    }
+
+    .wis-nav-toggle:checked ~ .wis-sidebar { transform: translateX(0); }
+
+    .wis-main { padding-top: 4rem; }
+}

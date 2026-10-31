@@ -32,7 +32,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Nombre).HasMaxLength(50);
             e.Property(x => x.Descripcion).HasMaxLength(50);
             e.Property(x => x.EsAdministrador).HasColumnName("EsAdministrador");
-            e.HasData(new Rol { Id = 1, Nombre = "Admin", Descripcion = "Administrador", EsAdministrador = true, Estado = true });
+            e.HasData(
+                new Rol { Id = 1, Nombre = "Admin", Descripcion = "Administrador", EsAdministrador = true, Estado = true },
+                new Rol { Id = 2, Nombre = "Operador", Descripcion = "Operador", EsAdministrador = false, Estado = true });
         });
 
         // Legacy no define clave primaria en ROL_EMPRESA; se usa la pareja como clave compuesta.
@@ -40,7 +42,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             e.ToTable("ROL_EMPRESA");
             e.HasKey(x => new { x.RolId, x.EmpresaId });
-            e.HasData(new RolEmpresa { RolId = 1, EmpresaId = 1 });
+            e.HasData(
+                new RolEmpresa { RolId = 1, EmpresaId = 1 },
+                new RolEmpresa { RolId = 2, EmpresaId = 1 });
         });
 
         modelBuilder.Entity<Usuario>(e =>
@@ -55,11 +59,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.ActivatedDate).HasColumnName("ACTIVATED_DATE");
             e.Property(x => x.UserActivates).HasColumnName("USER_ACTIVATES");
             // Contraseña en claro (temporal). El script maestro traía el cifrado AES legacy.
-            e.HasData(new Usuario
-            {
-                Id = 1, FullName = "administrador", NickName = "admin", Password = "123",
-                Email = "admin@admin.com", SendMail = false, RolId = 1, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1
-            });
+            e.HasData(
+                new Usuario
+                {
+                    Id = 1, FullName = "administrador", NickName = "admin", Password = "123",
+                    Email = "admin@admin.com", SendMail = false, RolId = 1, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1
+                },
+                new Usuario
+                {
+                    Id = 2, FullName = "operador", NickName = "operador", Password = "123",
+                    Email = "operador@admin.com", SendMail = false, RolId = 2, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1
+                });
         });
 
         modelBuilder.Entity<Configuracion>(e =>

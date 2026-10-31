@@ -1,6 +1,7 @@
 @page "/login"
 @attribute [AllowAnonymous]
 @attribute [ExcludeFromInteractiveRouting]
+@layout SAEOrderAuthorizations.Web.Components.Layout.AuthLayout
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
@@ -12,10 +13,6 @@
 @inject IHttpContextAccessor HttpAccessor
 
 <PageTitle>Iniciar sesión · WIS Dev Code</PageTitle>
-
-<header class="wis-logo-header">
-    <img src="brand/logos/svg/wis-logo-horizontal-on-dark.svg" width="240" height="72" alt="WIS Dev Code" />
-</header>
 
 <main class="wis-login-main">
     <section class="wis-card wis-login-card">

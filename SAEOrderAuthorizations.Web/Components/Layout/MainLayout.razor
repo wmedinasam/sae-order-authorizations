@@ -1,7 +1,16 @@
 @inherits LayoutComponentBase
 
-<div class="wis-page">
-    @Body
+<div class="wis-app">
+    <input type="checkbox" id="wis-nav-toggle" class="wis-nav-toggle" aria-hidden="true" />
+    <label for="wis-nav-toggle" class="wis-nav-button">Menú</label>
+
+    <aside class="wis-sidebar">
+        <NavMenu />
+    </aside>
+
+    <main class="wis-main">
+        @Body
+    </main>
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>

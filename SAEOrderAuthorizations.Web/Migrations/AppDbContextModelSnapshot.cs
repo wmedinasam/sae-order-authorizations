@@ -228,6 +228,14 @@ namespace SAEOrderAuthorizations.Web.Migrations
                             EsAdministrador = true,
                             Estado = true,
                             Nombre = "Admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Descripcion = "Operador",
+                            EsAdministrador = false,
+                            Estado = true,
+                            Nombre = "Operador"
                         });
                 });
 
@@ -247,6 +255,11 @@ namespace SAEOrderAuthorizations.Web.Migrations
                         new
                         {
                             RolId = 1,
+                            EmpresaId = 1
+                        },
+                        new
+                        {
+                            RolId = 2,
                             EmpresaId = 1
                         });
                 });
@@ -309,6 +322,18 @@ namespace SAEOrderAuthorizations.Web.Migrations
                             NickName = "admin",
                             Password = "123",
                             RolId = 1,
+                            SendMail = false,
+                            UserActivates = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ActivatedDate = new DateTime(2026, 10, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "operador@admin.com",
+                            FullName = "operador",
+                            NickName = "operador",
+                            Password = "123",
+                            RolId = 2,
                             SendMail = false,
                             UserActivates = 1
                         });

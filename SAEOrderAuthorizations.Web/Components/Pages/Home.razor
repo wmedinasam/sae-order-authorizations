@@ -5,11 +5,7 @@
 
 <PageTitle>Inicio · WIS Dev Code</PageTitle>
 
-<header class="wis-logo-header">
-    <img src="brand/logos/svg/wis-logo-horizontal-on-dark.svg" width="240" height="72" alt="WIS Dev Code" />
-</header>
-
-<main class="wis-container" style="padding-top: var(--wis-space-7);">
+<section class="wis-container">
     <section class="wis-card wis-stack">
         <div class="wis-user-bar">
             <div>
@@ -18,13 +14,9 @@
                     @nombre
                 </p>
             </div>
-            <form method="post" action="/auth/logout">
-                <AntiforgeryToken />
-                <button type="submit" class="wis-button wis-button--secondary">Cerrar sesión</button>
-            </form>
         </div>
     </section>
-</main>
+</section>
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
