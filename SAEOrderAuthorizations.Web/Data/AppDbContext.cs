@@ -60,22 +60,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.RolId).HasColumnName("ROL_ID");
             e.Property(x => x.ActivatedDate).HasColumnName("ACTIVATED_DATE");
             e.Property(x => x.UserActivates).HasColumnName("USER_ACTIVATES");
+            e.Property(x => x.Estado).HasColumnName("ESTADO").HasDefaultValue(true);
             // Contraseña en claro (temporal). El script maestro traía el cifrado AES legacy.
             e.HasData(
                 new Usuario
                 {
                     Id = 1, FullName = "administrador", NickName = "admin", Password = "123",
-                    Email = "admin@admin.com", SendMail = false, RolId = 1, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1
+                    Email = "admin@admin.com", SendMail = false, RolId = 1, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1, Estado = true
                 },
                 new Usuario
                 {
                     Id = 2, FullName = "operador", NickName = "operador", Password = "123",
-                    Email = "operador@admin.com", SendMail = false, RolId = 2, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1
+                    Email = "operador@admin.com", SendMail = false, RolId = 2, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1, Estado = true
                 },
                 new Usuario
                 {
                     Id = 3, FullName = "aprobador", NickName = "aprobador", Password = "123",
-                    Email = "aprobador@admin.com", SendMail = false, RolId = 3, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1
+                    Email = "aprobador@admin.com", SendMail = false, RolId = 3, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1, Estado = true
                 });
         });
 
@@ -84,11 +85,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.ToTable("WIS_CONFIGURATION");
             e.Property(x => x.Key).HasColumnName("KEY").HasMaxLength(25);
             e.Property(x => x.Value).HasColumnName("VALUE").HasMaxLength(255);
+            e.Property(x => x.Estado).HasColumnName("ESTADO").HasDefaultValue(true);
             e.HasData(
-                new Configuracion { Id = 1, Key = "MailFrom", Value = "" },
-                new Configuracion { Id = 2, Key = "MailPassword", Value = "" },
-                new Configuracion { Id = 3, Key = "MailSubject", Value = "" },
-                new Configuracion { Id = 4, Key = "MailBody", Value = "" });
+                new Configuracion { Id = 1, Key = "MailFrom", Value = "", Estado = true },
+                new Configuracion { Id = 2, Key = "MailPassword", Value = "", Estado = true },
+                new Configuracion { Id = 3, Key = "MailSubject", Value = "", Estado = true },
+                new Configuracion { Id = 4, Key = "MailBody", Value = "", Estado = true });
         });
 
         modelBuilder.Entity<OrdenCompra>(e =>

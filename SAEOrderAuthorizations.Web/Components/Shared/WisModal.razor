@@ -1,0 +1,17 @@
+<div class="wis-modal-overlay">
+    <div class="wis-modal" role="dialog" aria-modal="true" aria-labelledby="@tituloId">
+        <div class="wis-modal-header">
+            <h2 id="@tituloId" class="wis-h3">@Titulo</h2>
+            <button type="button" class="wis-button wis-button--secondary" @onclick="() => OnCerrar.InvokeAsync()">Cerrar</button>
+        </div>
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Titulo { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback OnCerrar { get; set; }
+
+    private readonly string tituloId = "modal-" + Guid.NewGuid().ToString("N")[..8];
+}

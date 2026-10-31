@@ -47,7 +47,7 @@
         // Contraseña en claro por ahora (decisión temporal; ver CLAUDE.md).
         var usuario = await (from u in Db.Usuarios
                              join r in Db.Roles on u.RolId equals r.Id
-                             where u.NickName == model.Nick && u.Password == model.Password && r.Estado == true
+                             where u.NickName == model.Nick && u.Password == model.Password && u.Estado && r.Estado == true
                              select new { u, r }).FirstOrDefaultAsync();
 
         if (usuario is null)

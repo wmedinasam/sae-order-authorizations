@@ -32,7 +32,12 @@ builder.Services.AddAuthorization(o =>
     o.AddPolicy("Aprobador", p => p.RequireRole("Aprobador"));
 });
 
-builder.Services.AddScoped<SAEOrderAuthorizations.Web.Services.OrdenesService>();
+// Registra como scoped todo servicio de Services/ (nombre terminado en Service).
+foreach (var tipo in typeof(Program).Assembly.GetTypes()
+    .Where(t => t.Namespace == "SAEOrderAuthorizations.Web.Services" && t.IsClass && !t.IsAbstract && t.Name.EndsWith("Service")))
+{
+    builder.Services.AddScoped(tipo);
+}
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 

@@ -1,15 +1,11 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @using SAEOrderAuthorizations.Web.Data.Entities
+@using SAEOrderAuthorizations.Web.Components.Shared
 @using SAEOrderAuthorizations.Web.Services
 @inject OrdenesService Ordenes
 
-<div class="wis-modal-overlay">
-    <div class="wis-modal" role="dialog" aria-modal="true" aria-labelledby="orden-titulo">
-        <div class="wis-modal-header">
-            <h2 id="orden-titulo" class="wis-h3">Orden @Orden.IdOrder.Trim()</h2>
-            <button type="button" class="wis-button wis-button--secondary" @onclick="() => OnCerrar.InvokeAsync()">Cerrar</button>
-        </div>
+<WisModal Titulo="@($"Orden {Orden.IdOrder.Trim()}")" OnCerrar="OnCerrar">
 
         @if (cabecera is not null)
         {
@@ -90,8 +86,7 @@
                 </div>
             </div>
         }
-    </div>
-</div>
+</WisModal>
 
 @code {
     [Parameter, EditorRequired] public OrdenSae Orden { get; set; } = default!;

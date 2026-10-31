@@ -11,4 +11,5 @@ public class Usuario
     public int? RolId { get; set; }
     public DateTime? ActivatedDate { get; set; }
     public int? UserActivates { get; set; }
+    public bool Estado { get; set; } = true;
 }

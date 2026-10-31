@@ -72,6 +72,12 @@ namespace SAEOrderAuthorizations.Web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Estado")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("ESTADO");
+
                     b.Property<string>("Key")
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)")
@@ -90,24 +96,28 @@ namespace SAEOrderAuthorizations.Web.Migrations
                         new
                         {
                             Id = 1,
+                            Estado = true,
                             Key = "MailFrom",
                             Value = ""
                         },
                         new
                         {
                             Id = 2,
+                            Estado = true,
                             Key = "MailPassword",
                             Value = ""
                         },
                         new
                         {
                             Id = 3,
+                            Estado = true,
                             Key = "MailSubject",
                             Value = ""
                         },
                         new
                         {
                             Id = 4,
+                            Estado = true,
                             Key = "MailBody",
                             Value = ""
                         });
@@ -294,6 +304,12 @@ namespace SAEOrderAuthorizations.Web.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("EMAIL");
 
+                    b.Property<bool>("Estado")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("ESTADO");
+
                     b.Property<string>("FullName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
@@ -331,6 +347,7 @@ namespace SAEOrderAuthorizations.Web.Migrations
                             Id = 1,
                             ActivatedDate = new DateTime(2026, 10, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@admin.com",
+                            Estado = true,
                             FullName = "administrador",
                             NickName = "admin",
                             Password = "123",
@@ -343,6 +360,7 @@ namespace SAEOrderAuthorizations.Web.Migrations
                             Id = 2,
                             ActivatedDate = new DateTime(2026, 10, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "operador@admin.com",
+                            Estado = true,
                             FullName = "operador",
                             NickName = "operador",
                             Password = "123",
@@ -355,6 +373,7 @@ namespace SAEOrderAuthorizations.Web.Migrations
                             Id = 3,
                             ActivatedDate = new DateTime(2026, 10, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "aprobador@admin.com",
+                            Estado = true,
                             FullName = "aprobador",
                             NickName = "aprobador",
                             Password = "123",
