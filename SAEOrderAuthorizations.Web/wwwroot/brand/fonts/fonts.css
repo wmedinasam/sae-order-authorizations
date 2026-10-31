@@ -1,0 +1,25 @@
+/* WIS Dev Code — tres familias variables locales. Conservar las licencias incluidas. */
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./Montserrat/Montserrat-Variable.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./Inter/Inter-Variable.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('./JetBrainsMono/JetBrainsMono-Variable.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+}

@@ -1,0 +1,157 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using SAEOrderAuthorizations.Web.Data.Entities
+@using SAEOrderAuthorizations.Web.Components.Shared
+@using SAEOrderAuthorizations.Web.Services
+@inject OrdenesService Ordenes
+
+<WisModal Titulo="@($"Orden {Orden.IdOrder.Trim()}")" OnCerrar="OnCerrar">
+
+        @if (cabecera is not null)
+        {
+            <dl class="wis-cabecera">
+                <div><dt>Proveedor</dt><dd>@cabecera.Supplier?.Trim()</dd></div>
+                <div><dt>Fecha</dt><dd>@cabecera.DateOrder.ToString("d")</dd></div>
+                <div><dt>Total</dt><dd>@((cabecera.Total ?? 0).ToString("N2"))</dd></div>
+            </dl>
+        }
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="wis-alert-error" role="alert">@mensaje</div>
+        }
+
+        <div class="wis-tabs" role="tablist">
+            <button type="button" role="tab" class="wis-tab @(pestana == "partidas" ? "activa" : "")" @onclick='() => pestana = "partidas"'>Partidas</button>
+            <button type="button" role="tab" class="wis-tab @(pestana == "historial" ? "activa" : "")" @onclick='() => pestana = "historial"'>Historial</button>
+        </div>
+
+        @if (pestana == "partidas")
+        {
+            <div class="wis-tabla-wrap">
+                <table class="wis-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Descripción</th>
+                            <th class="wis-num">Cantidad</th>
+                            <th class="wis-num">Precio</th>
+                            <th class="wis-num">IVA</th>
+                            <th class="wis-num">Descuento</th>
+                            <th class="wis-num">Total partida</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in partidas)
+                        {
+                            <tr>
+                                <td>@p.IdProd?.Trim()</td>
+                                <td>@p.Description?.Trim()</td>
+                                <td class="wis-num">@((p.Quantity ?? 0).ToString("N2"))</td>
+                                <td class="wis-num">@((p.Price ?? 0).ToString("N2"))</td>
+                                <td class="wis-num">@((p.VAT ?? 0).ToString("N2"))</td>
+                                <td class="wis-num">@((p.Discount ?? 0).ToString("N2"))</td>
+                                <td class="wis-num">@((p.TotalItem ?? 0).ToString("N2"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            @if (historial.Count == 0)
+            {
+                <p class="wis-muted">Sin movimientos registrados.</p>
+            }
+            <ul class="wis-historial">
+                @foreach (var h in historial)
+                {
+                    <li>
+                        <span class="wis-muted">@h.Fecha.ToString("g") · @h.Usuario</span>
+                        <div>@h.Descripcion</div>
+                    </li>
+                }
+            </ul>
+        }
+
+        @if (puedeProcesar)
+        {
+            <div class="wis-accion">
+                <label class="wis-field-label" for="comentario">Comentario (obligatorio para rechazar, máx. 150)</label>
+                <textarea id="comentario" class="wis-input" rows="2" maxlength="150" @bind="comentario"></textarea>
+                <div class="wis-modal-acciones">
+                    <IconButton Icono="check" Variante="autorizar" Texto="Autorizar" MostrarTexto="true" Solido="true" Deshabilitado="@procesando" OnClick="Autorizar" />
+                    <IconButton Icono="x" Variante="rechazar" Texto="Rechazar" MostrarTexto="true" Solido="true" Deshabilitado="@procesando" OnClick="Rechazar" />
+                </div>
+            </div>
+        }
+</WisModal>
+
+@code {
+    [Parameter, EditorRequired] public OrdenSae Orden { get; set; } = default!;
+    [Parameter, EditorRequired] public Empresa Empresa { get; set; } = default!;
+    [Parameter] public bool EsAprobador { get; set; }
+    [Parameter] public EventCallback OnCerrar { get; set; }
+    [Parameter] public EventCallback<string> OnProcesada { get; set; }
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private ClaimsPrincipal? usuario;
+    private Services.OrdenCabeceraSae? cabecera;
+    private List<OrdenPartidaSae> partidas = new();
+    private List<HistorialEntrada> historial = new();
+    private string pestana = "partidas";
+    private string comentario = string.Empty;
+    private string? mensaje;
+    private bool procesando;
+
+    private bool puedeProcesar => EsAprobador && Orden.Status == "P";
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuario = AuthState is null ? null : (await AuthState).User;
+        try
+        {
+            var (cab, partidasSae) = await Ordenes.DetalleAsync(Empresa, Orden.IdOrder.Trim());
+            cabecera = cab;
+            partidas = partidasSae;
+            historial = await Ordenes.HistorialAsync(Empresa, Orden.IdOrder.Trim());
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudo cargar el detalle: {ex.Message}";
+        }
+    }
+
+    private async Task Autorizar() => await Procesar(true);
+
+    private async Task Rechazar() => await Procesar(false);
+
+    private async Task Procesar(bool aprobar)
+    {
+        if (usuario is null) return;
+        procesando = true;
+        mensaje = null;
+        try
+        {
+            var resultado = await Ordenes.ProcesarAsync(usuario, Empresa, Orden.IdOrder.Trim(), aprobar, comentario);
+            if (resultado.Exito)
+            {
+                await OnProcesada.InvokeAsync(resultado.Mensaje);
+            }
+            else
+            {
+                mensaje = resultado.Mensaje;
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudo procesar la orden: {ex.Message}";
+        }
+        finally
+        {
+            procesando = false;
+        }
+    }
+}

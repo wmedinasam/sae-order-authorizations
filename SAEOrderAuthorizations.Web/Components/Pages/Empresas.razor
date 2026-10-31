@@ -1,0 +1,141 @@
+@page "/empresas"
+@attribute [Authorize(Policy = "Administrador")]
+@rendermode InteractiveServer
+@using SAEOrderAuthorizations.Web.Components.Empresas
+@using SAEOrderAuthorizations.Web.Data.Entities
+@using SAEOrderAuthorizations.Web.Services
+@inject EmpresasService EmpresasSvc
+
+<PageTitle>Empresas · WIS Dev Code</PageTitle>
+
+<section class="wis-container">
+    <div class="wis-card wis-stack">
+        <h1 class="wis-h2">Empresas</h1>
+
+        <div class="wis-modal-acciones">
+            <IconButton Icono="plus" Variante="agregar" Texto="Nueva" OnClick="Nueva" />
+            <label>
+                <input type="checkbox" @bind="mostrarInactivas" @bind:after="CargarAsync" />
+                Mostrar inactivas
+            </label>
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="wis-alert-error" role="alert">@mensaje</div>
+        }
+        @if (!string.IsNullOrEmpty(confirmacion))
+        {
+            <p class="wis-muted" role="status">@confirmacion</p>
+        }
+
+        <div class="wis-tabla-wrap">
+            <table class="wis-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Base</th>
+                        <th>Sufijo</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in empresas)
+                    {
+                        <tr>
+                            <td>@e.Nombre?.Trim()</td>
+                            <td>@e.DbSae?.Trim()</td>
+                            <td>@e.Sufijo?.Trim()</td>
+                            <td>@(e.Estado == true ? "Activa" : "Inactiva")</td>
+                            <td>
+                                <IconButton Icono="pencil" Variante="editar" Texto="Editar" OnClick="() => Editar(e)" />
+                                @if (e.Estado == true)
+                                {
+                                    <IconButton Icono="ban" Variante="inactivar" Texto="Inactivar" OnClick="() => AlternarEstado(e)" />
+                                }
+                                else
+                                {
+                                    <IconButton Icono="undo" Variante="reactivar" Texto="Reactivar" OnClick="() => AlternarEstado(e)" />
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (empresas.Count == 0 && string.IsNullOrEmpty(mensaje))
+                    {
+                        <tr><td colspan="5" class="wis-muted">No hay empresas para mostrar.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@if (modelo is not null)
+{
+    <EmpresaModal Modelo="modelo" OnCerrar="Cerrar" OnGuardada="Guardada" />
+}
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private List<Empresa> empresas = new();
+    private bool mostrarInactivas;
+    private string? mensaje;
+    private string? confirmacion;
+    private EmpresaEdicion? modelo;
+
+    protected override async Task OnInitializedAsync() => await CargarAsync();
+
+    private async Task CargarAsync()
+    {
+        mensaje = null;
+        confirmacion = null;
+        try
+        {
+            empresas = await EmpresasSvc.ListarAsync(mostrarInactivas);
+        }
+        catch (Exception ex)
+        {
+            empresas = new();
+            mensaje = $"No se pudieron cargar las empresas: {ex.Message}";
+        }
+    }
+
+    private void Nueva() => modelo = new EmpresaEdicion();
+
+    private void Editar(Empresa e) => modelo = new EmpresaEdicion
+    {
+        Id = e.Id,
+        Nombre = e.Nombre,
+        Direccion = e.Direccion,
+        DbSae = e.DbSae,
+        Sufijo = e.Sufijo
+    };
+
+    private void Cerrar() => modelo = null;
+
+    private async Task Guardada(string resultado)
+    {
+        modelo = null;
+        await CargarAsync();
+        confirmacion = resultado;
+    }
+
+    private async Task AlternarEstado(Empresa e)
+    {
+        var usuario = AuthState is null ? null : (await AuthState).User;
+        if (usuario is null) return;
+
+        var resultado = await EmpresasSvc.CambiarEstadoAsync(usuario, e.Id, e.Estado != true);
+        if (resultado.Exito)
+        {
+            await CargarAsync();
+            confirmacion = resultado.Mensaje;
+        }
+        else
+        {
+            mensaje = resultado.Mensaje;
+        }
+    }
+}

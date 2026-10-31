@@ -1,0 +1,137 @@
+@page "/roles"
+@attribute [Authorize(Policy = "Administrador")]
+@rendermode InteractiveServer
+@using System.Security.Claims
+@using SAEOrderAuthorizations.Web.Components.Roles
+@using SAEOrderAuthorizations.Web.Services
+@inject RolesService RolesSvc
+
+<PageTitle>Roles · WIS Dev Code</PageTitle>
+
+<section class="wis-container">
+    <div class="wis-card wis-stack">
+        <h1 class="wis-h2">Roles</h1>
+
+        <div class="wis-filtros">
+            <label class="wis-field-label">
+                <input type="checkbox" @bind="incluirInactivos" @bind:after="CargarAsync" /> Mostrar inactivos
+            </label>
+            <div>
+                <IconButton Icono="plus" Variante="agregar" Texto="Nuevo" OnClick="Nuevo" />
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="wis-alert-error" role="alert">@mensaje</div>
+        }
+
+        <div class="wis-tabla-wrap">
+            <table class="wis-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Administrador</th>
+                        <th>Estado</th>
+                        <th class="wis-num">Empresas</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in roles)
+                    {
+                        <tr>
+                            <td>@r.Nombre?.Trim()</td>
+                            <td>@r.Descripcion?.Trim()</td>
+                            <td>@(r.EsAdministrador ? "Sí" : "No")</td>
+                            <td>@(r.Estado ? "Activo" : "Inactivo")</td>
+                            <td class="wis-num">@r.NumEmpresas</td>
+                            <td>
+                                <IconButton Icono="pencil" Variante="editar" Texto="Editar" OnClick="() => Editar(r)" />
+                                @if (r.Estado)
+                                {
+                                    <IconButton Icono="ban" Variante="inactivar" Texto="Inactivar" OnClick="() => AlternarEstadoAsync(r)" />
+                                }
+                                else
+                                {
+                                    <IconButton Icono="undo" Variante="reactivar" Texto="Reactivar" OnClick="() => AlternarEstadoAsync(r)" />
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (roles.Count == 0 && string.IsNullOrEmpty(mensaje))
+                    {
+                        <tr><td colspan="6" class="wis-muted">No hay roles para mostrar.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@if (mostrarModal)
+{
+    <RolModal Rol="rolEditando" OnCerrar="Cerrar" OnGuardado="Guardado" />
+}
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private ClaimsPrincipal? usuario;
+    private List<RolFila> roles = new();
+    private bool incluirInactivos;
+    private string? mensaje;
+    private bool mostrarModal;
+    private RolFila? rolEditando;
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuario = AuthState is null ? null : (await AuthState).User;
+        await CargarAsync();
+    }
+
+    private async Task CargarAsync()
+    {
+        if (usuario is null) return;
+        try
+        {
+            roles = await RolesSvc.ListarAsync(usuario, incluirInactivos);
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudieron cargar los roles: {ex.Message}";
+        }
+    }
+
+    private void Nuevo()
+    {
+        mensaje = null;
+        rolEditando = null;
+        mostrarModal = true;
+    }
+
+    private void Editar(RolFila rol)
+    {
+        mensaje = null;
+        rolEditando = rol;
+        mostrarModal = true;
+    }
+
+    private void Cerrar() => mostrarModal = false;
+
+    private async Task Guardado(string resultado)
+    {
+        mostrarModal = false;
+        await CargarAsync();
+        mensaje = resultado;
+    }
+
+    private async Task AlternarEstadoAsync(RolFila rol)
+    {
+        if (usuario is null) return;
+        var resultado = await RolesSvc.CambiarEstadoAsync(usuario, rol.Id, !rol.Estado);
+        await CargarAsync();
+        mensaje = resultado.Mensaje;
+    }
+}

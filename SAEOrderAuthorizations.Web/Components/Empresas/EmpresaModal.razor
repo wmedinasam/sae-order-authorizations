@@ -1,0 +1,82 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using SAEOrderAuthorizations.Web.Components.Shared
+@using SAEOrderAuthorizations.Web.Services
+@inject EmpresasService EmpresasSvc
+
+<WisModal Titulo="@(Modelo.Id == 0 ? "Nueva empresa" : "Editar empresa")" OnCerrar="OnCerrar">
+    <EditForm Model="Modelo" OnValidSubmit="Guardar" class="wis-stack">
+        <DataAnnotationsValidator />
+
+        <div>
+            <label class="wis-field-label" for="emp-nombre">Nombre</label>
+            <InputText id="emp-nombre" class="wis-input" maxlength="50" @bind-Value="Modelo.Nombre" />
+            <ValidationMessage For="() => Modelo.Nombre" class="wis-alert-error" />
+        </div>
+        <div>
+            <label class="wis-field-label" for="emp-direccion">Dirección (opcional)</label>
+            <InputText id="emp-direccion" class="wis-input" maxlength="50" @bind-Value="Modelo.Direccion" />
+            <ValidationMessage For="() => Modelo.Direccion" class="wis-alert-error" />
+        </div>
+        <div>
+            <label class="wis-field-label" for="emp-dbsae">Base SAE</label>
+            <InputText id="emp-dbsae" class="wis-input" maxlength="50" @bind-Value="Modelo.DbSae" />
+            <ValidationMessage For="() => Modelo.DbSae" class="wis-alert-error" />
+        </div>
+        <div>
+            <label class="wis-field-label" for="emp-sufijo">Sufijo</label>
+            <InputText id="emp-sufijo" class="wis-input" maxlength="10" @bind-Value="Modelo.Sufijo" />
+            <ValidationMessage For="() => Modelo.Sufijo" class="wis-alert-error" />
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="wis-alert-error" role="alert">@mensaje</div>
+        }
+
+        <div class="wis-modal-acciones">
+            <IconButton Icono="save" Variante="guardar" Texto="Guardar" Tipo="submit" Deshabilitado="@guardando" />
+        </div>
+    </EditForm>
+</WisModal>
+
+@code {
+    [Parameter, EditorRequired] public EmpresaEdicion Modelo { get; set; } = default!;
+    [Parameter] public EventCallback OnCerrar { get; set; }
+    [Parameter] public EventCallback<string> OnGuardada { get; set; }
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private string? mensaje;
+    private bool guardando;
+
+    private async Task Guardar()
+    {
+        var usuario = AuthState is null ? null : (await AuthState).User;
+        if (usuario is null) return;
+
+        guardando = true;
+        mensaje = null;
+        try
+        {
+            var resultado = await EmpresasSvc.GuardarAsync(usuario, Modelo);
+            if (resultado.Exito)
+            {
+                await OnGuardada.InvokeAsync(resultado.Mensaje);
+            }
+            else
+            {
+                mensaje = resultado.Mensaje;
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudo guardar la empresa: {ex.Message}";
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+}

@@ -1,0 +1,32 @@
+@page "/"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+
+<PageTitle>Inicio · WIS Dev Code</PageTitle>
+
+<section class="wis-container">
+    <section class="wis-card wis-stack">
+        <div class="wis-user-bar">
+            <div>
+                <h1 class="wis-h2">Dashboard</h1>
+                <p class="wis-muted wis-small" style="margin: 0;">
+                    @nombre
+                </p>
+            </div>
+        </div>
+    </section>
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private string nombre = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthState is not null)
+        {
+            nombre = (await AuthState).User.Identity?.Name ?? string.Empty;
+        }
+    }
+}

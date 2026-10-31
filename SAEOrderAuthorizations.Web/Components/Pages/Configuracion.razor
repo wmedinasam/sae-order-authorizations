@@ -1,0 +1,149 @@
+@page "/configuracion"
+@attribute [Authorize(Policy = "Administrador")]
+@rendermode InteractiveServer
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using SAEOrderAuthorizations.Web.Components.Configuracion
+@using SAEOrderAuthorizations.Web.Services
+@inject ConfiguracionService ConfigSvc
+
+<PageTitle>Configuración · WIS Dev Code</PageTitle>
+
+<section class="wis-container">
+    <div class="wis-card wis-stack">
+        <h1 class="wis-h2">Configuración</h1>
+
+        <div class="wis-filtros">
+            <div>
+                <label class="wis-field-label">
+                    <input type="checkbox" @bind="mostrarInactivas" @bind:after="CargarAsync" /> Mostrar inactivas
+                </label>
+            </div>
+            <div class="wis-modal-acciones">
+                <IconButton Icono="plus" Variante="agregar" Texto="Nueva" OnClick="Nueva" />
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="@(exito ? "wis-muted" : "wis-alert-error")" role="alert">@mensaje</div>
+        }
+
+        <div class="wis-tabla-wrap">
+            <table class="wis-table">
+                <thead>
+                    <tr>
+                        <th>Clave</th>
+                        <th>Valor</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in items)
+                    {
+                        <tr>
+                            <td>@c.Key</td>
+                            <td>@(c.Sensible ? "••••••" : c.Valor)</td>
+                            <td>@(c.Estado ? "Activa" : "Inactiva")</td>
+                            <td>
+                                <div class="wis-modal-acciones">
+                                    <IconButton Icono="pencil" Variante="editar" Texto="Editar" OnClick="() => Editar(c)" />
+                                    @if (c.Estado)
+                                    {
+                                        <IconButton Icono="ban" Variante="inactivar" Texto="Inactivar" OnClick="() => CambiarEstado(c)" />
+                                    }
+                                    else
+                                    {
+                                        <IconButton Icono="undo" Variante="reactivar" Texto="Reactivar" OnClick="() => CambiarEstado(c)" />
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (items.Count == 0 && string.IsNullOrEmpty(mensaje))
+                    {
+                        <tr><td colspan="4" class="wis-muted">No hay configuraciones para mostrar.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@if (modalAbierto)
+{
+    <ConfiguracionModal Item="seleccionada" Usuario="usuario" OnCerrar="Cerrar" OnGuardado="Guardado" />
+}
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private ClaimsPrincipal usuario = new();
+    private List<ConfiguracionItem> items = new();
+    private bool mostrarInactivas;
+    private bool modalAbierto;
+    private ConfiguracionItem? seleccionada;
+    private string? mensaje;
+    private bool exito;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthState is not null) usuario = (await AuthState).User;
+        await CargarAsync();
+    }
+
+    private async Task CargarAsync()
+    {
+        try
+        {
+            items = await ConfigSvc.ListarAsync(usuario, mostrarInactivas);
+        }
+        catch (Exception ex)
+        {
+            items = new();
+            Mostrar(false, $"No se pudo cargar la configuración: {ex.Message}");
+        }
+    }
+
+    private void Mostrar(bool ok, string texto)
+    {
+        exito = ok;
+        mensaje = texto;
+    }
+
+    private void Nueva()
+    {
+        seleccionada = null;
+        modalAbierto = true;
+    }
+
+    private void Editar(ConfiguracionItem c)
+    {
+        seleccionada = c;
+        modalAbierto = true;
+    }
+
+    private void Cerrar() => modalAbierto = false;
+
+    private async Task Guardado(string resultado)
+    {
+        modalAbierto = false;
+        await CargarAsync();
+        Mostrar(true, resultado);
+    }
+
+    private async Task CambiarEstado(ConfiguracionItem c)
+    {
+        try
+        {
+            var r = await ConfigSvc.CambiarEstadoAsync(usuario, c.Id, !c.Estado);
+            await CargarAsync();
+            Mostrar(r.Exito, r.Mensaje);
+        }
+        catch (Exception ex)
+        {
+            Mostrar(false, $"No se pudo cambiar el estado: {ex.Message}");
+        }
+    }
+}

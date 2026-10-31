@@ -1,0 +1,95 @@
+@using System.Security.Claims
+@using SAEOrderAuthorizations.Web.Components.Shared
+@using SAEOrderAuthorizations.Web.Services
+@inject ConfiguracionService ConfigSvc
+
+<WisModal Titulo="@(EsNueva ? "Nueva configuración" : $"Editar {Item!.Key}")" OnCerrar="OnCerrar">
+    <form @onsubmit="Guardar" @onsubmit:preventDefault>
+        @if (EsNueva)
+        {
+            <label class="wis-field-label" for="cfg-clave">Clave (máx. 25, sin espacios, única)</label>
+            <input id="cfg-clave" class="wis-input" @bind="clave" maxlength="25" autocomplete="off" />
+        }
+        else
+        {
+            <label class="wis-field-label" for="cfg-clave">Clave</label>
+            <input id="cfg-clave" class="wis-input" value="@Item!.Key" disabled />
+        }
+
+        <label class="wis-field-label" for="cfg-valor">Valor (máx. 255)</label>
+        @if (EsSensible)
+        {
+            <input id="cfg-valor" class="wis-input" type="password" @bind="valor" maxlength="255"
+                   autocomplete="new-password" placeholder="En blanco = conservar el valor actual" />
+        }
+        else
+        {
+            <input id="cfg-valor" class="wis-input" @bind="valor" maxlength="255" autocomplete="off" />
+        }
+
+        @if (!EsNueva)
+        {
+            <label class="wis-field-label">
+                <input type="checkbox" @bind="activo" /> Activa
+            </label>
+        }
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="wis-alert-error" role="alert">@error</div>
+        }
+
+        <div class="wis-modal-acciones">
+            <IconButton Icono="save" Variante="guardar" Texto="Guardar" Tipo="submit" Deshabilitado="@guardando" />
+        </div>
+    </form>
+</WisModal>
+
+@code {
+    [Parameter] public ConfiguracionItem? Item { get; set; }
+    [Parameter] public ClaimsPrincipal Usuario { get; set; } = new();
+    [Parameter] public EventCallback OnCerrar { get; set; }
+    [Parameter] public EventCallback<string> OnGuardado { get; set; }
+
+    private bool EsNueva => Item is null;
+    private bool EsSensible => Item?.Sensible ?? false;
+
+    private string clave = string.Empty;
+    // En claves sensibles arranca vacío: la contraseña actual nunca llega al navegador.
+    private string valor = string.Empty;
+    private bool activo = true;
+    private string? error;
+    private bool guardando;
+
+    protected override void OnInitialized()
+    {
+        if (Item is not null)
+        {
+            valor = Item.Valor ?? string.Empty;
+            activo = Item.Estado;
+        }
+    }
+
+    private async Task Guardar()
+    {
+        guardando = true;
+        error = null;
+        try
+        {
+            var r = EsNueva
+                ? await ConfigSvc.CrearAsync(Usuario, clave, valor)
+                : await ConfigSvc.EditarAsync(Usuario, Item!.Id, valor, activo);
+
+            if (r.Exito) await OnGuardado.InvokeAsync(r.Mensaje);
+            else error = r.Mensaje;
+        }
+        catch (Exception ex)
+        {
+            error = $"No se pudo guardar: {ex.Message}";
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+}

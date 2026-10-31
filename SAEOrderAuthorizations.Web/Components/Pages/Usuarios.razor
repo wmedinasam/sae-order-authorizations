@@ -1,0 +1,164 @@
+@page "/usuarios"
+@attribute [Authorize(Policy = "Administrador")]
+@rendermode InteractiveServer
+@using System.Security.Claims
+@using SAEOrderAuthorizations.Web.Components.Usuarios
+@using SAEOrderAuthorizations.Web.Services
+@inject UsuariosService UsuariosSvc
+
+<PageTitle>Usuarios · WIS Dev Code</PageTitle>
+
+<section class="wis-container">
+    <div class="wis-card wis-stack">
+        <div class="wis-user-bar">
+            <h1 class="wis-h2">Usuarios</h1>
+            <IconButton Icono="plus" Variante="agregar" Texto="Nuevo" OnClick="Nuevo" />
+        </div>
+
+        <label class="wis-muted">
+            <input type="checkbox" @bind="mostrarInactivos" @bind:after="RecargarAsync" />
+            Mostrar inactivos
+        </label>
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            @if (mensajeError)
+            {
+                <div class="wis-alert-error" role="alert">@mensaje</div>
+            }
+            else
+            {
+                <p class="wis-muted" role="status">@mensaje</p>
+            }
+        }
+
+        <div class="wis-tabla-wrap">
+            <table class="wis-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Nick</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in usuarios)
+                    {
+                        <tr>
+                            <td>@u.FullName</td>
+                            <td>@u.NickName</td>
+                            <td>@u.Email</td>
+                            <td>@(u.Rol ?? "—")</td>
+                            <td>@(u.Estado ? "Activo" : "Inactivo")</td>
+                            <td>
+                                <IconButton Icono="pencil" Variante="editar" Texto="Editar" OnClick="() => Editar(u.Id)" />
+                                @if (u.Estado)
+                                {
+                                    <IconButton Icono="ban" Variante="inactivar" Texto="@(u.Id == miId ? "No puedes desactivarte a ti mismo" : "Inactivar")"
+                                                Deshabilitado="@(u.Id == miId)" OnClick="() => CambiarEstadoAsync(u)" />
+                                }
+                                else
+                                {
+                                    <IconButton Icono="undo" Variante="reactivar" Texto="Reactivar" OnClick="() => CambiarEstadoAsync(u)" />
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (usuarios.Count == 0 && string.IsNullOrEmpty(mensaje))
+                    {
+                        <tr><td colspan="6" class="wis-muted">No hay usuarios para mostrar.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@if (modalAbierto)
+{
+    <UsuarioModal UsuarioId="usuarioEditandoId" OnCerrar="Cerrar" OnGuardado="Guardado" />
+}
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private ClaimsPrincipal? actor;
+    private int miId;
+    private List<UsuarioFila> usuarios = new();
+    private bool mostrarInactivos;
+    private bool modalAbierto;
+    private int? usuarioEditandoId;
+    private string? mensaje;
+    private bool mensajeError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        actor = AuthState is null ? null : (await AuthState).User;
+        if (actor is null) return;
+
+        miId = actor.IdUsuario();
+        await CargarAsync();
+    }
+
+    private async Task CargarAsync()
+    {
+        if (actor is null) return;
+        try
+        {
+            usuarios = await UsuariosSvc.ListarAsync(actor, mostrarInactivos);
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudieron cargar los usuarios: {ex.Message}";
+            mensajeError = true;
+        }
+    }
+
+    private async Task RecargarAsync()
+    {
+        mensaje = null;
+        await CargarAsync();
+    }
+
+    private void Nuevo()
+    {
+        usuarioEditandoId = null;
+        modalAbierto = true;
+    }
+
+    private void Editar(int id)
+    {
+        usuarioEditandoId = id;
+        modalAbierto = true;
+    }
+
+    private void Cerrar() => modalAbierto = false;
+
+    private async Task Guardado(string resultado)
+    {
+        modalAbierto = false;
+        await CargarAsync();
+        mensaje = resultado;
+        mensajeError = false;
+    }
+
+    private async Task CambiarEstadoAsync(UsuarioFila u)
+    {
+        if (actor is null) return;
+        try
+        {
+            var resultado = await UsuariosSvc.CambiarEstadoAsync(actor, u.Id, !u.Estado);
+            await CargarAsync();
+            mensaje = resultado.Mensaje;
+            mensajeError = !resultado.Exito;
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudo cambiar el estado: {ex.Message}";
+            mensajeError = true;
+        }
+    }
+}

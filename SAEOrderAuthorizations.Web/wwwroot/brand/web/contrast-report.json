@@ -1,0 +1,242 @@
+{
+  "title": "WIS Dev Code — contrastes de color",
+  "method": "Luminancia relativa sRGB según WCAG 2.2. ratio=(LmásClaro+0.05)/(LmásOscuro+0.05). Se usan valores completos para determinar umbrales.",
+  "source": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+  "scope": "Combinaciones de la paleta; no equivale a una auditoría completa de accesibilidad de una web.",
+  "pairs": [
+    {
+      "foreground": "white",
+      "fg": "#FFFFFF",
+      "background": "azure",
+      "bg": "#079EF3",
+      "ratio": 2.9191028780440416,
+      "textAA": false,
+      "nonTextAA": false
+    },
+    {
+      "foreground": "white",
+      "fg": "#FFFFFF",
+      "background": "coral",
+      "bg": "#FF654F",
+      "ratio": 2.9060214259813373,
+      "textAA": false,
+      "nonTextAA": false
+    },
+    {
+      "foreground": "navy",
+      "fg": "#101E2A",
+      "background": "azure",
+      "bg": "#079EF3",
+      "ratio": 5.796115440675731,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "navy",
+      "fg": "#101E2A",
+      "background": "coral",
+      "bg": "#FF654F",
+      "ratio": 5.822206647577792,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "white",
+      "fg": "#FFFFFF",
+      "background": "interactive",
+      "bg": "#0068A8",
+      "ratio": 5.922906636133148,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "white",
+      "fg": "#FFFFFF",
+      "background": "hover",
+      "bg": "#005A91",
+      "ratio": 7.313677455076541,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "interactive",
+      "fg": "#0068A8",
+      "background": "white",
+      "bg": "#FFFFFF",
+      "ratio": 5.922906636133148,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "interactive",
+      "fg": "#0068A8",
+      "background": "offwhite",
+      "bg": "#F6F8FB",
+      "ratio": 5.567118665287282,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "text",
+      "fg": "#172F42",
+      "background": "white",
+      "bg": "#FFFFFF",
+      "ratio": 13.800289040039647,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "text",
+      "fg": "#172F42",
+      "background": "offwhite",
+      "bg": "#F6F8FB",
+      "ratio": 12.971308079122847,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "mutedLight",
+      "fg": "#526579",
+      "background": "white",
+      "bg": "#FFFFFF",
+      "ratio": 6.006289367600434,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "mutedLight",
+      "fg": "#526579",
+      "background": "offwhite",
+      "bg": "#F6F8FB",
+      "ratio": 5.645492610586752,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "mutedDark",
+      "fg": "#B4C2D0",
+      "background": "navy",
+      "bg": "#101E2A",
+      "ratio": 9.320355023428863,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "mutedDark",
+      "fg": "#B4C2D0",
+      "background": "darkSurface",
+      "bg": "#172B3B",
+      "ratio": 8.0049137048544,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "white",
+      "fg": "#FFFFFF",
+      "background": "navy",
+      "bg": "#101E2A",
+      "ratio": 16.919457264352033,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "white",
+      "fg": "#FFFFFF",
+      "background": "darkSurface",
+      "bg": "#172B3B",
+      "ratio": 14.531506041739105,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "azure",
+      "fg": "#079EF3",
+      "background": "navy",
+      "bg": "#101E2A",
+      "ratio": 5.796115440675731,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "azure",
+      "fg": "#079EF3",
+      "background": "darkSurface",
+      "bg": "#172B3B",
+      "ratio": 4.978072595877816,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "darkLink",
+      "fg": "#67C5FF",
+      "background": "navy",
+      "bg": "#101E2A",
+      "ratio": 8.868384969140905,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "darkLink",
+      "fg": "#67C5FF",
+      "background": "darkSurface",
+      "bg": "#172B3B",
+      "ratio": 7.616733075183232,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "lightBorderStrong",
+      "fg": "#7D8EA0",
+      "background": "white",
+      "bg": "#FFFFFF",
+      "ratio": 3.360640799749599,
+      "textAA": false,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "lightBorderStrong",
+      "fg": "#7D8EA0",
+      "background": "offwhite",
+      "bg": "#F6F8FB",
+      "ratio": 3.1587676917741283,
+      "textAA": false,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "darkBorderStrong",
+      "fg": "#71869A",
+      "background": "navy",
+      "bg": "#101E2A",
+      "ratio": 4.494774498927066,
+      "textAA": false,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "darkBorderStrong",
+      "fg": "#71869A",
+      "background": "darkSurface",
+      "bg": "#172B3B",
+      "ratio": 3.8603982247721897,
+      "textAA": false,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "darkLink",
+      "fg": "#67C5FF",
+      "background": "darkSurfaceAlt",
+      "bg": "#21384A",
+      "ratio": 6.36542709711363,
+      "textAA": true,
+      "nonTextAA": true
+    },
+    {
+      "foreground": "navy",
+      "fg": "#101E2A",
+      "background": "darkActionHover",
+      "bg": "#49B9FA",
+      "ratio": 7.737270832966503,
+      "textAA": true,
+      "nonTextAA": true
+    }
+  ]
+}

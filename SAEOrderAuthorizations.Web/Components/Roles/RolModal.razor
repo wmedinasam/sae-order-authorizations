@@ -1,0 +1,116 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using SAEOrderAuthorizations.Web.Components.Shared
+@using SAEOrderAuthorizations.Web.Data.Entities
+@using SAEOrderAuthorizations.Web.Services
+@inject RolesService RolesSvc
+
+<WisModal Titulo="@(Rol is null ? "Nuevo rol" : "Editar rol")" OnCerrar="OnCerrar">
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="wis-alert-error" role="alert">@mensaje</div>
+    }
+
+    <div class="wis-stack">
+        <div>
+            <label class="wis-field-label" for="rol-nombre">Nombre (obligatorio, máx. 50)</label>
+            <input id="rol-nombre" class="wis-input" maxlength="50" @bind="nombre" />
+        </div>
+        <div>
+            <label class="wis-field-label" for="rol-descripcion">Descripción (máx. 50)</label>
+            <input id="rol-descripcion" class="wis-input" maxlength="50" @bind="descripcion" />
+        </div>
+        <label><input type="checkbox" @bind="esAdministrador" /> Es administrador</label>
+        <label><input type="checkbox" @bind="estado" /> Activo</label>
+
+        <fieldset>
+            <legend class="wis-field-label">Empresas asignadas (solo activas)</legend>
+            @foreach (var e in empresas)
+            {
+                <label>
+                    <input type="checkbox" checked="@seleccion.Contains(e.Id)"
+                           @onchange="a => Alternar(e.Id, (bool)a.Value!)" />
+                    @e.Nombre?.Trim()
+                </label>
+            }
+            @if (empresas.Count == 0)
+            {
+                <p class="wis-muted">No hay empresas activas.</p>
+            }
+        </fieldset>
+
+        <div class="wis-modal-acciones">
+            <IconButton Icono="save" Variante="guardar" Texto="Guardar" Deshabilitado="@guardando" OnClick="Guardar" />
+        </div>
+    </div>
+</WisModal>
+
+@code {
+    [Parameter] public RolFila? Rol { get; set; }
+    [Parameter, EditorRequired] public EventCallback OnCerrar { get; set; }
+    [Parameter] public EventCallback<string> OnGuardado { get; set; }
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private ClaimsPrincipal? usuario;
+    private List<Empresa> empresas = new();
+    private List<int> seleccion = new();
+    private string nombre = string.Empty;
+    private string descripcion = string.Empty;
+    private bool esAdministrador;
+    private bool estado = true;
+    private string? mensaje;
+    private bool guardando;
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuario = AuthState is null ? null : (await AuthState).User;
+        if (usuario is null) return;
+
+        empresas = await RolesSvc.EmpresasActivasAsync(usuario);
+        if (Rol is not null)
+        {
+            nombre = Rol.Nombre?.Trim() ?? string.Empty;
+            descripcion = Rol.Descripcion?.Trim() ?? string.Empty;
+            esAdministrador = Rol.EsAdministrador;
+            estado = Rol.Estado;
+            // Solo se conservan las empresas que el formulario muestra (activas).
+            var asignadas = await RolesSvc.EmpresaIdsDelRolAsync(usuario, Rol.Id);
+            seleccion = asignadas.Where(id => empresas.Any(e => e.Id == id)).ToList();
+        }
+    }
+
+    private void Alternar(int empresaId, bool marcado) =>
+        seleccion = marcado
+            ? seleccion.Append(empresaId).Distinct().ToList()
+            : seleccion.Where(id => id != empresaId).ToList();
+
+    private async Task Guardar()
+    {
+        if (usuario is null) return;
+        guardando = true;
+        mensaje = null;
+        try
+        {
+            var formulario = new RolFormulario(nombre, descripcion, esAdministrador, estado, seleccion);
+            var resultado = await RolesSvc.GuardarAsync(usuario, Rol?.Id, formulario);
+            if (resultado.Exito)
+            {
+                await OnGuardado.InvokeAsync(resultado.Mensaje);
+            }
+            else
+            {
+                mensaje = resultado.Mensaje;
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudo guardar el rol: {ex.Message}";
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+}

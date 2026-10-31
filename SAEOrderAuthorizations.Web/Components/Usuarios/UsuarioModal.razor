@@ -1,0 +1,135 @@
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using SAEOrderAuthorizations.Web.Components.Shared
+@using SAEOrderAuthorizations.Web.Data.Entities
+@using SAEOrderAuthorizations.Web.Services
+@inject UsuariosService UsuariosSvc
+
+<WisModal Titulo="@titulo" OnCerrar="OnCerrar">
+    @if (!listo)
+    {
+        <p class="wis-muted">@(mensaje ?? "Cargando…")</p>
+    }
+    else
+    {
+        <EditForm Model="modelo" OnValidSubmit="GuardarAsync" class="wis-stack">
+            <DataAnnotationsValidator />
+
+            @if (!string.IsNullOrEmpty(mensaje))
+            {
+                <div class="wis-alert-error" role="alert">@mensaje</div>
+            }
+
+            <div>
+                <label class="wis-field-label" for="u-nombre">Nombre</label>
+                <InputText id="u-nombre" class="wis-input" @bind-Value="modelo.FullName" />
+                <ValidationMessage For="() => modelo.FullName" />
+            </div>
+            <div>
+                <label class="wis-field-label" for="u-nick">Nick (no distingue mayúsculas)</label>
+                <InputText id="u-nick" class="wis-input" @bind-Value="modelo.NickName" />
+                <ValidationMessage For="() => modelo.NickName" />
+            </div>
+            <div>
+                <label class="wis-field-label" for="u-password">Contraseña</label>
+                <InputText id="u-password" type="password" class="wis-input" autocomplete="new-password"
+                           placeholder="@(UsuarioId is null ? "" : "En blanco = conservar la actual")" @bind-Value="modelo.Password" />
+                <ValidationMessage For="() => modelo.Password" />
+            </div>
+            <div>
+                <label class="wis-field-label" for="u-email">Email (opcional)</label>
+                <InputText id="u-email" class="wis-input" @bind-Value="modelo.Email" />
+                <ValidationMessage For="() => modelo.Email" />
+            </div>
+            <div>
+                <label class="wis-field-label" for="u-rol">Rol</label>
+                <InputSelect id="u-rol" class="wis-input" @bind-Value="modelo.RolId">
+                    <option value="0">Selecciona un rol</option>
+                    @foreach (var r in roles)
+                    {
+                        <option value="@r.Id">@r.Nombre@(r.Estado == true ? "" : " (inactivo)")</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => modelo.RolId" />
+            </div>
+            <label><InputCheckbox @bind-Value="modelo.SendMail" /> Enviar notificaciones por correo</label>
+            <label><InputCheckbox @bind-Value="modelo.Estado" /> Activo</label>
+
+            <div class="wis-modal-acciones">
+                <IconButton Icono="save" Variante="guardar" Texto="Guardar" Tipo="submit" Deshabilitado="@procesando" />
+            </div>
+        </EditForm>
+    }
+</WisModal>
+
+@code {
+    [Parameter] public int? UsuarioId { get; set; }
+    [Parameter] public EventCallback OnCerrar { get; set; }
+    [Parameter] public EventCallback<string> OnGuardado { get; set; }
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private UsuarioDatos modelo = new();
+    private List<Rol> roles = new();
+    private ClaimsPrincipal? actor;
+    private string? mensaje;
+    private bool listo;
+    private bool procesando;
+
+    private string titulo => UsuarioId is null ? "Nuevo usuario" : "Editar usuario";
+
+    protected override async Task OnInitializedAsync()
+    {
+        actor = AuthState is null ? null : (await AuthState).User;
+        if (actor is null) return;
+
+        try
+        {
+            if (UsuarioId is int id)
+            {
+                var datos = await UsuariosSvc.ObtenerAsync(actor, id);
+                if (datos is null)
+                {
+                    mensaje = "El usuario no existe.";
+                    return;
+                }
+                modelo = datos;
+            }
+
+            roles = await UsuariosSvc.RolesAsignablesAsync(actor, modelo.RolId);
+            listo = true;
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudo cargar el usuario: {ex.Message}";
+        }
+    }
+
+    private async Task GuardarAsync()
+    {
+        if (actor is null) return;
+        procesando = true;
+        mensaje = null;
+        try
+        {
+            var resultado = await UsuariosSvc.GuardarAsync(actor, UsuarioId, modelo);
+            if (resultado.Exito)
+            {
+                await OnGuardado.InvokeAsync(resultado.Mensaje);
+            }
+            else
+            {
+                mensaje = resultado.Mensaje;
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudo guardar el usuario: {ex.Message}";
+        }
+        finally
+        {
+            procesando = false;
+        }
+    }
+}

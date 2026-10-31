@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es" data-theme="auto">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#F6F8FB" data-wis-theme-color>
+    <title>Ejemplo de integración — WIS Dev Code</title>
+    <link rel="icon" type="image/svg+xml" href="/brand/web-icons/favicon.svg" sizes="any">
+    <link rel="icon" href="/brand/web-icons/favicon.ico" sizes="16x16 32x32 48x48">
+    <link rel="apple-touch-icon" href="/brand/web-icons/apple-touch-icon.png" sizes="180x180">
+    <link rel="manifest" href="/brand/web/manifest.webmanifest">
+    <script src="/brand/web/theme-init.js"></script>
+    <link rel="stylesheet" href="/brand/web/brand-tokens.css">
+    <style>
+      body { margin: 0; }
+      .example-header { border-bottom: 1px solid var(--wis-border); background: var(--wis-surface); }
+      .example-nav { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding-block: 1.5rem; flex-wrap: wrap; }
+      .example-main { padding-block: var(--wis-space-8); }
+      .example-stack { display: grid; gap: 1.5rem; }
+      .example-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+      .example-theme { display: flex; align-items: center; gap: 0.75rem; }
+      .example-theme select { width: auto; min-width: 9rem; }
+    </style>
+  </head>
+  <body class="wis-brand">
+    <header class="example-header">
+      <nav class="wis-container example-nav" aria-label="Cabecera del ejemplo">
+        <a href="#example-content" aria-label="WIS Dev Code — contenido del ejemplo">
+          <span class="wis-logo" aria-hidden="true" style="width: 240px; aspect-ratio: 10 / 3;">
+            <img class="wis-logo__on-light" src="/brand/logos/svg/wis-logo-horizontal-on-light.svg" width="1200" height="360" alt="">
+            <img class="wis-logo__on-dark" src="/brand/logos/svg/wis-logo-horizontal-on-dark.svg" width="1200" height="360" alt="">
+          </span>
+        </a>
+        <div class="example-theme">
+          <label for="theme">Tema</label>
+          <select id="theme" class="wis-input">
+            <option value="auto">Sistema</option>
+            <option value="light">Claro</option>
+            <option value="dark">Oscuro</option>
+          </select>
+        </div>
+      </nav>
+    </header>
+    <main id="example-content" class="wis-container example-main example-stack">
+      <p class="wis-small wis-muted">Ejemplo técnico de identidad · sustituye el contenido por el de tu landing</p>
+      <h1 class="wis-h1 wis-measure">Tu siguiente proyecto empieza aquí.</h1>
+      <p class="wis-body wis-muted wis-measure">Texto de muestra para comprobar la tipografía, la jerarquía y los colores. Este archivo contiene una cabecera y componentes de referencia para integrar en tu sitio.</p>
+      <div class="example-actions">
+        <a class="wis-button" href="#reference">Ver componentes</a>
+        <a class="wis-button wis-button--secondary" href="#typography">Ver tipografía</a>
+      </div>
+      <section id="reference" class="wis-card example-stack" aria-labelledby="reference-title">
+        <h2 id="reference-title" class="wis-h3">Componentes de referencia</h2>
+        <p class="wis-body">Los componentes usan variables semánticas, como <code class="wis-code">var(--wis-action)</code>, para mantener la legibilidad al cambiar de tema.</p>
+        <div>
+          <label for="example-field" class="wis-field-label">Campo de ejemplo</label>
+          <input id="example-field" class="wis-input" type="text" placeholder="Escribe para probar el campo" aria-describedby="field-help">
+          <p id="field-help" class="wis-small wis-muted">Demostración visual: este campo no envía ni guarda información.</p>
+        </div>
+      </section>
+      <section id="typography" class="example-stack" aria-labelledby="typography-title">
+        <h2 id="typography-title" class="wis-h2">Una jerarquía fácil de leer.</h2>
+        <p class="wis-body wis-measure">Montserrat da presencia a los títulos. Inter acompaña los textos y controles. JetBrains Mono queda reservado para fragmentos de código.</p>
+        <a class="wis-link" href="#example-content">Volver al inicio del ejemplo</a>
+      </section>
+    </main>
+    <script>
+      const picker = document.getElementById("theme");
+      if (window.WISBrandTheme) {
+        picker.value = window.WISBrandTheme.get();
+        picker.addEventListener("change", () => window.WISBrandTheme.set(picker.value));
+      }
+    </script>
+  </body>
+</html>

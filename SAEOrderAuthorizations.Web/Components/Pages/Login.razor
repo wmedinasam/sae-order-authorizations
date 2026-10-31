@@ -1,0 +1,80 @@
+@page "/login"
+@attribute [AllowAnonymous]
+@attribute [ExcludeFromInteractiveRouting]
+@layout SAEOrderAuthorizations.Web.Components.Layout.AuthLayout
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using SAEOrderAuthorizations.Web.Data
+@inject AppDbContext Db
+@inject NavigationManager Navigation
+@inject IHttpContextAccessor HttpAccessor
+
+<PageTitle>Iniciar sesión · WIS Dev Code</PageTitle>
+
+<main class="wis-login-main">
+    <section class="wis-card wis-login-card">
+        <h1 class="wis-h2" style="margin-bottom: var(--wis-space-5);">Iniciar sesión</h1>
+
+        <EditForm Model="model" OnValidSubmit="Ingresar" FormName="login" class="wis-stack">
+            <div>
+                <label class="wis-field-label" for="usuario">Usuario</label>
+                <InputText id="usuario" class="wis-input" autocomplete="username" @bind-Value="model.Nick" />
+            </div>
+            <div>
+                <label class="wis-field-label" for="password">Contraseña</label>
+                <InputText id="password" type="password" class="wis-input" autocomplete="current-password" @bind-Value="model.Password" />
+            </div>
+            @if (!string.IsNullOrEmpty(mensaje))
+            {
+                <div class="wis-alert-error" role="alert">@mensaje</div>
+            }
+            <button type="submit" class="wis-button">Ingresar</button>
+        </EditForm>
+    </section>
+</main>
+
+@code {
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+    [SupplyParameterFromForm] private LoginModel model { get; set; } = new();
+    private string? mensaje;
+
+    private async Task Ingresar()
+    {
+        mensaje = null;
+        // Contraseña en claro por ahora (decisión temporal; ver CLAUDE.md).
+        var usuario = await (from u in Db.Usuarios
+                             join r in Db.Roles on u.RolId equals r.Id
+                             where u.NickName == model.Nick && u.Password == model.Password && u.Estado && r.Estado == true
+                             select new { u, r }).FirstOrDefaultAsync();
+
+        if (usuario is null)
+        {
+            mensaje = "Usuario/contraseña incorrecto";
+            return;
+        }
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, usuario.u.Id.ToString()),
+            new(ClaimTypes.Name, usuario.u.FullName ?? usuario.u.NickName ?? string.Empty),
+            new("Nick", usuario.u.NickName ?? string.Empty),
+            new("RolId", usuario.r.Id.ToString()),
+            new(ClaimTypes.Role, usuario.r.Nombre ?? string.Empty),
+            new("EsAdministrador", (usuario.r.EsAdministrador ?? false).ToString())
+        };
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpAccessor.HttpContext!.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+
+        var destino = !string.IsNullOrEmpty(ReturnUrl) && Uri.IsWellFormedUriString(ReturnUrl, UriKind.Relative) ? ReturnUrl : "/";
+        Navigation.NavigateTo(destino, forceLoad: true);
+    }
+
+    public class LoginModel
+    {
+        public string Nick { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,135 @@
+@page "/ordenes"
+@attribute [Authorize]
+@rendermode InteractiveServer
+@using SAEOrderAuthorizations.Web.Components.Orders
+@using SAEOrderAuthorizations.Web.Data.Entities
+@using SAEOrderAuthorizations.Web.Services
+@inject OrdenesService OrdenesSvc
+
+<PageTitle>Órdenes · WIS Dev Code</PageTitle>
+
+<section class="wis-container">
+    <div class="wis-card wis-stack">
+        <h1 class="wis-h2">Órdenes</h1>
+
+        <div class="wis-filtros">
+            <div>
+                <label class="wis-field-label" for="empresa">Empresa</label>
+                <select id="empresa" class="wis-input" @bind="empresaId" @bind:after="CargarAsync">
+                    @foreach (var e in empresas)
+                    {
+                        <option value="@e.Id">@e.Nombre</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="wis-field-label" for="estado">Estado</label>
+                <select id="estado" class="wis-input" @bind="estado" @bind:after="CargarAsync">
+                    <option value="P">Pendientes</option>
+                    <option value="O">Autorizadas</option>
+                    <option value="R">Rechazadas</option>
+                </select>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensaje))
+        {
+            <div class="wis-alert-error" role="alert">@mensaje</div>
+        }
+
+        <div class="wis-tabla-wrap">
+            <table class="wis-table">
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Proveedor</th>
+                        <th>Fecha</th>
+                        <th class="wis-num">Total</th>
+                        <th>Observaciones</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in ordenes)
+                    {
+                        <tr>
+                            <td>@o.IdOrder.Trim()</td>
+                            <td>@o.Vendor?.Trim()</td>
+                            <td>@o.OrdDate.ToString("d")</td>
+                            <td class="wis-num">@o.Total.ToString("N2")</td>
+                            <td>@o.Observations?.Trim()</td>
+                            <td><IconButton Icono="eye" Variante="ver" Texto="Consultar" OnClick="() => Abrir(o)" /></td>
+                        </tr>
+                    }
+                    @if (ordenes.Count == 0 && string.IsNullOrEmpty(mensaje))
+                    {
+                        <tr><td colspan="6" class="wis-muted">No hay órdenes en este estado.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@if (seleccionada is not null && empresaSeleccionada is not null)
+{
+    <OrdenModal Orden="seleccionada" Empresa="empresaSeleccionada" EsAprobador="esAprobador"
+                OnCerrar="Cerrar" OnProcesada="OrdenProcesada" />
+}
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private List<Empresa> empresas = new();
+    private List<OrdenSae> ordenes = new();
+    private int empresaId;
+    private string estado = "P";
+    private string? mensaje;
+    private bool esAprobador;
+    private OrdenSae? seleccionada;
+
+    private Empresa? empresaSeleccionada => empresas.FirstOrDefault(e => e.Id == empresaId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var usuario = AuthState is null ? null : (await AuthState).User;
+        if (usuario is null) return;
+
+        esAprobador = usuario.IsInRole("Aprobador");
+        var rolId = int.Parse(usuario.FindFirst("RolId")?.Value ?? "0");
+        empresas = await OrdenesSvc.EmpresasDelRolAsync(rolId);
+        empresaId = empresas.FirstOrDefault()?.Id ?? 0;
+        await CargarAsync();
+    }
+
+    private async Task CargarAsync()
+    {
+        mensaje = null;
+        ordenes = new();
+        if (empresaSeleccionada is null)
+        {
+            mensaje = "Tu rol no tiene empresas asignadas.";
+            return;
+        }
+
+        try
+        {
+            ordenes = await OrdenesSvc.ListarAsync(empresaSeleccionada, estado);
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudieron cargar las órdenes: {ex.Message}";
+        }
+    }
+
+    private void Abrir(OrdenSae orden) => seleccionada = orden;
+
+    private void Cerrar() => seleccionada = null;
+
+    private async Task OrdenProcesada(string resultado)
+    {
+        seleccionada = null;
+        await CargarAsync();
+        mensaje = resultado;
+    }
+}

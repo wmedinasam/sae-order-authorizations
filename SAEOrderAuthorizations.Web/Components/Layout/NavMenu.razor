@@ -1,0 +1,23 @@
+@using Microsoft.AspNetCore.Authorization
+
+<div class="wis-sidebar-brand">
+    <img src="brand/logos/svg/wis-logo-horizontal-on-dark.svg" width="200" height="60" alt="WIS Dev Code" />
+</div>
+
+<nav class="wis-nav" aria-label="Principal">
+    <NavLink class="wis-nav-link" href="/" Match="NavLinkMatch.All">Inicio</NavLink>
+    <NavLink class="wis-nav-link" href="/ordenes">Órdenes</NavLink>
+
+    <AuthorizeView Policy="Administrador">
+        <p class="wis-nav-section">Administración</p>
+        <NavLink class="wis-nav-link" href="/empresas">Empresas</NavLink>
+        <NavLink class="wis-nav-link" href="/usuarios">Usuarios</NavLink>
+        <NavLink class="wis-nav-link" href="/roles">Roles</NavLink>
+        <NavLink class="wis-nav-link" href="/configuracion">Configuración</NavLink>
+    </AuthorizeView>
+</nav>
+
+<form method="post" action="/auth/logout" class="wis-sidebar-footer">
+    <AntiforgeryToken />
+    <button type="submit" class="wis-button wis-button--secondary">Cerrar sesión</button>
+</form>
