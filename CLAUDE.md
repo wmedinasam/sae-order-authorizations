@@ -89,3 +89,11 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 - Autorizar/rechazar corre en una transacción: `WIS_Orders.Status` (`P`→`O`/`R`, con filtro `Status='P'` para evitar doble proceso), `COMPO{sufijo}.BLOQ='N'` (y `STATUS='C'` al rechazar) y una entrada en `WIS_WorkLog` (`BitacoraEntrada`). El rechazo exige comentario (máx. 150).
 - PopUp en `Components/Orders/OrdenModal.razor` (pestañas Partidas e Historial). Es Interactive Server; el resto de páginas siguen SSR.
 - Datos de prueba de SAE: `SAEOrderAuthorizations.Web/Scripts/dev-ordenes-prueba.sql`, se ejecuta a mano y solo en dev.
+
+## Módulos de administración (proyecto nuevo)
+
+- Empresas, Roles, Usuarios y Configuración: solo alta y edición, con **soft delete** (`Estado = false`). No hay `Remove`/`DELETE`; la única eliminación es el reemplazo de filas de `ROL_EMPRESA` al guardar un rol (tabla de relación sin estado).
+- Cada servicio valida permisos (`EsAdministrador()`), longitudes y unicidad en servidor; la UI solo ayuda.
+- Salvaguardas: no renombrar `Admin` ni `Aprobador`; no desactivar roles con usuarios activos; no quitar el último administrador activo; un usuario no puede desactivarse a sí mismo; las claves base del correo no se desactivan; `MailPassword` nunca sale a la UI.
+- Los servicios en `Services/` que terminen en `Service` se registran solos (`Program.cs`).
+- Estado de pruebas: ver `CHECKLIST-MODULOS.md`. Sin índice único en `WIS_USER.NICK_NAME`, `WIS_CONFIGURATION.KEY` ni `EMPRESA(DB_SAE, SUFIJO)`: la unicidad es solo de aplicación.

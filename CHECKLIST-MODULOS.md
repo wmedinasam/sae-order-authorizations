@@ -10,13 +10,13 @@ Reglas: solo create y update; soft delete (`Estado = false`), nunca `DELETE`. So
 - [x] F0.5 Build limpio + commit base (`74da4ec`)
 
 ## Fase 1 · Módulos (subagentes en worktrees)
-- [ ] M1 Empresas: listar, crear, editar, desactivar/reactivar, validaciones, build, prueba
-- [ ] M2 Roles: listar, crear, editar, asignar empresas, desactivar/reactivar, salvaguardas, build, prueba
-- [ ] M3 Usuarios: listar, crear, editar, un solo rol, desactivar/reactivar, salvaguardas, build, prueba
-- [ ] M4 Configuración: listar, crear, editar, claves base protegidas, desactivar/reactivar, build, prueba
+- [x] M1 Empresas: implementado y fusionado (`d11b400`). Probado: alta, duplicado, desactivar. Pendiente: editar, reactivar
+- [x] M2 Roles: implementado y fusionado (`44b615e`). Probado: alta con empresa, salvaguarda de Admin/Aprobador, desactivar. Pendiente: último admin, nombre duplicado
+- [x] M3 Usuarios: implementado y fusionado (`b6643df`). Probado: lista y permisos. Pendiente: crear, editar, desactivar, salvaguardas
+- [x] M4 Configuración: implementado y fusionado (`2652e5e` + fix `76e1c86`). Probado: permisos. Pendiente: crear, editar, claves base
 
 ## Fase 2 · Integración
-- [ ] I1 Ramas revisadas y fusionadas
+- [x] I1 Ramas revisadas y fusionadas (sin conflictos, sin archivos compartidos)
 - [ ] I2 Build integrado + recorrido en navegador (admin) de los 4 módulos
 - [ ] I3 Accesos denegados para operador/aprobador; pruebas cruzadas (usuario/rol/empresa inactivos)
 - [ ] I4 `CLAUDE.md` actualizado
