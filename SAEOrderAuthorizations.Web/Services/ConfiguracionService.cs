@@ -59,6 +59,9 @@ public class ConfiguracionService(AppDbContext db)
         var c = await db.Configuraciones.FirstOrDefaultAsync(x => x.Id == id);
         if (c is null) return new(false, "La configuración no existe.");
 
+        // Se valida todo antes de tocar la entidad: un error no debe dejar cambios rastreados.
+        if (!activo && EsBase(c.Key)) return new(false, "Las claves base del correo no se pueden desactivar.");
+
         var sensible = EsSensible(c.Key);
         if (!(sensible && string.IsNullOrEmpty(valor)))
         {
@@ -68,7 +71,6 @@ public class ConfiguracionService(AppDbContext db)
             c.Value = nuevo;
         }
 
-        if (!activo && EsBase(c.Key)) return new(false, "Las claves base del correo no se pueden desactivar.");
         c.Estado = activo;
 
         await db.SaveChangesAsync();
