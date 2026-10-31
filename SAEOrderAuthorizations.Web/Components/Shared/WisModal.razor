@@ -2,7 +2,7 @@
     <div class="wis-modal" role="dialog" aria-modal="true" aria-labelledby="@tituloId">
         <div class="wis-modal-header">
             <h2 id="@tituloId" class="wis-h3">@Titulo</h2>
-            <button type="button" class="wis-button wis-button--secondary" @onclick="() => OnCerrar.InvokeAsync()">Cerrar</button>
+            <IconButton Icono="x" Variante="cerrar" Texto="Cerrar" OnClick="OnCerrar" />
         </div>
         @ChildContent
     </div>

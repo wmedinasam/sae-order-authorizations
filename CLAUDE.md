@@ -97,3 +97,4 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 - Salvaguardas: no renombrar `Admin` ni `Aprobador`; no desactivar roles con usuarios activos; no quitar el último administrador activo; un usuario no puede desactivarse a sí mismo; las claves base del correo no se desactivan; `MailPassword` nunca sale a la UI.
 - Los servicios en `Services/` que terminen en `Service` se registran solos (`Program.cs`).
 - Estado de pruebas: ver `CHECKLIST-MODULOS.md`. Sin índice único en `WIS_USER.NICK_NAME`, `WIS_CONFIGURATION.KEY` ni `EMPRESA(DB_SAE, SUFIJO)`: la unicidad es solo de aplicación.
+- Acciones de tabla y modales: usar `Components/Shared/IconButton.razor` (ícono con `aria-label` y tooltip). Colores semánticos en `app.css`: verde agregar/autorizar, rojo inactivar/rechazar, amarillo reactivar, azul editar/ver/guardar. Autorizar y Rechazar llevan texto (`MostrarTexto`).

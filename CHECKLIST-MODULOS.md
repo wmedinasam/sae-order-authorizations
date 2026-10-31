@@ -34,3 +34,5 @@ Datos de prueba conservados en la BD (inactivos, no se borran):
 - Rol `TEST-M2-rol` (con su fila en `ROL_EMPRESA`)
 - Usuario `test-u1` (nombre `TEST-U1 Editado`, rol Operador)
 - Clave de configuración `TEST-K1`
+
+Estado de Fase 3 (aplicado en esta ronda, verificado en navegador en escritorio y móvil): U1 a U5 completos. U6 parcial: tooltips y colores verificados en Empresas; Órdenes (Autorizar y Rechazar) y el resto de módulos quedan por revisar visualmente.

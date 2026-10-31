@@ -12,7 +12,7 @@
     <div class="wis-card wis-stack">
         <div class="wis-user-bar">
             <h1 class="wis-h2">Usuarios</h1>
-            <button type="button" class="wis-button" @onclick="Nuevo">Nuevo</button>
+            <IconButton Icono="plus" Variante="agregar" Texto="Nuevo" OnClick="Nuevo" />
         </div>
 
         <label class="wis-muted">
@@ -54,11 +54,16 @@
                             <td>@(u.Rol ?? "—")</td>
                             <td>@(u.Estado ? "Activo" : "Inactivo")</td>
                             <td>
-                                <button type="button" class="wis-button wis-button--secondary" @onclick="() => Editar(u.Id)">Editar</button>
-                                <button type="button" class="wis-button wis-button--secondary"
-                                        disabled="@(u.Estado && u.Id == miId)" @onclick="() => CambiarEstadoAsync(u)">
-                                    @(u.Estado ? "Desactivar" : "Reactivar")
-                                </button>
+                                <IconButton Icono="pencil" Variante="editar" Texto="Editar" OnClick="() => Editar(u.Id)" />
+                                @if (u.Estado)
+                                {
+                                    <IconButton Icono="ban" Variante="inactivar" Texto="@(u.Id == miId ? "No puedes desactivarte a ti mismo" : "Inactivar")"
+                                                Deshabilitado="@(u.Id == miId)" OnClick="() => CambiarEstadoAsync(u)" />
+                                }
+                                else
+                                {
+                                    <IconButton Icono="undo" Variante="reactivar" Texto="Reactivar" OnClick="() => CambiarEstadoAsync(u)" />
+                                }
                             </td>
                         </tr>
                     }

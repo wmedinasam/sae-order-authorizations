@@ -58,7 +58,7 @@
                             <td>@o.OrdDate.ToString("d")</td>
                             <td class="wis-num">@o.Total.ToString("N2")</td>
                             <td>@o.Observations?.Trim()</td>
-                            <td><button class="wis-button wis-button--secondary" @onclick="() => Abrir(o)">Consultar</button></td>
+                            <td><IconButton Icono="eye" Variante="ver" Texto="Consultar" OnClick="() => Abrir(o)" /></td>
                         </tr>
                     }
                     @if (ordenes.Count == 0 && string.IsNullOrEmpty(mensaje))

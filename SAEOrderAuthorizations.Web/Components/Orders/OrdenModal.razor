@@ -81,8 +81,8 @@
                 <label class="wis-field-label" for="comentario">Comentario (obligatorio para rechazar, máx. 150)</label>
                 <textarea id="comentario" class="wis-input" rows="2" maxlength="150" @bind="comentario"></textarea>
                 <div class="wis-modal-acciones">
-                    <button type="button" class="wis-button" disabled="@procesando" @onclick="Autorizar">Autorizar</button>
-                    <button type="button" class="wis-button wis-button--secondary" disabled="@procesando" @onclick="Rechazar">Rechazar</button>
+                    <IconButton Icono="check" Variante="autorizar" Texto="Autorizar" MostrarTexto="true" Solido="true" Deshabilitado="@procesando" OnClick="Autorizar" />
+                    <IconButton Icono="x" Variante="rechazar" Texto="Rechazar" MostrarTexto="true" Solido="true" Deshabilitado="@procesando" OnClick="Rechazar" />
                 </div>
             </div>
         }

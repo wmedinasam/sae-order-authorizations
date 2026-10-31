@@ -1,0 +1,63 @@
+@* Botón de acción solo con ícono (o ícono + texto). El nombre accesible siempre es Texto. *@
+<button type="@Tipo"
+        class="wis-icon-btn wis-icon-btn--@Variante @(Solido ? "wis-icon-btn--solido" : "") @(MostrarTexto ? "wis-icon-btn--texto" : "")"
+        aria-label="@Texto"
+        aria-disabled="@(Deshabilitado ? "true" : null)"
+        disabled="@(Deshabilitado && Tipo == "submit")"
+        data-tooltip="@Texto"
+        @onclick="Clic">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        @switch (Icono)
+        {
+            case "plus":
+                <path d="M12 5v14M5 12h14" />
+                break;
+            case "pencil":
+                <path d="M4 20h4L19 9l-4-4L4 16v4z" />
+                break;
+            case "ban":
+                <circle cx="12" cy="12" r="9" />
+                <path d="M5.6 5.6l12.8 12.8" />
+                break;
+            case "undo":
+                <path d="M9 14 4 9l5-5" />
+                <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
+                break;
+            case "eye":
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+                <circle cx="12" cy="12" r="3" />
+                break;
+            case "save":
+                <path d="M5 3h11l3 3v15H5z" />
+                <path d="M8 3v5h8V3M8 21v-7h8v7" />
+                break;
+            case "x":
+                <path d="M6 6l12 12M18 6 6 18" />
+                break;
+            case "check":
+                <path d="M5 12l5 5 9-10" />
+                break;
+        }
+    </svg>
+    @if (MostrarTexto)
+    {
+        <span>@Texto</span>
+    }
+</button>
+
+@code {
+    // Icono: plus, pencil, ban, undo, eye, save, x, check.
+    // Variante: agregar, editar, inactivar, reactivar, ver, guardar, cerrar, autorizar, rechazar.
+    [Parameter, EditorRequired] public string Icono { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Texto { get; set; } = string.Empty;
+    [Parameter] public string Variante { get; set; } = "ver";
+    [Parameter] public string Tipo { get; set; } = "button";
+    [Parameter] public bool Deshabilitado { get; set; }
+    [Parameter] public bool MostrarTexto { get; set; }
+    [Parameter] public bool Solido { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    // Deshabilitado usa aria-disabled (no el atributo disabled) para que el tooltip siga visible.
+    private Task Clic() => Deshabilitado ? Task.CompletedTask : OnClick.InvokeAsync();
+}

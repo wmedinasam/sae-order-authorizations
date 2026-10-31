@@ -17,7 +17,7 @@
                 <input type="checkbox" @bind="incluirInactivos" @bind:after="CargarAsync" /> Mostrar inactivos
             </label>
             <div>
-                <button type="button" class="wis-button" @onclick="Nuevo">Nuevo</button>
+                <IconButton Icono="plus" Variante="agregar" Texto="Nuevo" OnClick="Nuevo" />
             </div>
         </div>
 
@@ -48,10 +48,15 @@
                             <td>@(r.Estado ? "Activo" : "Inactivo")</td>
                             <td class="wis-num">@r.NumEmpresas</td>
                             <td>
-                                <button type="button" class="wis-button wis-button--secondary" @onclick="() => Editar(r)">Editar</button>
-                                <button type="button" class="wis-button wis-button--secondary" @onclick="() => AlternarEstadoAsync(r)">
-                                    @(r.Estado ? "Desactivar" : "Reactivar")
-                                </button>
+                                <IconButton Icono="pencil" Variante="editar" Texto="Editar" OnClick="() => Editar(r)" />
+                                @if (r.Estado)
+                                {
+                                    <IconButton Icono="ban" Variante="inactivar" Texto="Inactivar" OnClick="() => AlternarEstadoAsync(r)" />
+                                }
+                                else
+                                {
+                                    <IconButton Icono="undo" Variante="reactivar" Texto="Reactivar" OnClick="() => AlternarEstadoAsync(r)" />
+                                }
                             </td>
                         </tr>
                     }

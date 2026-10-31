@@ -204,3 +204,83 @@ html, body {
 
 .wis-historial { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--wis-space-3); }
 .wis-historial li { padding: var(--wis-space-3); border: 1px solid var(--wis-border); border-radius: var(--wis-radius-small); }
+
+/* Colores semánticos de acciones (no cambian la paleta de marca). */
+:root {
+    --wis-success: #2FBF71;
+    --wis-danger: #FF654F;
+    --wis-warning: #F5B83D;
+}
+
+/* Botón de ícono con color y tooltip. */
+.wis-icon-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wis-space-2);
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    padding: 0;
+    border: 1.5px solid currentColor;
+    border-radius: var(--wis-radius-small);
+    background: transparent;
+    color: var(--wis-action);
+    font: inherit;
+    cursor: pointer;
+    transition: background-color var(--wis-duration-fast) var(--wis-ease), color var(--wis-duration-fast) var(--wis-ease);
+}
+.wis-icon-btn:hover { background: color-mix(in srgb, currentColor 18%, transparent); }
+.wis-icon-btn:focus-visible { outline: 3px solid var(--wis-focus); outline-offset: 3px; }
+
+.wis-icon-btn--agregar, .wis-icon-btn--autorizar { color: var(--wis-success); }
+.wis-icon-btn--inactivar, .wis-icon-btn--rechazar { color: var(--wis-danger); }
+.wis-icon-btn--reactivar { color: var(--wis-warning); }
+.wis-icon-btn--editar, .wis-icon-btn--ver, .wis-icon-btn--guardar { color: var(--wis-action); }
+.wis-icon-btn--cerrar { color: var(--wis-text-muted); }
+
+/* Solido: relleno del color de la acción, texto oscuro (contraste ≥ 5,8:1). */
+.wis-icon-btn--solido { border-color: transparent; color: #101E2A; }
+.wis-icon-btn--solido.wis-icon-btn--autorizar { background: var(--wis-success); }
+.wis-icon-btn--solido.wis-icon-btn--rechazar { background: var(--wis-danger); }
+.wis-icon-btn--solido:hover { filter: brightness(1.08); background: inherit; }
+
+/* Con texto visible: más ancho, sin tooltip. */
+.wis-icon-btn--texto { width: auto; padding: 0 var(--wis-space-4); font: 600 1rem/1 var(--wis-font-body); }
+.wis-icon-btn--texto::after { display: none; }
+
+.wis-icon-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+
+/* Tooltip a la izquierda del botón: no lo recorta el scroll horizontal de las tablas. */
+.wis-icon-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    right: calc(100% + 0.5rem);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    white-space: nowrap;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--wis-border);
+    border-radius: var(--wis-radius-small);
+    background: var(--wis-surface-subtle);
+    color: var(--wis-text);
+    font-size: var(--wis-text-caption);
+    font-weight: var(--wis-weight-medium);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--wis-duration-fast) var(--wis-ease);
+}
+.wis-icon-btn:hover::after,
+.wis-icon-btn:focus-visible::after { opacity: 1; }
+
+/* Logo del sidebar: nunca más ancho que el panel (también en móvil). */
+.wis-sidebar { min-width: 0; }
+.wis-sidebar-brand { min-width: 0; overflow: hidden; }
+.wis-sidebar-brand img { display: block; width: 100%; max-width: 200px; height: auto; }
+
+/* En móvil el botón "Menú" queda encima del sidebar: el logo baja para no quedar tapado. */
+@media (max-width: 48rem) {
+    .wis-sidebar { padding-top: 4.5rem; }
+}

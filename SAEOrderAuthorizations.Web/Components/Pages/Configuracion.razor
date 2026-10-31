@@ -20,7 +20,7 @@
                 </label>
             </div>
             <div class="wis-modal-acciones">
-                <button type="button" class="wis-button" @onclick="Nueva">Nueva</button>
+                <IconButton Icono="plus" Variante="agregar" Texto="Nueva" OnClick="Nueva" />
             </div>
         </div>
 
@@ -48,8 +48,15 @@
                             <td>@(c.Estado ? "Activa" : "Inactiva")</td>
                             <td>
                                 <div class="wis-modal-acciones">
-                                    <button type="button" class="wis-button wis-button--secondary" @onclick="() => Editar(c)">Editar</button>
-                                    <button type="button" class="wis-button wis-button--secondary" @onclick="() => CambiarEstado(c)">@(c.Estado ? "Desactivar" : "Reactivar")</button>
+                                    <IconButton Icono="pencil" Variante="editar" Texto="Editar" OnClick="() => Editar(c)" />
+                                    @if (c.Estado)
+                                    {
+                                        <IconButton Icono="ban" Variante="inactivar" Texto="Inactivar" OnClick="() => CambiarEstado(c)" />
+                                    }
+                                    else
+                                    {
+                                        <IconButton Icono="undo" Variante="reactivar" Texto="Reactivar" OnClick="() => CambiarEstado(c)" />
+                                    }
                                 </div>
                             </td>
                         </tr>

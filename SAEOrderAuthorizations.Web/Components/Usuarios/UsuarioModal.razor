@@ -57,7 +57,7 @@
             <label><InputCheckbox @bind-Value="modelo.Estado" /> Activo</label>
 
             <div class="wis-modal-acciones">
-                <button type="submit" class="wis-button" disabled="@procesando">Guardar</button>
+                <IconButton Icono="save" Variante="guardar" Texto="Guardar" Tipo="submit" Deshabilitado="@procesando" />
             </div>
         </EditForm>
     }

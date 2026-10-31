@@ -13,7 +13,7 @@
         <h1 class="wis-h2">Empresas</h1>
 
         <div class="wis-modal-acciones">
-            <button type="button" class="wis-button" @onclick="Nueva">Nueva</button>
+            <IconButton Icono="plus" Variante="agregar" Texto="Nueva" OnClick="Nueva" />
             <label>
                 <input type="checkbox" @bind="mostrarInactivas" @bind:after="CargarAsync" />
                 Mostrar inactivas
@@ -49,8 +49,15 @@
                             <td>@e.Sufijo?.Trim()</td>
                             <td>@(e.Estado == true ? "Activa" : "Inactiva")</td>
                             <td>
-                                <button class="wis-button wis-button--secondary" @onclick="() => Editar(e)">Editar</button>
-                                <button class="wis-button wis-button--secondary" @onclick="() => AlternarEstado(e)">@(e.Estado == true ? "Desactivar" : "Reactivar")</button>
+                                <IconButton Icono="pencil" Variante="editar" Texto="Editar" OnClick="() => Editar(e)" />
+                                @if (e.Estado == true)
+                                {
+                                    <IconButton Icono="ban" Variante="inactivar" Texto="Inactivar" OnClick="() => AlternarEstado(e)" />
+                                }
+                                else
+                                {
+                                    <IconButton Icono="undo" Variante="reactivar" Texto="Reactivar" OnClick="() => AlternarEstado(e)" />
+                                }
                             </td>
                         </tr>
                     }
