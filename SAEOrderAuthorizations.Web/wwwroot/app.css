@@ -143,3 +143,64 @@ html, body {
 
     .wis-main { padding-top: 4rem; }
 }
+
+/* Órdenes: filtros, tablas, PopUp de detalle. */
+.wis-filtros { display: flex; gap: var(--wis-space-4); flex-wrap: wrap; }
+.wis-filtros > div { min-width: 14rem; flex: 1; }
+.wis-tabla-wrap { overflow-x: auto; }
+
+.wis-table { width: 100%; border-collapse: collapse; }
+.wis-table th, .wis-table td {
+    padding: var(--wis-space-2) var(--wis-space-3);
+    border-bottom: 1px solid var(--wis-border);
+    text-align: left;
+    vertical-align: middle;
+}
+.wis-table th { color: var(--wis-text-muted); font-size: var(--wis-text-small); font-weight: var(--wis-weight-semibold); }
+.wis-num { text-align: right !important; font-variant-numeric: tabular-nums; }
+
+.wis-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: var(--wis-space-4);
+    background: rgb(0 0 0 / 60%);
+}
+.wis-modal {
+    width: 100%;
+    max-width: 56rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wis-space-4);
+    padding: var(--wis-space-5);
+    background: var(--wis-surface);
+    border: 1px solid var(--wis-border);
+    border-radius: var(--wis-radius-large);
+    box-shadow: var(--wis-shadow);
+}
+.wis-modal-header { display: flex; justify-content: space-between; align-items: center; gap: var(--wis-space-3); }
+.wis-modal-acciones { display: flex; gap: var(--wis-space-3); justify-content: flex-end; flex-wrap: wrap; }
+.wis-accion { display: flex; flex-direction: column; gap: var(--wis-space-2); }
+
+.wis-cabecera { display: flex; gap: var(--wis-space-5); flex-wrap: wrap; margin: 0; }
+.wis-cabecera dt { color: var(--wis-text-muted); font-size: var(--wis-text-small); }
+.wis-cabecera dd { margin: 0; font-weight: var(--wis-weight-semibold); }
+
+.wis-tabs { display: flex; gap: var(--wis-space-2); border-bottom: 1px solid var(--wis-border); }
+.wis-tab {
+    padding: var(--wis-space-2) var(--wis-space-3);
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--wis-text-muted);
+    cursor: pointer;
+    font: inherit;
+}
+.wis-tab.activa { color: var(--wis-text); border-bottom-color: var(--wis-action); }
+
+.wis-historial { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--wis-space-3); }
+.wis-historial li { padding: var(--wis-space-3); border: 1px solid var(--wis-border); border-radius: var(--wis-radius-small); }

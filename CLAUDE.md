@@ -81,3 +81,11 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 - El claim se fija al iniciar sesión: si cambia el rol de un usuario, debe volver a ingresar.
 - El menú oculta los enlaces de administración, pero la protección real está en la política de cada página.
 - Usuarios de prueba (dev, contraseña `123` en claro): `admin` (rol Admin, acceso total) y `operador` (rol Operador, sin acceso a módulos de administración). Ambos asignados a la empresa 01 en `ROL_EMPRESA`. Migración `SemillaOperador`.
+
+## Órdenes y autorización (proyecto nuevo)
+
+- Rol `Aprobador` (usuario `aprobador` / `123`, dev) es el único que autoriza o rechaza (`OrdenesService.ProcesarAsync` valida el rol en servidor). `admin` y `operador` solo consultan.
+- `Services/OrdenesService.cs` lee órdenes desde SAE con `SqlQueryRaw` (valores como parámetros). El nombre de BD y el sufijo de `EMPRESA` se validan con regex antes de armar `[BD].dbo.[TABLA{sufijo}]`. No copiar el SQL concatenado del legacy (`ORD_SAE/SERVICE/DataAction.cs`).
+- Autorizar/rechazar corre en una transacción: `WIS_Orders.Status` (`P`→`O`/`R`, con filtro `Status='P'` para evitar doble proceso), `COMPO{sufijo}.BLOQ='N'` (y `STATUS='C'` al rechazar) y una entrada en `WIS_WorkLog` (`BitacoraEntrada`). El rechazo exige comentario (máx. 150).
+- PopUp en `Components/Orders/OrdenModal.razor` (pestañas Partidas e Historial). Es Interactive Server; el resto de páginas siguen SSR.
+- Datos de prueba de SAE: `SAEOrderAuthorizations.Web/Scripts/dev-ordenes-prueba.sql`, se ejecuta a mano y solo en dev.

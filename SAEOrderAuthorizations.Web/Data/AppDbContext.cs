@@ -34,7 +34,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.EsAdministrador).HasColumnName("EsAdministrador");
             e.HasData(
                 new Rol { Id = 1, Nombre = "Admin", Descripcion = "Administrador", EsAdministrador = true, Estado = true },
-                new Rol { Id = 2, Nombre = "Operador", Descripcion = "Operador", EsAdministrador = false, Estado = true });
+                new Rol { Id = 2, Nombre = "Operador", Descripcion = "Operador", EsAdministrador = false, Estado = true },
+                new Rol { Id = 3, Nombre = "Aprobador", Descripcion = "Aprobador de órdenes", EsAdministrador = false, Estado = true });
         });
 
         // Legacy no define clave primaria en ROL_EMPRESA; se usa la pareja como clave compuesta.
@@ -44,7 +45,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasKey(x => new { x.RolId, x.EmpresaId });
             e.HasData(
                 new RolEmpresa { RolId = 1, EmpresaId = 1 },
-                new RolEmpresa { RolId = 2, EmpresaId = 1 });
+                new RolEmpresa { RolId = 2, EmpresaId = 1 },
+                new RolEmpresa { RolId = 3, EmpresaId = 1 });
         });
 
         modelBuilder.Entity<Usuario>(e =>
@@ -69,6 +71,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 {
                     Id = 2, FullName = "operador", NickName = "operador", Password = "123",
                     Email = "operador@admin.com", SendMail = false, RolId = 2, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1
+                },
+                new Usuario
+                {
+                    Id = 3, FullName = "aprobador", NickName = "aprobador", Password = "123",
+                    Email = "aprobador@admin.com", SendMail = false, RolId = 3, ActivatedDate = new DateTime(2026, 10, 31), UserActivates = 1
                 });
         });
 

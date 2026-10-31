@@ -29,8 +29,10 @@ builder.Services.AddAuthorization(o =>
         .Build();
     // Módulos de administración. El claim EsAdministrador se fija al iniciar sesión.
     o.AddPolicy("Administrador", p => p.RequireClaim("EsAdministrador", "True"));
+    o.AddPolicy("Aprobador", p => p.RequireRole("Aprobador"));
 });
 
+builder.Services.AddScoped<SAEOrderAuthorizations.Web.Services.OrdenesService>();
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
