@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -7,21 +7,25 @@ using SAEOrderAuthorizations.Web.Data.Entities;
 
 namespace SAEOrderAuthorizations.Web.Services;
 
-public class OrdenesService(AppDbContext db, SesionService sesion)
+public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionService sesion, CorreoOrdenService correo)
 {
     // La BD y el sufijo vienen de la tabla EMPRESA, pero se validan antes de armar nombres de tabla.
     private static readonly Regex Identificador = new(@"^[A-Za-z0-9_]+$", RegexOptions.Compiled);
 
-    public async Task<List<Empresa>> EmpresasDelRolAsync(int rolId) =>
-        await db.RolesEmpresa
+    public async Task<List<Empresa>> EmpresasDelRolAsync(int rolId)
+    {
+        await using var db = await dbFactory.CreateDbContextAsync();
+        return await db.RolesEmpresa
             .Where(re => re.RolId == rolId)
             .Join(db.Empresas, re => re.EmpresaId, e => e.Id, (re, e) => e)
             .Where(e => e.Estado == true)
             .OrderBy(e => e.Id)
             .ToListAsync();
+    }
 
     public async Task<List<OrdenSae>> ListarAsync(Empresa empresa, string status)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         var sql = $"""
             SELECT wo.IdOrder, wo.IdSupplier, p.NOMBRE AS Vendor, wo.OrdDate, wo.Status, wo.Total, obs.STR_OBS AS Observations
             FROM dbo.WIS_Orders wo
@@ -38,6 +42,7 @@ public class OrdenesService(AppDbContext db, SesionService sesion)
 
     public async Task<(OrdenCabeceraSae? Cabecera, List<OrdenPartidaSae> Partidas)> DetalleAsync(Empresa empresa, string idOrder)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         var cabecera = await db.Database.SqlQueryRaw<OrdenCabeceraSae>($"""
             SELECT c.CVE_DOC AS IdOrder, p.NOMBRE AS Supplier, c.CAN_TOT AS Total, c.FECHA_DOC AS DateOrder
             FROM {Tabla(empresa, "COMPO")} c
@@ -59,6 +64,7 @@ public class OrdenesService(AppDbContext db, SesionService sesion)
 
     public async Task<List<HistorialEntrada>> HistorialAsync(Empresa empresa, string idOrder)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         var entradas = await db.Bitacora
             .Where(b => b.EmpresaId == empresa.Id && b.IdOrder == idOrder)
             .OrderByDescending(b => b.LogDate)
@@ -74,6 +80,7 @@ public class OrdenesService(AppDbContext db, SesionService sesion)
 
     public async Task<ResultadoOperacion> ProcesarAsync(ClaimsPrincipal usuario, Empresa empresa, string idOrder, bool aprobar, string? comentario)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         // Validación de servidor: la UI también la aplica, pero no es suficiente.
         if (!usuario.IsInRole("Aprobador"))
             return new(false, "Solo el rol Aprobador puede procesar órdenes.");
@@ -90,10 +97,8 @@ public class OrdenesService(AppDbContext db, SesionService sesion)
             return new(false, "La empresa no está asignada a tu rol.");
 
         comentario = comentario?.Trim();
-        if (!aprobar && string.IsNullOrEmpty(comentario))
-            return new(false, "Para rechazar la orden escribe un comentario.");
-        if (comentario?.Length > 150)
-            return new(false, "El comentario no puede exceder 150 caracteres.");
+        if (ValidarComentario(aprobar, comentario) is { } errorComentario)
+            return new(false, errorComentario);
 
         var orden = await db.OrdenesCompra
             .FirstOrDefaultAsync(o => o.EmpresaId == empresa.Id && o.IdOrder == idOrder);
@@ -133,7 +138,53 @@ public class OrdenesService(AppDbContext db, SesionService sesion)
         await db.SaveChangesAsync();
         await tx.CommitAsync();
 
-        return new(true, aprobar ? "Orden autorizada." : "Orden rechazada.");
+        // Después del commit: si el correo falla, la orden ya quedó procesada.
+        var nombre = usuario.FindFirstValue(ClaimTypes.Name) ?? string.Empty;
+        var fallo = await correo.EnviarResultadoAsync(empresa, orden, nombre, await EmailUsuarioAsync(usuarioId), aprobar, comentario);
+        var mensaje = aprobar ? "Orden autorizada." : "Orden rechazada.";
+        if (fallo is not null) mensaje += " (No se pudo enviar el correo.)";
+
+        return new(true, mensaje);
+    }
+
+    // TEMPORAL: prueba de correo desde el popup; quitar cuando se valide el envío.
+    // No cambia el estatus de la orden ni escribe en WIS_WorkLog ni en COMPO.
+    public async Task<ResultadoOperacion> ProbarCorreoAsync(ClaimsPrincipal usuario, Empresa empresa, string idOrder, bool aprobar, string? comentario)
+    {
+        await using var db = await dbFactory.CreateDbContextAsync();
+        if (!usuario.EsAdministrador())
+            return new(false, "Solo un administrador puede probar el correo.");
+        if (!await sesion.EsActivaAsync(usuario))
+            return new(false, "Tu usuario o rol está inactivo.");
+
+        comentario = comentario?.Trim();
+        if (ValidarComentario(aprobar, comentario) is { } errorComentario)
+            return new(false, errorComentario);
+
+        var orden = await db.OrdenesCompra
+            .FirstOrDefaultAsync(o => o.EmpresaId == empresa.Id && o.IdOrder == idOrder);
+        if (orden is null)
+            return new(false, "La orden no existe.");
+
+        var nombre = usuario.FindFirstValue(ClaimTypes.Name) ?? string.Empty;
+        var fallo = await correo.EnviarResultadoAsync(empresa, orden, nombre, await EmailUsuarioAsync(usuario.IdUsuario()), aprobar, comentario);
+        return fallo is null
+            ? new(true, "Correo de prueba enviado. La orden no se modificó.")
+            : new(false, $"No se envió el correo: {fallo}");
+    }
+
+    private static string? ValidarComentario(bool aprobar, string? comentario)
+    {
+        if (!aprobar && string.IsNullOrEmpty(comentario)) return "Para rechazar la orden escribe un comentario.";
+        if (comentario?.Length > 150) return "El comentario no puede exceder 150 caracteres.";
+        return null;
+    }
+
+    // El Reply-To sale de la BD, no de un claim: así no hace falta volver a iniciar sesión.
+    private async Task<string?> EmailUsuarioAsync(int usuarioId)
+    {
+        await using var db = await dbFactory.CreateDbContextAsync();
+        return await db.Usuarios.Where(u => u.Id == usuarioId).Select(u => u.Email).FirstOrDefaultAsync();
     }
 
     private static string Tabla(Empresa empresa, string tabla)

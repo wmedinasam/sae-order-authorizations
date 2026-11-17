@@ -1,0 +1,120 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using SAEOrderAuthorizations.Web.Components.Shared
+@using SAEOrderAuthorizations.Web.Services
+@inject ConfiguracionService ConfigSvc
+
+<div class="wis-card wis-stack">
+    <h2 class="wis-h3">Correo de autorización</h2>
+    <p class="wis-muted">Se envía al autorizar o rechazar una orden. Gmail y Outlook requieren una contraseña de aplicación.</p>
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="@(exito ? "wis-muted" : "wis-alert-error")" role="alert">@mensaje</div>
+    }
+
+    @if (datos is not null)
+    {
+        <form class="wis-stack" @onsubmit="GuardarAsync" @onsubmit:preventDefault>
+            <label class="wis-field-label" for="correo-host">Servidor SMTP</label>
+            <input id="correo-host" class="wis-input" @bind="datos.Host" maxlength="255" autocomplete="off" />
+            <p class="wis-muted">Gmail: smtp.gmail.com · Outlook: smtp-mail.outlook.com</p>
+
+            <label class="wis-field-label" for="correo-puerto">Puerto (587 STARTTLS, 465 SSL)</label>
+            <input id="correo-puerto" class="wis-input" @bind="datos.Puerto" maxlength="5" inputmode="numeric" autocomplete="off" />
+
+            <label class="wis-field-label" for="correo-usuario-smtp">Cuenta SMTP (MailUser)</label>
+            <input id="correo-usuario-smtp" class="wis-input" @bind="datos.UsuarioSmtp" maxlength="255" autocomplete="off" />
+            <p class="wis-muted">Autentica el envío. El correo sale con el nombre del usuario que autoriza o rechaza, y las respuestas van a su correo.</p>
+
+            <label class="wis-field-label" for="correo-clave">Contraseña de aplicación</label>
+            <input id="correo-clave" class="wis-input" type="password" @bind="datos.NuevaPassword" maxlength="255"
+                   autocomplete="new-password"
+                   placeholder="@(datos.TienePassword ? "Guardada. En blanco = conservar" : "Sin contraseña guardada")" />
+
+            <label class="wis-field-label" for="correo-destinatario">Destinatario (MailTo)</label>
+            <input id="correo-destinatario" class="wis-input" @bind="datos.Destinatario" maxlength="255" autocomplete="off" />
+
+            <label class="wis-field-label" for="correo-cc">Copias (MailToCC, opcional)</label>
+            <input id="correo-cc" class="wis-input" @bind="datos.CopiaCC" maxlength="1000" autocomplete="off"
+                   placeholder="correo1@dominio.com, correo2@dominio.com" />
+            <p class="wis-muted">Separa varias direcciones con coma o punto y coma.</p>
+
+            <label class="wis-field-label" for="correo-plantilla">Plantilla (máx. 4000)</label>
+            <div class="wis-modal-acciones">
+                @foreach (var m in CorreoOrdenService.Marcadores)
+                {
+                    <button type="button" class="wis-button" @onclick="() => Insertar(m)">@m</button>
+                }
+            </div>
+            <textarea id="correo-plantilla" class="wis-input" rows="5" maxlength="4000"
+                      @bind="datos.Plantilla" @bind:event="oninput"></textarea>
+
+            <div class="wis-card wis-stack" aria-live="polite">
+                <h3 class="wis-h3">Vista previa</h3>
+                <p>@Vista</p>
+            </div>
+
+            <div class="wis-modal-acciones">
+                <IconButton Icono="save" Variante="guardar" Texto="Guardar correo" Tipo="submit" Deshabilitado="guardando" />
+            </div>
+        </form>
+    }
+</div>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private ClaimsPrincipal usuario = new();
+    private CorreoConfigItem? datos;
+    private string? mensaje;
+    private bool exito;
+    private bool guardando;
+
+    private string Vista => CorreoOrdenService.Reemplazar(datos?.Plantilla ?? string.Empty, CorreoOrdenService.ValoresEjemplo());
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthState is not null) usuario = (await AuthState).User;
+        try
+        {
+            datos = await ConfigSvc.ObtenerCorreoAsync(usuario);
+        }
+        catch (Exception ex)
+        {
+            Mostrar(false, $"No se pudo cargar el correo: {ex.Message}");
+        }
+    }
+
+    private void Mostrar(bool ok, string texto)
+    {
+        exito = ok;
+        mensaje = texto;
+    }
+
+    private void Insertar(string marcador)
+    {
+        if (datos is null) return;
+        datos.Plantilla = string.IsNullOrEmpty(datos.Plantilla) ? marcador : $"{datos.Plantilla} {marcador}";
+    }
+
+    private async Task GuardarAsync()
+    {
+        if (datos is null) return;
+        guardando = true;
+        try
+        {
+            var r = await ConfigSvc.GuardarCorreoAsync(usuario, datos);
+            Mostrar(r.Exito, r.Mensaje);
+            if (r.Exito) datos = await ConfigSvc.ObtenerCorreoAsync(usuario);
+        }
+        catch (Exception ex)
+        {
+            Mostrar(false, $"No se pudo guardar: {ex.Message}");
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+}

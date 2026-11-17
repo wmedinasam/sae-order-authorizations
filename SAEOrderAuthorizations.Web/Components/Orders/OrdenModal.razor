@@ -18,7 +18,7 @@
 
         @if (!string.IsNullOrEmpty(mensaje))
         {
-            <div class="wis-alert-error" role="alert">@mensaje</div>
+            <div class="@(mensajeOk ? "wis-muted" : "wis-alert-error")" role="alert">@mensaje</div>
         }
 
         <div class="wis-tabs" role="tablist">
@@ -86,12 +86,25 @@
                 </div>
             </div>
         }
+        @if (EsAdministrador)
+        {
+            <div class="wis-accion">
+                <p class="wis-muted">Prueba temporal: solo envía el correo. No autoriza ni rechaza la orden.</p>
+                <label class="wis-field-label" for="comentario-prueba">Comentario de prueba (obligatorio para rechazo, máx. 150)</label>
+                <textarea id="comentario-prueba" class="wis-input" rows="2" maxlength="150" @bind="comentarioPrueba"></textarea>
+                <div class="wis-modal-acciones">
+                    <IconButton Icono="check" Variante="autorizar" Texto="Probar autorización" MostrarTexto="true" Deshabilitado="@procesando" OnClick="() => ProbarAsync(true)" />
+                    <IconButton Icono="x" Variante="rechazar" Texto="Probar rechazo" MostrarTexto="true" Deshabilitado="@procesando" OnClick="() => ProbarAsync(false)" />
+                </div>
+            </div>
+        }
 </WisModal>
 
 @code {
     [Parameter, EditorRequired] public OrdenSae Orden { get; set; } = default!;
     [Parameter, EditorRequired] public Empresa Empresa { get; set; } = default!;
     [Parameter] public bool EsAprobador { get; set; }
+    [Parameter] public bool EsAdministrador { get; set; }
     [Parameter] public EventCallback OnCerrar { get; set; }
     [Parameter] public EventCallback<string> OnProcesada { get; set; }
 
@@ -105,6 +118,8 @@
     private string comentario = string.Empty;
     private string? mensaje;
     private bool procesando;
+    private bool mensajeOk;
+    private string comentarioPrueba = string.Empty;
 
     private bool puedeProcesar => EsAprobador && Orden.Status == "P";
 
@@ -128,11 +143,35 @@
 
     private async Task Rechazar() => await Procesar(false);
 
+    // TEMPORAL: prueba de correo; quitar cuando se valide el envío. No cambia la orden.
+    private async Task ProbarAsync(bool aprobar)
+    {
+        if (usuario is null) return;
+        procesando = true;
+        mensaje = null;
+        try
+        {
+            var resultado = await Ordenes.ProbarCorreoAsync(usuario, Empresa, Orden.IdOrder.Trim(), aprobar, comentarioPrueba);
+            mensaje = resultado.Mensaje;
+            mensajeOk = resultado.Exito;
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudo enviar la prueba: {ex.Message}";
+            mensajeOk = false;
+        }
+        finally
+        {
+            procesando = false;
+        }
+    }
+
     private async Task Procesar(bool aprobar)
     {
         if (usuario is null) return;
         procesando = true;
         mensaje = null;
+        mensajeOk = false;
         try
         {
             var resultado = await Ordenes.ProcesarAsync(usuario, Empresa, Orden.IdOrder.Trim(), aprobar, comentario);

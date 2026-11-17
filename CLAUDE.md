@@ -96,6 +96,13 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 - PopUp en `Components/Orders/OrdenModal.razor` (pestañas Partidas e Historial). Es Interactive Server; el resto de páginas siguen SSR.
 - Datos de prueba de SAE: `SAEOrderAuthorizations.Web/Scripts/dev-ordenes-prueba.sql`, se ejecuta a mano y solo en dev.
 
+## Correo de autorización (proyecto nuevo)
+
+- Claves en `WIS_CONFIGURATION`, editadas en Configuración → Correo (no en la tabla genérica): `MailHost`, `MailPort` (465 SSL, otro STARTTLS), `MailUser` (cuenta SMTP que autentica), `MailPassword` (contraseña de aplicación, nunca sale a la UI), `MailTo` (destinatario), `MailToCC` (copias separadas por coma o punto y coma), `MailBody` (plantilla de texto con marcadores). `MailSubject` queda oculta y sin uso.
+- Remitente: Gmail/Outlook reescriben el *De* a la cuenta SMTP, así que el correo sale como `Nombre del usuario <MailUser>` y el Reply-To es el correo del usuario que autorizó o rechazó.
+- `Services/CorreoOrdenService.cs` envía con MailKit. Nunca lanza: un fallo no revierte la orden; el motivo se muestra en pantalla.
+- **Temporal:** `OrdenModal` muestra "Probar autorización" y "Probar rechazo" solo a admin. `OrdenesService.ProbarCorreoAsync` solo envía correo, sin cambiar estatus ni bitácora. Quitar cuando se valide el envío (buscar `TEMPORAL`).
+
 ## Módulos de administración (proyecto nuevo)
 
 - Empresas, Roles, Usuarios y Configuración: solo alta y edición, con **soft delete** (`Estado = false`). No hay `Remove`/`DELETE`; la única eliminación es el reemplazo de filas de `ROL_EMPRESA` al guardar un rol (tabla de relación sin estado). La columna `Estado` en `WIS_USER` y `WIS_CONFIGURATION` la agrega la migración `AgregarEstadoUsuarioYConfiguracion`.
