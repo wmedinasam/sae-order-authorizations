@@ -140,37 +140,12 @@ public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionSer
 
         // Después del commit: si el correo falla, la orden ya quedó procesada.
         var nombre = usuario.FindFirstValue(ClaimTypes.Name) ?? string.Empty;
-        var fallo = await correo.EnviarResultadoAsync(empresa, orden, nombre, await EmailUsuarioAsync(usuarioId), aprobar, comentario);
+        var proveedor = await ProveedorAsync(empresa, idOrder);
+        var fallo = await correo.EnviarResultadoAsync(orden, nombre, await EmailUsuarioAsync(usuarioId), aprobar, comentario, proveedor);
         var mensaje = aprobar ? "Orden autorizada." : "Orden rechazada.";
         if (fallo is not null) mensaje += " (No se pudo enviar el correo.)";
 
         return new(true, mensaje);
-    }
-
-    // TEMPORAL: prueba de correo desde el popup; quitar cuando se valide el envío.
-    // No cambia el estatus de la orden ni escribe en WIS_WorkLog ni en COMPO.
-    public async Task<ResultadoOperacion> ProbarCorreoAsync(ClaimsPrincipal usuario, Empresa empresa, string idOrder, bool aprobar, string? comentario)
-    {
-        await using var db = await dbFactory.CreateDbContextAsync();
-        if (!usuario.EsAdministrador())
-            return new(false, "Solo un administrador puede probar el correo.");
-        if (!await sesion.EsActivaAsync(usuario))
-            return new(false, "Tu usuario o rol está inactivo.");
-
-        comentario = comentario?.Trim();
-        if (ValidarComentario(aprobar, comentario) is { } errorComentario)
-            return new(false, errorComentario);
-
-        var orden = await db.OrdenesCompra
-            .FirstOrDefaultAsync(o => o.EmpresaId == empresa.Id && o.IdOrder == idOrder);
-        if (orden is null)
-            return new(false, "La orden no existe.");
-
-        var nombre = usuario.FindFirstValue(ClaimTypes.Name) ?? string.Empty;
-        var fallo = await correo.EnviarResultadoAsync(empresa, orden, nombre, await EmailUsuarioAsync(usuario.IdUsuario()), aprobar, comentario);
-        return fallo is null
-            ? new(true, "Correo de prueba enviado. La orden no se modificó.")
-            : new(false, $"No se envió el correo: {fallo}");
     }
 
     private static string? ValidarComentario(bool aprobar, string? comentario)
@@ -181,6 +156,19 @@ public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionSer
     }
 
     // El Reply-To sale de la BD, no de un claim: así no hace falta volver a iniciar sesión.
+    // Nombre del proveedor en SAE. Si SAE no responde, el correo usa la clave del proveedor.
+    private async Task<string?> ProveedorAsync(Empresa empresa, string idOrder)
+    {
+        try
+        {
+            return (await DetalleAsync(empresa, idOrder)).Cabecera?.Supplier;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     private async Task<string?> EmailUsuarioAsync(int usuarioId)
     {
         await using var db = await dbFactory.CreateDbContextAsync();

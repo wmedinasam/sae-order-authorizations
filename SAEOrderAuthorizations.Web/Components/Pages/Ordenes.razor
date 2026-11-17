@@ -1,4 +1,4 @@
-@page "/ordenes"
+﻿@page "/ordenes"
 @attribute [Authorize]
 @rendermode InteractiveServer
 @using SAEOrderAuthorizations.Web.Components.Orders
@@ -73,7 +73,7 @@
 
 @if (seleccionada is not null && empresaSeleccionada is not null)
 {
-    <OrdenModal Orden="seleccionada" Empresa="empresaSeleccionada" EsAprobador="esAprobador" EsAdministrador="esAdministrador"
+    <OrdenModal Orden="seleccionada" Empresa="empresaSeleccionada" EsAprobador="esAprobador"
                 OnCerrar="Cerrar" OnProcesada="OrdenProcesada" />
 }
 
@@ -86,7 +86,6 @@
     private string estado = "P";
     private string? mensaje;
     private bool esAprobador;
-    private bool esAdministrador;
     private OrdenSae? seleccionada;
     private readonly Dictionary<string, IconButton?> botonesConsulta = new();
 
@@ -98,7 +97,6 @@
         if (usuario is null) return;
 
         esAprobador = usuario.IsInRole("Aprobador");
-        esAdministrador = usuario.EsAdministrador();
         var rolId = int.Parse(usuario.FindFirst("RolId")?.Value ?? "0");
         empresas = await OrdenesSvc.EmpresasDelRolAsync(rolId);
         empresaId = empresas.FirstOrDefault()?.Id ?? 0;

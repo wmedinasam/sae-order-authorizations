@@ -1,4 +1,4 @@
-@using System.Security.Claims
+﻿@using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @using SAEOrderAuthorizations.Web.Components.Shared
 @using SAEOrderAuthorizations.Web.Services
@@ -40,19 +40,25 @@
                    placeholder="correo1@dominio.com, correo2@dominio.com" />
             <p class="wis-muted">Separa varias direcciones con coma o punto y coma.</p>
 
-            <label class="wis-field-label" for="correo-plantilla">Plantilla (máx. 4000)</label>
-            <div class="wis-modal-acciones">
+            <label class="wis-field-label" for="correo-plantilla">Plantilla del correo (máx. 50 000)</label>
+            <p class="wis-muted">Admite HTML: tablas, estilos en línea e imágenes con <code>&lt;img src="https://…"&gt;</code> (URL pública). Los scripts, formularios e iframes se eliminan al guardar.</p>
+            <p class="wis-muted">Etiquetas (clic para insertar en la plantilla):</p>
+            <div class="wis-tags">
                 @foreach (var m in CorreoOrdenService.Marcadores)
                 {
-                    <button type="button" class="wis-button" @onclick="() => Insertar(m)">@m</button>
+                    <button type="button" class="wis-tag" title="@m.Descripcion" @onclick="() => Insertar(m.Etiqueta)">@m.Etiqueta</button>
                 }
             </div>
-            <textarea id="correo-plantilla" class="wis-input" rows="5" maxlength="4000"
+            <div class="wis-modal-acciones">
+                <button type="button" class="wis-button" @onclick="CargarBase">Cargar plantilla base</button>
+            </div>
+            <textarea id="correo-plantilla" class="wis-input" rows="14" maxlength="50000" style="font-family: monospace;"
                       @bind="datos.Plantilla" @bind:event="oninput"></textarea>
 
             <div class="wis-card wis-stack" aria-live="polite">
                 <h3 class="wis-h3">Vista previa</h3>
-                <p>@Vista</p>
+                <p class="wis-muted">Con datos de ejemplo. Se muestra aislada: nada de la plantilla se ejecuta en la aplicación.</p>
+                <iframe title="Vista previa del correo" sandbox srcdoc="@VistaHtml" style="width: 100%; min-height: 320px; border: 1px solid #cccccc; background: #ffffff;"></iframe>
             </div>
 
             <div class="wis-modal-acciones">
@@ -71,7 +77,7 @@
     private bool exito;
     private bool guardando;
 
-    private string Vista => CorreoOrdenService.Reemplazar(datos?.Plantilla ?? string.Empty, CorreoOrdenService.ValoresEjemplo());
+    private string VistaHtml => CorreoOrdenService.ArmarHtml(datos?.Plantilla ?? string.Empty, CorreoOrdenService.ValoresEjemplo());
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,6 +102,13 @@
     {
         if (datos is null) return;
         datos.Plantilla = string.IsNullOrEmpty(datos.Plantilla) ? marcador : $"{datos.Plantilla} {marcador}";
+    }
+
+    // Solo rellena el editor; no guarda hasta pulsar Guardar.
+    private void CargarBase()
+    {
+        if (datos is null) return;
+        datos.Plantilla = CorreoOrdenService.PlantillaBase;
     }
 
     private async Task GuardarAsync()

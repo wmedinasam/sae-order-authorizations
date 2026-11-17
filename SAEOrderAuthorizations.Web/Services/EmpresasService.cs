@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using SAEOrderAuthorizations.Web.Data;
@@ -6,10 +6,11 @@ using SAEOrderAuthorizations.Web.Data.Entities;
 
 namespace SAEOrderAuthorizations.Web.Services;
 
-public class EmpresasService(AppDbContext db)
+public class EmpresasService(IDbContextFactory<AppDbContext> dbFactory)
 {
     public async Task<List<Empresa>> ListarAsync(ClaimsPrincipal usuario, bool incluirInactivas)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador())
             return new();
 
@@ -21,6 +22,7 @@ public class EmpresasService(AppDbContext db)
 
     public async Task<ResultadoOperacion> GuardarAsync(ClaimsPrincipal usuario, EmpresaEdicion modelo)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador())
             return new(false, "Solo un administrador puede modificar empresas.");
 
@@ -64,6 +66,7 @@ public class EmpresasService(AppDbContext db)
     // Baja lógica: no hay borrado físico. Estado = false saca la empresa de Órdenes.
     public async Task<ResultadoOperacion> CambiarEstadoAsync(ClaimsPrincipal usuario, int id, bool activa)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador())
             return new(false, "Solo un administrador puede modificar empresas.");
 

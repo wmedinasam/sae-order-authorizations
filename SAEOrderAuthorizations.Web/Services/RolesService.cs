@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using SAEOrderAuthorizations.Web.Data;
 using SAEOrderAuthorizations.Web.Data.Entities;
@@ -9,13 +9,14 @@ public record RolFila(int Id, string? Nombre, string? Descripcion, bool EsAdmini
 
 public record RolFormulario(string? Nombre, string? Descripcion, bool EsAdministrador, bool Estado, List<int> EmpresaIds);
 
-public class RolesService(AppDbContext db)
+public class RolesService(IDbContextFactory<AppDbContext> dbFactory)
 {
     // Las políticas de autorización (Admin, Aprobador) dependen de estos nombres.
     private static readonly string[] NombresReservados = ["Admin", "Aprobador"];
 
     public async Task<List<RolFila>> ListarAsync(ClaimsPrincipal usuario, bool incluirInactivos)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return new List<RolFila>();
 
         var consulta = db.Roles.AsQueryable();
@@ -30,18 +31,21 @@ public class RolesService(AppDbContext db)
 
     public async Task<List<Empresa>> EmpresasActivasAsync(ClaimsPrincipal usuario)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return new List<Empresa>();
         return await db.Empresas.Where(e => e.Estado == true).OrderBy(e => e.Id).ToListAsync();
     }
 
     public async Task<List<int>> EmpresaIdsDelRolAsync(ClaimsPrincipal usuario, int rolId)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return new List<int>();
         return await db.RolesEmpresa.Where(re => re.RolId == rolId).Select(re => re.EmpresaId).ToListAsync();
     }
 
     public async Task<ResultadoOperacion> GuardarAsync(ClaimsPrincipal usuario, int? id, RolFormulario f)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return new(false, "Solo los administradores pueden gestionar roles.");
 
         var nombre = f.Nombre?.Trim() ?? string.Empty;
@@ -62,7 +66,7 @@ public class RolesService(AppDbContext db)
         if (otrosNombres.Any(n => string.Equals(n?.Trim(), nombre, StringComparison.OrdinalIgnoreCase)))
             return new(false, "Ya existe un rol con ese nombre.");
 
-        var error = await ValidarEstadoAsync(actual, f.EsAdministrador, f.Estado);
+        var error = await ValidarEstadoAsync(db, actual, f.EsAdministrador, f.Estado);
         if (error is not null) return new(false, error);
 
         // Solo se pueden asignar empresas activas; las inactivas no aparecen en el formulario.
@@ -95,12 +99,13 @@ public class RolesService(AppDbContext db)
 
     public async Task<ResultadoOperacion> CambiarEstadoAsync(ClaimsPrincipal usuario, int id, bool activo)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return new(false, "Solo los administradores pueden gestionar roles.");
 
         var rol = await db.Roles.FindAsync(id);
         if (rol is null) return new(false, "El rol no existe.");
 
-        var error = await ValidarEstadoAsync(rol, rol.EsAdministrador == true, activo);
+        var error = await ValidarEstadoAsync(db, rol, rol.EsAdministrador == true, activo);
         if (error is not null) return new(false, error);
 
         rol.Estado = activo;
@@ -109,7 +114,7 @@ public class RolesService(AppDbContext db)
     }
 
     // Salvaguardas de estado: usuarios activos y último administrador activo.
-    private async Task<string?> ValidarEstadoAsync(Rol? actual, bool esAdministrador, bool activo)
+    private static async Task<string?> ValidarEstadoAsync(AppDbContext db, Rol? actual, bool esAdministrador, bool activo)
     {
         if (actual is null) return null;
 
