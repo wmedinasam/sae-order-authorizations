@@ -140,7 +140,8 @@ public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionSer
 
         // Después del commit: si el correo falla, la orden ya quedó procesada.
         var nombre = usuario.FindFirstValue(ClaimTypes.Name) ?? string.Empty;
-        var fallo = await correo.EnviarResultadoAsync(empresa, orden, nombre, await EmailUsuarioAsync(usuarioId), aprobar, comentario);
+        var proveedor = await ProveedorAsync(empresa, idOrder);
+        var fallo = await correo.EnviarResultadoAsync(orden, nombre, await EmailUsuarioAsync(usuarioId), aprobar, comentario, proveedor);
         var mensaje = aprobar ? "Orden autorizada." : "Orden rechazada.";
         if (fallo is not null) mensaje += " (No se pudo enviar el correo.)";
 
@@ -155,6 +156,19 @@ public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionSer
     }
 
     // El Reply-To sale de la BD, no de un claim: así no hace falta volver a iniciar sesión.
+    // Nombre del proveedor en SAE. Si SAE no responde, el correo usa la clave del proveedor.
+    private async Task<string?> ProveedorAsync(Empresa empresa, string idOrder)
+    {
+        try
+        {
+            return (await DetalleAsync(empresa, idOrder)).Cabecera?.Supplier;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     private async Task<string?> EmailUsuarioAsync(int usuarioId)
     {
         await using var db = await dbFactory.CreateDbContextAsync();

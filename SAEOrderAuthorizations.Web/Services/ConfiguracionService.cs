@@ -97,16 +97,17 @@ public class ConfiguracionService(IDbContextFactory<AppDbContext> dbFactory)
             return new(false, "Una dirección en copia (MailToCC) no es válida. Sepáralas con coma o punto y coma.");
         if (plantilla.Length == 0)
             return new(false, "La plantilla no puede estar vacía.");
-        if (ValidarValor(plantilla) is { } errorPlantilla)
-            return new(false, errorPlantilla);
+        if (plantilla.Length > 50_000)
+            return new(false, "La plantilla no puede tener más de 50 000 caracteres.");
         if (ValidarValor(nuevaClave) is { } errorClave)
             return new(false, errorClave);
 
-        var desconocido = Regex.Matches(plantilla, @"\{[^{}]*\}")
+        // Solo llaves con texto de etiqueta: el HTML (CSS en línea, scripts) también usa llaves.
+        var desconocida = Regex.Matches(plantilla, @"\{[\p{L} ]+\}")
             .Select(m => m.Value)
-            .FirstOrDefault(v => !CorreoOrdenService.Marcadores.Contains(v));
-        if (desconocido is not null)
-            return new(false, $"Marcador no válido: {desconocido}. Usa solo los botones de marcadores.");
+            .FirstOrDefault(v => !CorreoOrdenService.Marcadores.Any(m => string.Equals(m.Etiqueta, v, StringComparison.OrdinalIgnoreCase)));
+        if (desconocida is not null)
+            return new(false, $"Etiqueta no válida: {desconocida}. Usa los botones de etiquetas.");
 
         await GuardarValorAsync(db, "MailHost", host);
         await GuardarValorAsync(db, "MailPort", puerto);

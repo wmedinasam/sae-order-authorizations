@@ -98,9 +98,12 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 
 ## Correo de autorización (proyecto nuevo)
 
-- Claves en `WIS_CONFIGURATION`, editadas en Configuración → Correo (no en la tabla genérica): `MailHost`, `MailPort` (465 SSL, otro STARTTLS), `MailUser` (cuenta SMTP que autentica), `MailPassword` (contraseña de aplicación, nunca sale a la UI), `MailTo` (destinatario), `MailToCC` (copias separadas por coma o punto y coma), `MailBody` (plantilla de texto con marcadores). `MailSubject` queda oculta y sin uso.
+- Claves en `WIS_CONFIGURATION`, editadas en Configuración → Correo (no en la tabla genérica): `MailHost`, `MailPort` (465 SSL, otro STARTTLS), `MailUser` (cuenta SMTP que autentica), `MailPassword` (contraseña de aplicación, nunca sale a la UI), `MailTo` (destinatario), `MailToCC` (copias separadas por coma o punto y coma), `MailBody` (plantilla HTML con etiquetas). `MailSubject` queda oculta y sin uso.
 - Remitente: Gmail/Outlook reescriben el *De* a la cuenta SMTP, así que el correo sale como `Nombre del usuario <MailUser>` y el Reply-To es el correo del usuario que autorizó o rechazó.
 - `Services/CorreoOrdenService.cs` envía con MailKit. Nunca lanza: un fallo no revierte la orden; el motivo se muestra en pantalla.
+- Etiquetas visibles (`CorreoOrdenService.Marcadores`): `{Número de Orden de Compra}`, `{Empresa}` (empresa dueña de la orden, no la de la sesión), `{Estado de la Orden}`, `{Usuario que Procesó}`, `{Observación}`, `{Proveedor}`, `{Total de la Orden}`, `{Fecha de la Orden}`, `{Fecha de Resolución}`. El nombre visible es el de negocio; el campo de origen va en el comentario de `DatosCorreo`.
+- La plantilla admite HTML libre. Se sanea con `HtmlSanitizer` (lista blanca de etiquetas y atributos; sin scripts, formularios ni iframes). Las imágenes van por URL pública (`<img src="https://…">`). Los valores se codifican antes de insertarse. La vista previa es un `iframe sandbox`.
+- Las plantillas de texto plano heredadas siguen funcionando; la migración `RenombrarEtiquetasCorreo` convierte las etiquetas antiguas.
 
 ## Módulos de administración (proyecto nuevo)
 
