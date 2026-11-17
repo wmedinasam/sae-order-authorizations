@@ -1,7 +1,9 @@
 @using Microsoft.AspNetCore.Authorization
+@using SAEOrderAuthorizations.Web.Services
+@inject MarcaService MarcaService
 
 <div class="wis-sidebar-brand">
-    <img src="brand/logos/svg/wis-logo-horizontal-on-dark.svg" width="200" height="60" alt="WIS Dev Code" />
+    <img src="@_marca.LogoSidebarUrl" alt="@_marca.NombreEmpresa" />
 </div>
 
 <nav class="wis-nav" aria-label="Principal">
@@ -21,3 +23,9 @@
     <AntiforgeryToken />
     <button type="submit" class="wis-button wis-button--secondary">Cerrar sesión</button>
 </form>
+
+@code {
+    private MarcaInfo _marca = null!;
+
+    protected override async Task OnInitializedAsync() => _marca = await MarcaService.ObtenerAsync();
+}
