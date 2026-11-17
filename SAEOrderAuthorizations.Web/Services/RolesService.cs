@@ -9,7 +9,7 @@ public record RolFila(int Id, string? Nombre, string? Descripcion, bool EsAdmini
 
 public record RolFormulario(string? Nombre, string? Descripcion, bool EsAdministrador, bool Estado, List<int> EmpresaIds);
 
-public class RolesService(IDbContextFactory<AppDbContext> dbFactory)
+public class RolesService(IDbContextFactory<AppDbContext> dbFactory, LicenciaService licencia)
 {
     // Las políticas de autorización (Admin, Aprobador) dependen de estos nombres.
     private static readonly string[] NombresReservados = ["Admin", "Aprobador"];
@@ -47,6 +47,8 @@ public class RolesService(IDbContextFactory<AppDbContext> dbFactory)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return new(false, "Solo los administradores pueden gestionar roles.");
+
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
 
         var nombre = f.Nombre?.Trim() ?? string.Empty;
         var descripcion = f.Descripcion?.Trim() ?? string.Empty;
@@ -101,6 +103,8 @@ public class RolesService(IDbContextFactory<AppDbContext> dbFactory)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return new(false, "Solo los administradores pueden gestionar roles.");
+
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
 
         var rol = await db.Roles.FindAsync(id);
         if (rol is null) return new(false, "El rol no existe.");

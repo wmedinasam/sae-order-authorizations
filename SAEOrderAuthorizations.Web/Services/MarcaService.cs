@@ -8,7 +8,7 @@ namespace SAEOrderAuthorizations.Web.Services;
 
 public record MarcaInfo(string LogoSidebarUrl, string LogoLoginUrl, string FaviconUrl, string FaviconTipo, string NombreEmpresa);
 
-public class MarcaService(IDbContextFactory<AppDbContext> dbFactory, IMemoryCache cache)
+public class MarcaService(IDbContextFactory<AppDbContext> dbFactory, IMemoryCache cache, LicenciaService licencia)
 {
     public static readonly string[] Slots = ["LogoSidebar", "LogoLogin", "Favicon"];
 
@@ -44,6 +44,8 @@ public class MarcaService(IDbContextFactory<AppDbContext> dbFactory, IMemoryCach
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return Denegado;
         if (!Slots.Contains(slot)) return new(false, "El elemento de marca no es válido.");
+
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
 
         var favicon = slot == "Favicon";
         var limite = favicon ? MaxFaviconBytes : MaxLogoBytes;
@@ -81,6 +83,8 @@ public class MarcaService(IDbContextFactory<AppDbContext> dbFactory, IMemoryCach
         if (!usuario.EsAdministrador()) return Denegado;
         if (!Slots.Contains(slot)) return new(false, "El elemento de marca no es válido.");
 
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
+
         var fila = await db.Marcas.FirstOrDefaultAsync(m => m.Slot == slot);
         if (fila is null || !fila.Estado) return new(false, "Este elemento ya usa el valor por defecto.");
 
@@ -95,6 +99,8 @@ public class MarcaService(IDbContextFactory<AppDbContext> dbFactory, IMemoryCach
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return Denegado;
+
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
 
         var valor = nombre?.Trim() ?? string.Empty;
         if (valor.Length > MaxNombre) return new(false, "El nombre no puede tener más de 255 caracteres.");

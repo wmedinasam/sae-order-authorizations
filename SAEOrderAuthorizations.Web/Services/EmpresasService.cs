@@ -6,7 +6,7 @@ using SAEOrderAuthorizations.Web.Data.Entities;
 
 namespace SAEOrderAuthorizations.Web.Services;
 
-public class EmpresasService(IDbContextFactory<AppDbContext> dbFactory)
+public class EmpresasService(IDbContextFactory<AppDbContext> dbFactory, LicenciaService licencia)
 {
     public async Task<List<Empresa>> ListarAsync(ClaimsPrincipal usuario, bool incluirInactivas)
     {
@@ -25,6 +25,11 @@ public class EmpresasService(IDbContextFactory<AppDbContext> dbFactory)
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador())
             return new(false, "Solo un administrador puede modificar empresas.");
+
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo)
+            return new(false, bloqueo);
+        if (modelo.Id == 0 && await licencia.MotivoLimiteAsync(LimiteLicencia.Empresas) is { } limite)
+            return new(false, limite);
 
         modelo.Normalizar();
         var validacion = new List<ValidationResult>();
@@ -69,6 +74,11 @@ public class EmpresasService(IDbContextFactory<AppDbContext> dbFactory)
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador())
             return new(false, "Solo un administrador puede modificar empresas.");
+
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo)
+            return new(false, bloqueo);
+        if (activa && await licencia.MotivoLimiteAsync(LimiteLicencia.Empresas) is { } limite)
+            return new(false, limite);
 
         var empresa = await db.Empresas.FirstOrDefaultAsync(e => e.Id == id);
         if (empresa is null)

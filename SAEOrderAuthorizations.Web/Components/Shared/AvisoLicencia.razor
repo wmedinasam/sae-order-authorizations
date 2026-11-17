@@ -1,0 +1,54 @@
+@implements IDisposable
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using SAEOrderAuthorizations.Web.Services
+@inject LicenciaService LicenciaSvc
+@inject NavigationManager Navegacion
+
+@if (_estado is { } e && MostrarAviso(e))
+{
+    <div class="@(Critico(e) ? "wis-alert-error" : "wis-alert-ok") wis-mb-5" role="@(Critico(e) ? "alert" : "status")">
+        @e.Mensaje
+        <AuthorizeView Policy="Administrador">
+            <a href="/licencia">Ver licencia</a>
+        </AuthorizeView>
+    </div>
+}
+
+@code {
+    private EstadoLicenciaInfo? _estado;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Navegacion.LocationChanged += RecargarAlNavegar;
+        await CargarAsync();
+    }
+
+    // El layout vive durante toda la sesión: al cambiar de página se vuelve a consultar para ver una licencia recién cargada.
+    private async void RecargarAlNavegar(object? sender, LocationChangedEventArgs e)
+    {
+        await CargarAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task CargarAsync()
+    {
+        try
+        {
+            _estado = await LicenciaSvc.ObtenerEstadoAsync();
+        }
+        catch (Exception)
+        {
+            // El aviso no debe impedir usar la aplicación; la pantalla Licencia muestra el detalle del error.
+            _estado = null;
+        }
+    }
+
+    // Solo se avisa en lo que requiere atención: vigencia de 30 días o menos, o cualquier estado sin escritura.
+    private static bool MostrarAviso(EstadoLicenciaInfo e) =>
+        e.Estado is not EstadoLicencia.Vigente || e.DiasRestantes is <= 30;
+
+    private static bool Critico(EstadoLicenciaInfo e) => !e.PermiteEscritura || e.DiasRestantes is <= 7;
+
+    public void Dispose() => Navegacion.LocationChanged -= RecargarAlNavegar;
+}
