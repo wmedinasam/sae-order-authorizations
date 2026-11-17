@@ -21,6 +21,25 @@ html, body {
     padding: var(--wis-space-5) var(--wis-page-gutter) 0;
 }
 
+.wis-marca-preview {
+    display: block;
+    max-width: 100%;
+    max-height: 96px;
+    align-self: flex-start;
+    background: var(--wis-surface-subtle);
+    padding: var(--wis-space-3);
+    object-fit: contain;
+}
+
+.wis-logo-header img {
+    display: block;
+    max-width: 100%;
+    max-height: 72px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
 .wis-login-main {
     flex: 1;
     display: grid;
@@ -279,7 +298,14 @@ html, body {
 /* Logo del sidebar: nunca más ancho que el panel (también en móvil). */
 .wis-sidebar { min-width: 0; }
 .wis-sidebar-brand { min-width: 0; overflow: hidden; }
-.wis-sidebar-brand img { display: block; width: 100%; max-width: 200px; height: auto; }
+.wis-sidebar-brand img {
+    display: block;
+    max-width: 100%;
+    max-height: 60px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
 
 /* En móvil el botón "Menú" queda encima del sidebar: el logo baja para no quedar tapado. */
 @media (max-width: 48rem) {

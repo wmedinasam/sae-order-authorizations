@@ -1,0 +1,13 @@
+@using SAEOrderAuthorizations.Web.Services
+@inject MarcaService MarcaService
+
+<PageTitle>@Texto · @_nombre</PageTitle>
+
+@code {
+    [Parameter] public string Texto { get; set; } = "";
+
+    private string _nombre = "";
+
+    protected override async Task OnInitializedAsync() =>
+        _nombre = (await MarcaService.ObtenerAsync()).NombreEmpresa;
+}

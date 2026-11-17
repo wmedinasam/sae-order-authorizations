@@ -166,6 +166,36 @@ namespace SAEOrderAuthorizations.Web.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.Marca", b =>
+                {
+                    b.Property<string>("Slot")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("Actualizado")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("Contenido")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<bool>("Estado")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("NombreArchivo")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TipoMime")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Slot");
+
+                    b.ToTable("WIS_BRANDING", (string)null);
+                });
+
             modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.OrdenCompra", b =>
                 {
                     b.Property<int>("Id")

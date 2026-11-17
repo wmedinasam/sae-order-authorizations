@@ -1,8 +1,16 @@
 @inherits LayoutComponentBase
+@using SAEOrderAuthorizations.Web.Services
+@inject MarcaService MarcaService
 
 <div class="wis-page">
     <header class="wis-logo-header">
-        <img src="brand/logos/svg/wis-logo-horizontal-on-dark.svg" width="240" height="72" alt="WIS Dev Code" />
+        <img src="@_marca?.LogoLoginUrl" alt="@_marca?.NombreEmpresa" />
     </header>
     @Body
 </div>
+
+@code {
+    private MarcaInfo? _marca;
+
+    protected override async Task OnInitializedAsync() => _marca = await MarcaService.ObtenerAsync();
+}

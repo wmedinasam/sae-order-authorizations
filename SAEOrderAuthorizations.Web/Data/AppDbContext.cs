@@ -13,9 +13,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Configuracion> Configuraciones => Set<Configuracion>();
     public DbSet<OrdenCompra> OrdenesCompra => Set<OrdenCompra>();
     public DbSet<BitacoraEntrada> Bitacora => Set<BitacoraEntrada>();
+    public DbSet<Marca> Marcas => Set<Marca>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Marca>(e =>
+        {
+            e.ToTable("WIS_BRANDING");
+            e.HasKey(x => x.Slot);
+            e.Property(x => x.Slot).HasMaxLength(20);
+            e.Property(x => x.Contenido).HasColumnType("varbinary(max)");
+            e.Property(x => x.TipoMime).HasMaxLength(50);
+            e.Property(x => x.NombreArchivo).HasMaxLength(255);
+            e.Property(x => x.Estado).HasDefaultValue(true);
+        });
+
         modelBuilder.Entity<Empresa>(e =>
         {
             e.ToTable("EMPRESA");

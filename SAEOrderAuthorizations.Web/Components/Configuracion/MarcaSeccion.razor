@@ -1,0 +1,161 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@using SAEOrderAuthorizations.Web.Components.Shared
+@using SAEOrderAuthorizations.Web.Services
+@inject MarcaService MarcaSvc
+
+<div class="wis-card wis-stack">
+    <h2 class="wis-h3">Marca</h2>
+    <p class="wis-muted">El fondo de la aplicación es oscuro: usa un logo con fondo transparente y colores claros.</p>
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="@(exito ? "wis-muted" : "wis-alert-error")" role="alert">@mensaje</div>
+    }
+
+    @if (info is not null)
+    {
+        @foreach (var s in Secciones)
+        {
+            <div class="wis-stack">
+                <h3 class="wis-h3">@s.Titulo</h3>
+                <img class="wis-marca-preview" src="@UrlDe(s.Slot)" alt="Vista previa de @s.Titulo" />
+                <label class="wis-field-label" for="@IdDe(s.Slot)">Archivo nuevo</label>
+                <InputFile id="@IdDe(s.Slot)" class="wis-input" accept="@s.Accept"
+                           OnChange="e => Seleccionar(s.Slot, e)" />
+                <div class="wis-modal-acciones">
+                    <IconButton Icono="save" Variante="guardar" Texto="Guardar" OnClick="() => GuardarSlotAsync(s.Slot, s.Limite)" />
+                    <IconButton Icono="undo" Variante="reactivar" Texto="Restaurar" OnClick="() => RestaurarAsync(s.Slot)" />
+                </div>
+            </div>
+        }
+
+        <form class="wis-stack" @onsubmit="GuardarNombreAsync" @onsubmit:preventDefault>
+            <label class="wis-field-label" for="marca-nombre">Nombre de la empresa (máx. 255)</label>
+            <input id="marca-nombre" class="wis-input" @bind="nombre" maxlength="255" autocomplete="off" />
+            <div class="wis-modal-acciones">
+                <IconButton Icono="save" Variante="guardar" Texto="Guardar nombre" Tipo="submit" />
+            </div>
+        </form>
+    }
+</div>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private const long LimiteLogo = 512 * 1024;
+    private const long LimiteFavicon = 128 * 1024;
+
+    private static readonly (string Slot, string Titulo, string Accept, long Limite)[] Secciones =
+    [
+        ("LogoSidebar", "Logo del menú lateral", "image/png,image/jpeg,image/webp", LimiteLogo),
+        ("LogoLogin", "Logo del inicio de sesión", "image/png,image/jpeg,image/webp", LimiteLogo),
+        ("Favicon", "Ícono de pestaña", "image/png,image/jpeg,image/webp,image/x-icon,.ico", LimiteFavicon)
+    ];
+
+    private ClaimsPrincipal usuario = new();
+    private MarcaInfo? info;
+    private string nombre = string.Empty;
+    private readonly Dictionary<string, IBrowserFile> seleccionados = new();
+    private string? mensaje;
+    private bool exito;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthState is not null) usuario = (await AuthState).User;
+        await CargarAsync();
+    }
+
+    private async Task CargarAsync()
+    {
+        try
+        {
+            info = await MarcaSvc.ObtenerAsync();
+            nombre = info.NombreEmpresa;
+        }
+        catch (Exception ex)
+        {
+            info = null;
+            Mostrar(false, $"No se pudo cargar la marca: {ex.Message}");
+        }
+    }
+
+    private string UrlDe(string slot) => slot switch
+    {
+        "LogoSidebar" => info!.LogoSidebarUrl,
+        "LogoLogin" => info!.LogoLoginUrl,
+        _ => info!.FaviconUrl
+    };
+
+    private static string IdDe(string slot) => $"marca-{slot}";
+
+    private void Mostrar(bool ok, string texto)
+    {
+        exito = ok;
+        mensaje = texto;
+    }
+
+    private void Seleccionar(string slot, InputFileChangeEventArgs e) => seleccionados[slot] = e.File;
+
+    private async Task GuardarSlotAsync(string slot, long limite)
+    {
+        if (!seleccionados.TryGetValue(slot, out var archivo))
+        {
+            Mostrar(false, "Selecciona un archivo antes de guardar.");
+            return;
+        }
+
+        try
+        {
+            // OpenReadStream lanza IOException si el archivo supera el límite.
+            await using var contenido = archivo.OpenReadStream(limite);
+            var r = await MarcaSvc.GuardarAsync(usuario, slot, contenido, archivo.Name);
+            Mostrar(r.Exito, r.Mensaje);
+            if (r.Exito)
+            {
+                seleccionados.Remove(slot);
+                await CargarAsync();
+            }
+        }
+        catch (IOException)
+        {
+            Mostrar(false, $"El archivo supera el máximo de {limite / 1024} KB.");
+        }
+        catch (Exception ex)
+        {
+            Mostrar(false, $"No se pudo guardar: {ex.Message}");
+        }
+    }
+
+    private async Task RestaurarAsync(string slot)
+    {
+        try
+        {
+            var r = await MarcaSvc.RestaurarAsync(usuario, slot);
+            Mostrar(r.Exito, r.Mensaje);
+            if (r.Exito)
+            {
+                seleccionados.Remove(slot);
+                await CargarAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Mostrar(false, $"No se pudo restaurar: {ex.Message}");
+        }
+    }
+
+    private async Task GuardarNombreAsync()
+    {
+        try
+        {
+            var r = await MarcaSvc.GuardarNombreAsync(usuario, nombre);
+            Mostrar(r.Exito, r.Mensaje);
+            if (r.Exito) await CargarAsync();
+        }
+        catch (Exception ex)
+        {
+            Mostrar(false, $"No se pudo guardar el nombre: {ex.Message}");
+        }
+    }
+}
