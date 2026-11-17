@@ -1,4 +1,4 @@
-# CLAUDE.md
+﻿# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -101,9 +101,10 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 - Claves en `WIS_CONFIGURATION`, editadas en Configuración → Correo (no en la tabla genérica): `MailHost`, `MailPort` (465 SSL, otro STARTTLS), `MailUser` (cuenta SMTP que autentica), `MailPassword` (contraseña de aplicación, nunca sale a la UI), `MailTo` (destinatario), `MailToCC` (copias separadas por coma o punto y coma), `MailBody` (plantilla de texto con marcadores). `MailSubject` queda oculta y sin uso.
 - Remitente: Gmail/Outlook reescriben el *De* a la cuenta SMTP, así que el correo sale como `Nombre del usuario <MailUser>` y el Reply-To es el correo del usuario que autorizó o rechazó.
 - `Services/CorreoOrdenService.cs` envía con MailKit. Nunca lanza: un fallo no revierte la orden; el motivo se muestra en pantalla.
-- **Temporal:** `OrdenModal` muestra "Probar autorización" y "Probar rechazo" solo a admin. `OrdenesService.ProbarCorreoAsync` solo envía correo, sin cambiar estatus ni bitácora. Quitar cuando se valide el envío (buscar `TEMPORAL`).
 
 ## Módulos de administración (proyecto nuevo)
+
+- Los servicios de `Services/` inyectan `IDbContextFactory<AppDbContext>` y abren un contexto por operación (`await using var db = await dbFactory.CreateDbContextAsync();`), nunca `AppDbContext` directo: Blazor carga componentes en paralelo y EF no admite dos operaciones a la vez sobre el mismo contexto. `Login.razor` es la excepción (SSR, una consulta).
 
 - Empresas, Roles, Usuarios y Configuración: solo alta y edición, con **soft delete** (`Estado = false`). No hay `Remove`/`DELETE`; la única eliminación es el reemplazo de filas de `ROL_EMPRESA` al guardar un rol (tabla de relación sin estado). La columna `Estado` en `WIS_USER` y `WIS_CONFIGURATION` la agrega la migración `AgregarEstadoUsuarioYConfiguracion`.
 - Cada servicio valida permisos (`EsAdministrador()`), longitudes y unicidad en servidor; la UI solo ayuda.

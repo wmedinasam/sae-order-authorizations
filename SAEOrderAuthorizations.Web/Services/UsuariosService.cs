@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
@@ -8,12 +8,13 @@ using SAEOrderAuthorizations.Web.Data.Entities;
 namespace SAEOrderAuthorizations.Web.Services;
 
 // Módulo Usuarios: solo create/update y soft delete (Estado). Un único rol por usuario.
-public class UsuariosService(AppDbContext db)
+public class UsuariosService(IDbContextFactory<AppDbContext> dbFactory)
 {
     private static readonly ResultadoOperacion SinPermiso = new(false, "Solo un administrador puede gestionar usuarios.");
 
     public async Task<List<UsuarioFila>> ListarAsync(ClaimsPrincipal actor, bool incluirInactivos)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!actor.EsAdministrador()) return new();
 
         return await db.Usuarios
@@ -27,6 +28,7 @@ public class UsuariosService(AppDbContext db)
     // Roles activos más el actual del usuario (si está inactivo) para que el select lo muestre.
     public async Task<List<Rol>> RolesAsignablesAsync(ClaimsPrincipal actor, int rolActual)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!actor.EsAdministrador()) return new();
 
         return await db.Roles
@@ -38,6 +40,7 @@ public class UsuariosService(AppDbContext db)
     // Devuelve los datos sin la contraseña: el formulario de edición nunca la muestra.
     public async Task<UsuarioDatos?> ObtenerAsync(ClaimsPrincipal actor, int id)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!actor.EsAdministrador()) return null;
 
         return await db.Usuarios.AsNoTracking()
@@ -56,6 +59,7 @@ public class UsuariosService(AppDbContext db)
 
     public async Task<ResultadoOperacion> GuardarAsync(ClaimsPrincipal actor, int? id, UsuarioDatos datos)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!actor.EsAdministrador()) return SinPermiso;
 
         var nombre = datos.FullName.Trim();
@@ -74,7 +78,7 @@ public class UsuariosService(AppDbContext db)
         // Serializable: las comprobaciones de nick y de administradores no pueden colarse entre dos peticiones.
         await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
 
-        if (!await RolActivoAsync(datos.RolId))
+        if (!await RolActivoAsync(db, datos.RolId))
             return new(false, "El rol seleccionado no existe o está inactivo.");
 
         var nickMinusculas = nick.ToLowerInvariant();
@@ -101,7 +105,7 @@ public class UsuariosService(AppDbContext db)
             var u = await db.Usuarios.FirstOrDefaultAsync(x => x.Id == id);
             if (u is null) return new(false, "El usuario no existe.");
 
-            var error = await ErrorCambioAsync(actor, u, datos.Estado, datos.RolId);
+            var error = await ErrorCambioAsync(db, actor, u, datos.Estado, datos.RolId);
             if (error is not null) return new(false, error);
 
             u.FullName = nombre;
@@ -120,6 +124,7 @@ public class UsuariosService(AppDbContext db)
 
     public async Task<ResultadoOperacion> CambiarEstadoAsync(ClaimsPrincipal actor, int id, bool activo)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!actor.EsAdministrador()) return SinPermiso;
 
         await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
@@ -127,10 +132,10 @@ public class UsuariosService(AppDbContext db)
         var u = await db.Usuarios.FirstOrDefaultAsync(x => x.Id == id);
         if (u is null) return new(false, "El usuario no existe.");
 
-        if (activo && !await RolActivoAsync(u.RolId ?? 0))
+        if (activo && !await RolActivoAsync(db, u.RolId ?? 0))
             return new(false, "El rol del usuario está inactivo; asígnale un rol activo antes de reactivarlo.");
 
-        var error = await ErrorCambioAsync(actor, u, activo, u.RolId ?? 0);
+        var error = await ErrorCambioAsync(db, actor, u, activo, u.RolId ?? 0);
         if (error is not null) return new(false, error);
 
         u.Estado = activo;
@@ -140,24 +145,24 @@ public class UsuariosService(AppDbContext db)
     }
 
     // Salvaguardas de servidor: no desactivarse a uno mismo y no dejar el sistema sin administradores activos.
-    private async Task<string?> ErrorCambioAsync(ClaimsPrincipal actor, Usuario u, bool estadoNuevo, int rolNuevo)
+    private static async Task<string?> ErrorCambioAsync(AppDbContext db, ClaimsPrincipal actor, Usuario u, bool estadoNuevo, int rolNuevo)
     {
         if (!estadoNuevo && u.Id == actor.IdUsuario())
             return "No puedes desactivarte a ti mismo.";
 
-        var eraAdmin = await AdministradoresActivos().AnyAsync(a => a.Id == u.Id);
+        var eraAdmin = await AdministradoresActivos(db).AnyAsync(a => a.Id == u.Id);
         var seraAdmin = estadoNuevo && await db.Roles.AnyAsync(r => r.Id == rolNuevo && r.EsAdministrador == true && r.Estado == true);
-        if (eraAdmin && !seraAdmin && !await AdministradoresActivos().AnyAsync(a => a.Id != u.Id))
+        if (eraAdmin && !seraAdmin && !await AdministradoresActivos(db).AnyAsync(a => a.Id != u.Id))
             return "No puedes desactivar ni quitar el rol de administrador al último administrador activo.";
 
         return null;
     }
 
-    private Task<bool> RolActivoAsync(int rolId) =>
+    private static Task<bool> RolActivoAsync(AppDbContext db, int rolId) =>
         db.Roles.AnyAsync(r => r.Id == rolId && r.Estado == true);
 
     // Usuarios activos cuyo rol es administrador y está activo (mismo criterio que el login).
-    private IQueryable<Usuario> AdministradoresActivos() =>
+    private static IQueryable<Usuario> AdministradoresActivos(AppDbContext db) =>
         db.Usuarios.Where(u => u.Estado && db.Roles.Any(r => r.Id == u.RolId && r.EsAdministrador == true && r.Estado == true));
 }
 
