@@ -9,46 +9,48 @@
 <TituloPagina Texto="Empresas" />
 
 <section class="wis-container">
-    <div class="wis-card wis-stack">
-        <h1 class="wis-h2">Empresas</h1>
+    <PaginaEncabezado Titulo="Empresas" Subtitulo="Bases de datos de Aspel SAE disponibles para autorizar órdenes.">
+        <IconButton Icono="plus" Variante="agregar" Texto="Nueva" MostrarTexto="true" OnClick="Nueva" />
+    </PaginaEncabezado>
 
-        <div class="wis-modal-acciones">
-            <IconButton Icono="plus" Variante="agregar" Texto="Nueva" OnClick="Nueva" />
-            <label>
-                <input type="checkbox" @bind="mostrarInactivas" @bind:after="CargarAsync" />
-                Mostrar inactivas
-            </label>
-        </div>
+    <div class="wis-toolbar">
+        <label class="wis-check">
+            <input type="checkbox" @bind="mostrarInactivas" @bind:after="CargarAsync" />
+            Mostrar inactivas
+        </label>
+    </div>
 
-        @if (!string.IsNullOrEmpty(mensaje))
-        {
-            <div class="wis-alert-error" role="alert">@mensaje</div>
-        }
-        @if (!string.IsNullOrEmpty(confirmacion))
-        {
-            <p class="wis-muted" role="status">@confirmacion</p>
-        }
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="wis-alert-error wis-mb-5" role="alert">@mensaje</div>
+    }
+    @if (!string.IsNullOrEmpty(confirmacion))
+    {
+        <div class="wis-alert-ok wis-mb-5" role="status">@confirmacion</div>
+    }
 
+    <div class="wis-card wis-seccion-tabla">
         <div class="wis-tabla-wrap">
-            <table class="wis-table">
+            <table class="wis-table wis-table--cards">
                 <thead>
                     <tr>
                         <th>Nombre</th>
                         <th>Base</th>
                         <th>Sufijo</th>
                         <th>Estado</th>
-                        <th></th>
+                        <th><span class="wis-sr-only">Acciones</span></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var e in empresas)
                     {
                         <tr>
-                            <td>@e.Nombre?.Trim()</td>
-                            <td>@e.DbSae?.Trim()</td>
-                            <td>@e.Sufijo?.Trim()</td>
-                            <td>@(e.Estado == true ? "Activa" : "Inactiva")</td>
+                            <td data-label="Nombre">@e.Nombre?.Trim()</td>
+                            <td data-label="Base">@e.DbSae?.Trim()</td>
+                            <td data-label="Sufijo">@e.Sufijo?.Trim()</td>
+                            <td data-label="Estado"><EstadoBadge Tipo="@(e.Estado == true ? "activo" : "inactivo")" Texto="@(e.Estado == true ? "Activa" : "Inactiva")" /></td>
                             <td>
+                                <div class="wis-acciones">
                                 <IconButton Icono="pencil" Variante="editar" Texto="Editar" OnClick="() => Editar(e)" />
                                 @if (e.Estado == true)
                                 {
@@ -58,12 +60,13 @@
                                 {
                                     <IconButton Icono="undo" Variante="reactivar" Texto="Reactivar" OnClick="() => AlternarEstado(e)" />
                                 }
+                                </div>
                             </td>
                         </tr>
                     }
                     @if (empresas.Count == 0 && string.IsNullOrEmpty(mensaje))
                     {
-                        <tr><td colspan="5" class="wis-muted">No hay empresas para mostrar.</td></tr>
+                        <EstadoVacio Columnas="5" Mensaje="No hay empresas para mostrar." />
                     }
                 </tbody>
             </table>

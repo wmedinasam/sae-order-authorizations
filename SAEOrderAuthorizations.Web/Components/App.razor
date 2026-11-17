@@ -10,6 +10,7 @@
     <meta name="color-scheme" content="dark" />
     <base href="/" />
     <ResourcePreloader />
+    <link rel="preload" href="brand/fonts/Inter/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="brand/web/brand-tokens.css" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["SAEOrderAuthorizations.Web.styles.css"]" />
@@ -22,6 +23,7 @@
     <Routes />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="@Assets["app.js"]" defer></script>
 </body>
 
 </html>

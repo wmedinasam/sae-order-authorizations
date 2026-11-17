@@ -2,31 +2,93 @@
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using SAEOrderAuthorizations.Web.Data.Entities
+@using SAEOrderAuthorizations.Web.Services
+@inject OrdenesService OrdenesSvc
 
 <TituloPagina Texto="Inicio" />
 
 <section class="wis-container">
-    <section class="wis-card wis-stack">
-        <div class="wis-user-bar">
-            <div>
-                <h1 class="wis-h2">Dashboard</h1>
-                <p class="wis-muted wis-small" style="margin: 0;">
-                    @nombre
-                </p>
+    <PaginaEncabezado Titulo="@($"Hola, {nombre}")" Subtitulo="Resumen de órdenes de compra por empresa.">
+        <a class="wis-button" href="/ordenes">Ver órdenes pendientes</a>
+    </PaginaEncabezado>
+
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="wis-alert-error wis-mb-5" role="alert">@error</div>
+    }
+
+    <div class="wis-seccion">
+        @foreach (var r in resumenes)
+        {
+            <div class="wis-card wis-stack">
+                <h2 class="wis-h3">@r.Empresa.Nombre?.Trim()</h2>
+                @if (r.Error is not null)
+                {
+                    <div class="wis-alert-error" role="alert">@r.Error</div>
+                }
+                else
+                {
+                    <div class="wis-stats">
+                        <a class="wis-stat wis-stat--pendiente" href="/ordenes">
+                            <span class="wis-stat-num">@r.Pendientes</span>
+                            <span class="wis-stat-label">Pendientes</span>
+                        </a>
+                        <div class="wis-stat wis-stat--autorizada">
+                            <span class="wis-stat-num">@r.Autorizadas</span>
+                            <span class="wis-stat-label">Autorizadas</span>
+                        </div>
+                        <div class="wis-stat wis-stat--rechazada">
+                            <span class="wis-stat-num">@r.Rechazadas</span>
+                            <span class="wis-stat-label">Rechazadas</span>
+                        </div>
+                    </div>
+                }
             </div>
-        </div>
-    </section>
+        }
+        @if (resumenes.Count == 0 && string.IsNullOrEmpty(error))
+        {
+            <div class="wis-card"><p class="wis-muted wis-flush">Tu rol no tiene empresas asignadas.</p></div>
+        }
+    </div>
 </section>
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
     private string nombre = string.Empty;
+    private string? error;
+    private readonly List<Resumen> resumenes = new();
+
+    private sealed record Resumen(Empresa Empresa, int Pendientes, int Autorizadas, int Rechazadas, string? Error);
 
     protected override async Task OnInitializedAsync()
     {
-        if (AuthState is not null)
+        if (AuthState is null) return;
+        var usuario = (await AuthState).User;
+        nombre = usuario.Identity?.Name ?? string.Empty;
+
+        try
         {
-            nombre = (await AuthState).User.Identity?.Name ?? string.Empty;
+            var rolId = int.Parse(usuario.FindFirst("RolId")?.Value ?? "0");
+            foreach (var e in await OrdenesSvc.EmpresasDelRolAsync(rolId))
+            {
+                try
+                {
+                    var p = (await OrdenesSvc.ListarAsync(e, "P")).Count;
+                    var o = (await OrdenesSvc.ListarAsync(e, "O")).Count;
+                    var r = (await OrdenesSvc.ListarAsync(e, "R")).Count;
+                    resumenes.Add(new Resumen(e, p, o, r, null));
+                }
+                catch (Exception ex)
+                {
+                    resumenes.Add(new Resumen(e, 0, 0, 0, $"No se pudieron leer las órdenes: {ex.Message}"));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            error = $"No se pudo cargar el resumen: {ex.Message}";
         }
     }
 }

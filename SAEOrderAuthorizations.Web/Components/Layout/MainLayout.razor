@@ -1,10 +1,17 @@
 @inherits LayoutComponentBase
+@using SAEOrderAuthorizations.Web.Services
+@inject MarcaService MarcaService
 
 <div class="wis-app">
-    <input type="checkbox" id="wis-nav-toggle" class="wis-nav-toggle" aria-hidden="true" />
-    <label for="wis-nav-toggle" class="wis-nav-button">Menú</label>
+    <header class="wis-topbar">
+        <button type="button" class="wis-menu-btn" aria-label="Abrir menú" aria-controls="wis-sidebar" aria-expanded="false">
+            <Icono Nombre="menu" />
+        </button>
+        <img src="@_marca?.LogoSidebarUrl" alt="@_marca?.NombreEmpresa" />
+    </header>
+    <button type="button" class="wis-scrim" tabindex="-1" aria-label="Cerrar menú"></button>
 
-    <aside class="wis-sidebar">
+    <aside class="wis-sidebar" id="wis-sidebar">
         <NavMenu />
     </aside>
 
@@ -13,8 +20,14 @@
     </main>
 </div>
 
-<div id="blazor-error-ui" data-nosnippet>
-    Ocurrió un error no controlado.
+<div id="blazor-error-ui" data-nosnippet role="alert">
+    <span>Ocurrió un error no controlado.</span>
     <a href="." class="reload">Recargar</a>
-    <span class="dismiss">🗙</span>
+    <button type="button" class="dismiss" aria-label="Cerrar aviso"><Icono Nombre="x" /></button>
 </div>
+
+@code {
+    private MarcaInfo? _marca;
+
+    protected override async Task OnInitializedAsync() => _marca = await MarcaService.ObtenerAsync();
+}

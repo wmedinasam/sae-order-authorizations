@@ -10,44 +10,56 @@
 <TituloPagina Texto="Configuración" />
 
 <section class="wis-container">
-    <div class="wis-card wis-stack">
-        <h1 class="wis-h2">Configuración</h1>
-
-        <div class="wis-filtros">
-            <div>
-                <label class="wis-field-label">
-                    <input type="checkbox" @bind="mostrarInactivas" @bind:after="CargarAsync" /> Mostrar inactivas
-                </label>
-            </div>
-            <div class="wis-modal-acciones">
-                <IconButton Icono="plus" Variante="agregar" Texto="Nueva" OnClick="Nueva" />
-            </div>
-        </div>
-
-        @if (!string.IsNullOrEmpty(mensaje))
+    <PaginaEncabezado Titulo="Configuración" Subtitulo="Parámetros del sistema, marca y correo de autorización.">
+        @if (pestana == "general")
         {
-            <div class="@(exito ? "wis-muted" : "wis-alert-error")" role="alert">@mensaje</div>
+            <IconButton Icono="plus" Variante="agregar" Texto="Nueva" MostrarTexto="true" OnClick="Nueva" />
         }
+    </PaginaEncabezado>
 
+    <div class="wis-tabs wis-mb-5" role="tablist" aria-label="Secciones de configuración" @onkeydown="TeclaPestana">
+        @foreach (var (id, titulo) in Pestanas)
+        {
+            <button type="button" role="tab" id="tab-@id" aria-controls="panel-@id" aria-selected="@(pestana == id ? "true" : "false")"
+                    tabindex="@(pestana == id ? 0 : -1)" class="wis-tab @(pestana == id ? "activa" : "")"
+                    @onclick="() => pestana = id">@titulo</button>
+        }
+    </div>
+
+    <div role="tabpanel" id="panel-@pestana" aria-labelledby="tab-@pestana">
+    @if (pestana == "general")
+    {
+    <div class="wis-toolbar">
+        <label class="wis-check">
+            <input type="checkbox" @bind="mostrarInactivas" @bind:after="CargarAsync" /> Mostrar inactivas
+        </label>
+    </div>
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="@(exito ? "wis-alert-ok" : "wis-alert-error") wis-mb-5" role="@(exito ? "status" : "alert")">@mensaje</div>
+    }
+
+    <div class="wis-card wis-seccion-tabla">
         <div class="wis-tabla-wrap">
-            <table class="wis-table">
+            <table class="wis-table wis-table--cards">
                 <thead>
                     <tr>
                         <th>Clave</th>
                         <th>Valor</th>
                         <th>Estado</th>
-                        <th></th>
+                        <th><span class="wis-sr-only">Acciones</span></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var c in items)
                     {
                         <tr>
-                            <td>@c.Key</td>
-                            <td>@(c.Sensible ? "••••••" : c.Valor)</td>
-                            <td>@(c.Estado ? "Activa" : "Inactiva")</td>
+                            <td data-label="Clave">@c.Key</td>
+                            <td data-label="Valor">@(c.Sensible ? "••••••" : c.Valor)</td>
+                            <td data-label="Estado"><EstadoBadge Tipo="@(c.Estado ? "activo" : "inactivo")" Texto="@(c.Estado ? "Activa" : "Inactiva")" /></td>
                             <td>
-                                <div class="wis-modal-acciones">
+                                <div class="wis-acciones">
                                     <IconButton Icono="pencil" Variante="editar" Texto="Editar" OnClick="() => Editar(c)" />
                                     @if (c.Estado)
                                     {
@@ -63,15 +75,23 @@
                     }
                     @if (items.Count == 0 && string.IsNullOrEmpty(mensaje))
                     {
-                        <tr><td colspan="4" class="wis-muted">No hay configuraciones para mostrar.</td></tr>
+                        <EstadoVacio Columnas="4" Mensaje="No hay configuraciones para mostrar." />
                     }
                 </tbody>
             </table>
         </div>
     </div>
 
-    <MarcaSeccion />
-    <CorreoSeccion />
+    }
+    else if (pestana == "marca")
+    {
+        <MarcaSeccion />
+    }
+    else
+    {
+        <CorreoSeccion />
+    }
+    </div>
 </section>
 
 @if (modalAbierto)
@@ -84,6 +104,14 @@
 
     private ClaimsPrincipal usuario = new();
     private List<ConfiguracionItem> items = new();
+    private static readonly (string Id, string Titulo)[] Pestanas =
+    [
+        ("general", "General"),
+        ("marca", "Marca"),
+        ("correo", "Correo")
+    ];
+
+    private string pestana = "general";
     private bool mostrarInactivas;
     private bool modalAbierto;
     private ConfiguracionItem? seleccionada;
@@ -107,6 +135,14 @@
             items = new();
             Mostrar(false, $"No se pudo cargar la configuración: {ex.Message}");
         }
+    }
+
+    private void TeclaPestana(KeyboardEventArgs e)
+    {
+        var delta = e.Key switch { "ArrowRight" => 1, "ArrowLeft" => -1, _ => 0 };
+        if (delta == 0) return;
+        var i = Array.FindIndex(Pestanas, p => p.Id == pestana);
+        pestana = Pestanas[(i + delta + Pestanas.Length) % Pestanas.Length].Id;
     }
 
     private void Mostrar(bool ok, string texto)

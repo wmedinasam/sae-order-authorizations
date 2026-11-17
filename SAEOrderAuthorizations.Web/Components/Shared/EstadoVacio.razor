@@ -1,0 +1,13 @@
+@* Fila vacía de tabla: mensaje y, opcionalmente, una acción (ChildContent). *@
+<tr>
+    <td colspan="@Columnas" class="wis-vacio">
+        <p class="wis-muted">@Mensaje</p>
+        @ChildContent
+    </td>
+</tr>
+
+@code {
+    [Parameter, EditorRequired] public string Mensaje { get; set; } = string.Empty;
+    [Parameter] public int Columnas { get; set; } = 1;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

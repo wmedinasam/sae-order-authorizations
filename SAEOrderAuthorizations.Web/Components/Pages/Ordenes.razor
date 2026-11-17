@@ -1,4 +1,4 @@
-﻿@page "/ordenes"
+@page "/ordenes"
 @attribute [Authorize]
 @rendermode InteractiveServer
 @using SAEOrderAuthorizations.Web.Components.Orders
@@ -9,10 +9,9 @@
 <TituloPagina Texto="Órdenes" />
 
 <section class="wis-container">
-    <div class="wis-card wis-stack">
-        <h1 class="wis-h2">Órdenes</h1>
+    <PaginaEncabezado Titulo="Órdenes" Subtitulo="Consulta y autoriza las órdenes de compra de SAE." />
 
-        <div class="wis-filtros">
+    <div class="wis-toolbar wis-mb-5">
             <div>
                 <label class="wis-field-label" for="empresa">Empresa</label>
                 <select id="empresa" class="wis-input" @bind="empresaId" @bind:after="CargarAsync">
@@ -30,15 +29,16 @@
                     <option value="R">Rechazadas</option>
                 </select>
             </div>
-        </div>
+    </div>
 
-        @if (!string.IsNullOrEmpty(mensaje))
-        {
-            <div class="wis-alert-error" role="alert">@mensaje</div>
-        }
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="@(mensajeOk ? "wis-alert-ok" : "wis-alert-error") wis-mb-5" role="@(mensajeOk ? "status" : "alert")">@mensaje</div>
+    }
 
+    <div class="wis-card wis-seccion-tabla">
         <div class="wis-tabla-wrap">
-            <table class="wis-table">
+            <table class="wis-table wis-table--cards">
                 <thead>
                     <tr>
                         <th>Documento</th>
@@ -46,28 +46,54 @@
                         <th>Fecha</th>
                         <th class="wis-num">Total</th>
                         <th>Observaciones</th>
-                        <th></th>
+                        <th><span class="wis-sr-only">Acciones</span></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var o in ordenes)
+                    @if (cargando)
                     {
-                        <tr>
-                            <td>@o.IdOrder.Trim()</td>
-                            <td>@o.Vendor?.Trim()</td>
-                            <td>@o.OrdDate.ToString("d")</td>
-                            <td class="wis-num">@o.Total.ToString("N2")</td>
-                            <td>@o.Observations?.Trim()</td>
-                            <td><IconButton @ref="botonesConsulta[o.IdOrder.Trim()]" Icono="eye" Variante="ver" Texto="Consultar" OnClick="() => Abrir(o)" /></td>
+                        @for (var i = 0; i < 5; i++)
+                        {
+                            <tr class="wis-skeleton" aria-hidden="true">
+                                @for (var c = 0; c < 6; c++)
+                                {
+                                    <td><span></span></td>
+                                }
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                    @foreach (var o in ordenesPagina)
+                    {
+                        <tr class="wis-row-link" @onclick="() => Abrir(o)">
+                            <td data-label="Documento">@o.IdOrder.Trim()</td>
+                            <td data-label="Proveedor">@o.Vendor?.Trim()</td>
+                            <td data-label="Fecha">@o.OrdDate.ToString("d")</td>
+                            <td data-label="Total" class="wis-num">@o.Total.ToString("N2")</td>
+                            <td data-label="Observaciones">@o.Observations?.Trim()</td>
+                            <td><div class="wis-acciones"><IconButton @ref="botonesConsulta[o.IdOrder.Trim()]" Icono="eye" Variante="ver" Texto="Consultar" OnClick="() => Abrir(o)" /></div></td>
                         </tr>
                     }
                     @if (ordenes.Count == 0 && string.IsNullOrEmpty(mensaje))
                     {
-                        <tr><td colspan="6" class="wis-muted">No hay órdenes en este estado.</td></tr>
+                        <EstadoVacio Columnas="6" Mensaje="No hay órdenes en este estado." />
+                    }
                     }
                 </tbody>
             </table>
         </div>
+        @if (ordenes.Count > 0)
+        {
+            <nav class="wis-paginacion" aria-label="Paginación de órdenes">
+                <span class="wis-muted" aria-live="polite">Mostrando @(((pagina - 1) * TamanoPagina) + 1)–@(Math.Min(pagina * TamanoPagina, ordenes.Count)) de @ordenes.Count</span>
+                <div class="wis-acciones">
+                    <button type="button" class="wis-button wis-button--secondary" disabled="@(pagina <= 1)" @onclick="() => IrAPagina(pagina - 1)">Anterior</button>
+                    <span class="wis-muted">Página @pagina de @TotalPaginas</span>
+                    <button type="button" class="wis-button wis-button--secondary" disabled="@(pagina >= TotalPaginas)" @onclick="() => IrAPagina(pagina + 1)">Siguiente</button>
+                </div>
+            </nav>
+        }
     </div>
 </section>
 
@@ -82,9 +108,15 @@
 
     private List<Empresa> empresas = new();
     private List<OrdenSae> ordenes = new();
+    private const int TamanoPagina = 10;
+    private int pagina = 1;
+    private int TotalPaginas => Math.Max(1, (int)Math.Ceiling(ordenes.Count / (double)TamanoPagina));
+    private IEnumerable<OrdenSae> ordenesPagina => ordenes.Skip((pagina - 1) * TamanoPagina).Take(TamanoPagina);
     private int empresaId;
     private string estado = "P";
     private string? mensaje;
+    private bool mensajeOk;
+    private bool cargando = true;
     private bool esAprobador;
     private OrdenSae? seleccionada;
     private readonly Dictionary<string, IconButton?> botonesConsulta = new();
@@ -106,12 +138,17 @@
     private async Task CargarAsync()
     {
         mensaje = null;
+        mensajeOk = false;
         ordenes = new();
+        pagina = 1;
         if (empresaSeleccionada is null)
         {
             mensaje = "Tu rol no tiene empresas asignadas.";
+            cargando = false;
             return;
         }
+
+        cargando = true;
 
         try
         {
@@ -121,6 +158,15 @@
         {
             mensaje = $"No se pudieron cargar las órdenes: {ex.Message}";
         }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private void IrAPagina(int nueva)
+    {
+        pagina = Math.Clamp(nueva, 1, TotalPaginas);
     }
 
     private void Abrir(OrdenSae orden) => seleccionada = orden;
@@ -140,5 +186,6 @@
         seleccionada = null;
         await CargarAsync();
         mensaje = resultado;
+        mensajeOk = true;
     }
 }

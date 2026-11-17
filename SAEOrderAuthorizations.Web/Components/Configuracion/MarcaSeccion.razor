@@ -10,7 +10,7 @@
 
     @if (!string.IsNullOrEmpty(mensaje))
     {
-        <div class="@(exito ? "wis-muted" : "wis-alert-error")" role="alert">@mensaje</div>
+        <div class="@(exito ? "wis-alert-ok" : "wis-alert-error")" role="@(exito ? "status" : "alert")">@mensaje</div>
     }
 
     @if (info is not null)
@@ -23,7 +23,7 @@
                 <label class="wis-field-label" for="@IdDe(s.Slot)">Archivo nuevo</label>
                 <InputFile id="@IdDe(s.Slot)" class="wis-input" accept="@s.Accept"
                            OnChange="e => Seleccionar(s.Slot, e)" />
-                <div class="wis-modal-acciones">
+                <div class="wis-form-acciones">
                     <IconButton Icono="save" Variante="guardar" Texto="Guardar" OnClick="() => GuardarSlotAsync(s.Slot, s.Limite)" />
                     <IconButton Icono="undo" Variante="reactivar" Texto="Restaurar" OnClick="() => RestaurarAsync(s.Slot)" />
                 </div>
@@ -33,7 +33,7 @@
         <form class="wis-stack" @onsubmit="GuardarNombreAsync" @onsubmit:preventDefault>
             <label class="wis-field-label" for="marca-nombre">Nombre de la empresa (máx. 255)</label>
             <input id="marca-nombre" class="wis-input" @bind="nombre" maxlength="255" autocomplete="off" />
-            <div class="wis-modal-acciones">
+            <div class="wis-form-acciones">
                 <IconButton Icono="save" Variante="guardar" Texto="Guardar nombre" Tipo="submit" />
             </div>
         </form>
