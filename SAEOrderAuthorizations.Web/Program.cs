@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -54,6 +54,9 @@ foreach (var tipo in typeof(Program).Assembly.GetTypes()
 }
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+// Servicios que atienden componentes concurrentes: cada operación usa su propio contexto.
+builder.Services.AddDbContextFactory<AppDbContext>(o =>
+    o.UseSqlServer(builder.Configuration.GetConnectionString("Default")), ServiceLifetime.Scoped);
 
 var app = builder.Build();
 

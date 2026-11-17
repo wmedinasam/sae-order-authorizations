@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using SAEOrderAuthorizations.Web.Data;
@@ -8,7 +8,7 @@ namespace SAEOrderAuthorizations.Web.Services;
 
 public record MarcaInfo(string LogoSidebarUrl, string LogoLoginUrl, string FaviconUrl, string FaviconTipo, string NombreEmpresa);
 
-public class MarcaService(AppDbContext db, IMemoryCache cache)
+public class MarcaService(IDbContextFactory<AppDbContext> dbFactory, IMemoryCache cache)
 {
     public static readonly string[] Slots = ["LogoSidebar", "LogoLogin", "Favicon"];
 
@@ -27,10 +27,21 @@ public class MarcaService(AppDbContext db, IMemoryCache cache)
 
     private static readonly ResultadoOperacion Denegado = new(false, "Solo un administrador puede modificar la marca.");
 
-    public Task<MarcaInfo> ObtenerAsync() => cache.GetOrCreateAsync(CacheKey, _ => CargarAsync())!;
+    // Las páginas y layouts piden la marca a la vez y comparten el mismo DbContext del request:
+    // se reutiliza una sola tarea por scope para no lanzar dos consultas concurrentes.
+    private Task<MarcaInfo>? _enCurso;
+
+    public Task<MarcaInfo> ObtenerAsync() => _enCurso ??= cache.GetOrCreateAsync(CacheKey, _ => CargarAsync())!;
+
+    private void Invalidar()
+    {
+        cache.Remove(CacheKey);
+        _enCurso = null;
+    }
 
     public async Task<ResultadoOperacion> GuardarAsync(ClaimsPrincipal usuario, string slot, Stream contenido, string nombreArchivo)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return Denegado;
         if (!Slots.Contains(slot)) return new(false, "El elemento de marca no es válido.");
 
@@ -60,12 +71,13 @@ public class MarcaService(AppDbContext db, IMemoryCache cache)
         fila.Estado = true;
 
         await db.SaveChangesAsync();
-        cache.Remove(CacheKey);
+        Invalidar();
         return new(true, "Imagen guardada.");
     }
 
     public async Task<ResultadoOperacion> RestaurarAsync(ClaimsPrincipal usuario, string slot)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return Denegado;
         if (!Slots.Contains(slot)) return new(false, "El elemento de marca no es válido.");
 
@@ -75,12 +87,13 @@ public class MarcaService(AppDbContext db, IMemoryCache cache)
         // Soft delete: la fila queda para auditoría y la siguiente subida la reactiva.
         fila.Estado = false;
         await db.SaveChangesAsync();
-        cache.Remove(CacheKey);
+        Invalidar();
         return new(true, "Imagen restaurada al valor por defecto.");
     }
 
     public async Task<ResultadoOperacion> GuardarNombreAsync(ClaimsPrincipal usuario, string? nombre)
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return Denegado;
 
         var valor = nombre?.Trim() ?? string.Empty;
@@ -103,12 +116,13 @@ public class MarcaService(AppDbContext db, IMemoryCache cache)
         }
 
         await db.SaveChangesAsync();
-        cache.Remove(CacheKey);
+        Invalidar();
         return new(true, valor.Length == 0 ? "Nombre restaurado a WIS Dev Code." : "Nombre de la empresa guardado.");
     }
 
     private async Task<MarcaInfo> CargarAsync()
     {
+        await using var db = await dbFactory.CreateDbContextAsync();
         // Proyección sin Contenido: esta consulta corre en cada cambio de caché, no hay que traer los bytes.
         var activas = await db.Marcas
             .Where(m => m.Estado)

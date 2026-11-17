@@ -84,8 +84,7 @@ namespace SAEOrderAuthorizations.Web.Migrations
                         .HasColumnName("KEY");
 
                     b.Property<string>("Value")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("VALUE");
 
                     b.HasKey("Id");
@@ -97,7 +96,7 @@ namespace SAEOrderAuthorizations.Web.Migrations
                         {
                             Id = 1,
                             Estado = true,
-                            Key = "MailFrom",
+                            Key = "MailUser",
                             Value = ""
                         },
                         new

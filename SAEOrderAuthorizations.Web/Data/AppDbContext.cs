@@ -96,10 +96,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             e.ToTable("WIS_CONFIGURATION");
             e.Property(x => x.Key).HasColumnName("KEY").HasMaxLength(25);
-            e.Property(x => x.Value).HasColumnName("VALUE").HasMaxLength(255);
+            e.Property(x => x.Value).HasColumnName("VALUE").HasColumnType("nvarchar(max)");
             e.Property(x => x.Estado).HasColumnName("ESTADO").HasDefaultValue(true);
             e.HasData(
-                new Configuracion { Id = 1, Key = "MailFrom", Value = "", Estado = true },
+                new Configuracion { Id = 1, Key = "MailUser", Value = "", Estado = true },
                 new Configuracion { Id = 2, Key = "MailPassword", Value = "", Estado = true },
                 new Configuracion { Id = 3, Key = "MailSubject", Value = "", Estado = true },
                 new Configuracion { Id = 4, Key = "MailBody", Value = "", Estado = true });
