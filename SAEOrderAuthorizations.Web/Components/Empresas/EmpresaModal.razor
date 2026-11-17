@@ -12,22 +12,22 @@
         <div>
             <label class="wis-field-label" for="emp-nombre">Nombre</label>
             <InputText id="emp-nombre" class="wis-input" maxlength="50" @bind-Value="Modelo.Nombre" />
-            <ValidationMessage For="() => Modelo.Nombre" class="wis-alert-error" />
+            <ValidationMessage For="() => Modelo.Nombre" class="wis-alert-error" role="alert" />
         </div>
         <div>
             <label class="wis-field-label" for="emp-direccion">Dirección (opcional)</label>
             <InputText id="emp-direccion" class="wis-input" maxlength="50" @bind-Value="Modelo.Direccion" />
-            <ValidationMessage For="() => Modelo.Direccion" class="wis-alert-error" />
+            <ValidationMessage For="() => Modelo.Direccion" class="wis-alert-error" role="alert" />
         </div>
         <div>
             <label class="wis-field-label" for="emp-dbsae">Base SAE</label>
             <InputText id="emp-dbsae" class="wis-input" maxlength="50" @bind-Value="Modelo.DbSae" />
-            <ValidationMessage For="() => Modelo.DbSae" class="wis-alert-error" />
+            <ValidationMessage For="() => Modelo.DbSae" class="wis-alert-error" role="alert" />
         </div>
         <div>
             <label class="wis-field-label" for="emp-sufijo">Sufijo</label>
             <InputText id="emp-sufijo" class="wis-input" maxlength="10" @bind-Value="Modelo.Sufijo" />
-            <ValidationMessage For="() => Modelo.Sufijo" class="wis-alert-error" />
+            <ValidationMessage For="() => Modelo.Sufijo" class="wis-alert-error" role="alert" />
         </div>
 
         @if (!string.IsNullOrEmpty(mensaje))

@@ -15,7 +15,7 @@
     <div class="wis-stack">
         <div>
             <label class="wis-field-label" for="rol-nombre">Nombre (obligatorio, máx. 50)</label>
-            <input id="rol-nombre" class="wis-input" maxlength="50" @bind="nombre" />
+            <input id="rol-nombre" class="wis-input" maxlength="50" @bind="nombre" @ref="primerCampo" />
         </div>
         <div>
             <label class="wis-field-label" for="rol-descripcion">Descripción (máx. 50)</label>
@@ -62,6 +62,12 @@
     private bool estado = true;
     private string? mensaje;
     private bool guardando;
+    private ElementReference primerCampo;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) await primerCampo.FocusAsync();
+    }
 
     protected override async Task OnInitializedAsync()
     {
