@@ -1,4 +1,4 @@
-/* Estilos base sobre el brand kit (brand/web/brand-tokens.css). */
+﻿/* Estilos base sobre el brand kit (brand/web/brand-tokens.css). */
 
 html, body {
     margin: 0;
@@ -231,6 +231,23 @@ html, body {
     --wis-danger: #FF654F;
     --wis-warning: #F5B83D;
 }
+
+/* Etiquetas insertables: píldora verde, distinta de los botones. */
+.wis-tags { display: flex; flex-wrap: wrap; gap: var(--wis-space-2); }
+.wis-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.75rem;
+    border: 1px solid var(--wis-success);
+    border-radius: var(--wis-radius-pill);
+    background: color-mix(in srgb, var(--wis-success) 14%, transparent);
+    color: var(--wis-success);
+    font: 600 0.85rem/1.5 var(--wis-font-body);
+    cursor: pointer;
+    transition: background-color var(--wis-duration-fast) var(--wis-ease);
+}
+.wis-tag:hover { background: color-mix(in srgb, var(--wis-success) 26%, transparent); }
+.wis-tag:focus-visible { outline: 3px solid var(--wis-focus); outline-offset: 3px; }
 
 /* Botón de ícono con color y tooltip. */
 .wis-icon-btn {

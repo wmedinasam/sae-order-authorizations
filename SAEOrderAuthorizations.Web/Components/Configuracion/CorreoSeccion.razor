@@ -1,4 +1,4 @@
-@using System.Security.Claims
+﻿@using System.Security.Claims
 @using Microsoft.AspNetCore.Components.Authorization
 @using SAEOrderAuthorizations.Web.Components.Shared
 @using SAEOrderAuthorizations.Web.Services
@@ -42,11 +42,14 @@
 
             <label class="wis-field-label" for="correo-plantilla">Plantilla del correo (máx. 50 000)</label>
             <p class="wis-muted">Admite HTML: tablas, estilos en línea e imágenes con <code>&lt;img src="https://…"&gt;</code> (URL pública). Los scripts, formularios e iframes se eliminan al guardar.</p>
-            <div class="wis-modal-acciones">
+            <p class="wis-muted">Etiquetas (clic para insertar en la plantilla):</p>
+            <div class="wis-tags">
                 @foreach (var m in CorreoOrdenService.Marcadores)
                 {
-                    <button type="button" class="wis-button" title="@m.Descripcion" @onclick="() => Insertar(m.Etiqueta)">@m.Etiqueta</button>
+                    <button type="button" class="wis-tag" title="@m.Descripcion" @onclick="() => Insertar(m.Etiqueta)">@m.Etiqueta</button>
                 }
+            </div>
+            <div class="wis-modal-acciones">
                 <button type="button" class="wis-button" @onclick="CargarBase">Cargar plantilla base</button>
             </div>
             <textarea id="correo-plantilla" class="wis-input" rows="14" maxlength="50000" style="font-family: monospace;"
