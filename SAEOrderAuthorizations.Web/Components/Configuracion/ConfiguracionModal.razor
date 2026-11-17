@@ -8,7 +8,7 @@
         @if (EsNueva)
         {
             <label class="wis-field-label" for="cfg-clave">Clave (máx. 25, sin espacios, única)</label>
-            <input id="cfg-clave" class="wis-input" @bind="clave" maxlength="25" autocomplete="off" />
+            <input id="cfg-clave" class="wis-input" @bind="clave" maxlength="25" autocomplete="off" @ref="claveRef" />
         }
         else
         {
@@ -19,12 +19,12 @@
         <label class="wis-field-label" for="cfg-valor">Valor (máx. 255)</label>
         @if (EsSensible)
         {
-            <input id="cfg-valor" class="wis-input" type="password" @bind="valor" maxlength="255"
+            <input id="cfg-valor" class="wis-input" type="password" @bind="valor" maxlength="255" @ref="valorRef"
                    autocomplete="new-password" placeholder="En blanco = conservar el valor actual" />
         }
         else
         {
-            <input id="cfg-valor" class="wis-input" @bind="valor" maxlength="255" autocomplete="off" />
+            <input id="cfg-valor" class="wis-input" @bind="valor" maxlength="255" autocomplete="off" @ref="valorRef" />
         }
 
         @if (!EsNueva)
@@ -60,6 +60,13 @@
     private bool activo = true;
     private string? error;
     private bool guardando;
+    private ElementReference claveRef;
+    private ElementReference valorRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) await (EsNueva ? claveRef : valorRef).FocusAsync();
+    }
 
     protected override void OnInitialized()
     {

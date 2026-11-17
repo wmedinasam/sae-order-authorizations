@@ -24,23 +24,23 @@
             <div>
                 <label class="wis-field-label" for="u-nombre">Nombre</label>
                 <InputText id="u-nombre" class="wis-input" @bind-Value="modelo.FullName" />
-                <ValidationMessage For="() => modelo.FullName" />
+                <ValidationMessage For="() => modelo.FullName" role="alert" />
             </div>
             <div>
                 <label class="wis-field-label" for="u-nick">Nick (no distingue mayúsculas)</label>
                 <InputText id="u-nick" class="wis-input" @bind-Value="modelo.NickName" />
-                <ValidationMessage For="() => modelo.NickName" />
+                <ValidationMessage For="() => modelo.NickName" role="alert" />
             </div>
             <div>
                 <label class="wis-field-label" for="u-password">Contraseña</label>
                 <InputText id="u-password" type="password" class="wis-input" autocomplete="new-password"
                            placeholder="@(UsuarioId is null ? "" : "En blanco = conservar la actual")" @bind-Value="modelo.Password" />
-                <ValidationMessage For="() => modelo.Password" />
+                <ValidationMessage For="() => modelo.Password" role="alert" />
             </div>
             <div>
                 <label class="wis-field-label" for="u-email">Email (opcional)</label>
                 <InputText id="u-email" class="wis-input" @bind-Value="modelo.Email" />
-                <ValidationMessage For="() => modelo.Email" />
+                <ValidationMessage For="() => modelo.Email" role="alert" />
             </div>
             <div>
                 <label class="wis-field-label" for="u-rol">Rol</label>
@@ -51,7 +51,7 @@
                         <option value="@r.Id">@r.Nombre@(r.Estado == true ? "" : " (inactivo)")</option>
                     }
                 </InputSelect>
-                <ValidationMessage For="() => modelo.RolId" />
+                <ValidationMessage For="() => modelo.RolId" role="alert" />
             </div>
             <label><InputCheckbox @bind-Value="modelo.SendMail" /> Enviar notificaciones por correo</label>
             <label><InputCheckbox @bind-Value="modelo.Estado" /> Activo</label>
