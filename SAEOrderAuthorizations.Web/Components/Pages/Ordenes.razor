@@ -58,7 +58,7 @@
                             <td>@o.OrdDate.ToString("d")</td>
                             <td class="wis-num">@o.Total.ToString("N2")</td>
                             <td>@o.Observations?.Trim()</td>
-                            <td><IconButton Icono="eye" Variante="ver" Texto="Consultar" OnClick="() => Abrir(o)" /></td>
+                            <td><IconButton @ref="botonesConsulta[o.IdOrder.Trim()]" Icono="eye" Variante="ver" Texto="Consultar" OnClick="() => Abrir(o)" /></td>
                         </tr>
                     }
                     @if (ordenes.Count == 0 && string.IsNullOrEmpty(mensaje))
@@ -87,6 +87,7 @@
     private string? mensaje;
     private bool esAprobador;
     private OrdenSae? seleccionada;
+    private readonly Dictionary<string, IconButton?> botonesConsulta = new();
 
     private Empresa? empresaSeleccionada => empresas.FirstOrDefault(e => e.Id == empresaId);
 
@@ -124,7 +125,15 @@
 
     private void Abrir(OrdenSae orden) => seleccionada = orden;
 
-    private void Cerrar() => seleccionada = null;
+    private async Task Cerrar()
+    {
+        var id = seleccionada?.IdOrder.Trim();
+        seleccionada = null;
+        if (id is not null && botonesConsulta.TryGetValue(id, out var boton) && boton is not null)
+        {
+            await boton.EnfocarAsync();
+        }
+    }
 
     private async Task OrdenProcesada(string resultado)
     {

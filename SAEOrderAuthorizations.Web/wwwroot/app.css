@@ -182,6 +182,7 @@ html, body {
     border-radius: var(--wis-radius-large);
     box-shadow: var(--wis-shadow);
 }
+.wis-modal:focus { outline: none; }
 .wis-modal-header { display: flex; justify-content: space-between; align-items: center; gap: var(--wis-space-3); }
 .wis-modal-acciones { display: flex; gap: var(--wis-space-3); justify-content: flex-end; flex-wrap: wrap; }
 .wis-accion { display: flex; flex-direction: column; gap: var(--wis-space-2); }
@@ -244,7 +245,7 @@ html, body {
 .wis-icon-btn--solido { border-color: transparent; color: #101E2A; }
 .wis-icon-btn--solido.wis-icon-btn--autorizar { background: var(--wis-success); }
 .wis-icon-btn--solido.wis-icon-btn--rechazar { background: var(--wis-danger); }
-.wis-icon-btn--solido:hover { filter: brightness(1.08); background: inherit; }
+.wis-icon-btn--solido:hover { filter: brightness(1.08); }
 
 /* Con texto visible: más ancho, sin tooltip. */
 .wis-icon-btn--texto { width: auto; padding: 0 var(--wis-space-4); font: 600 1rem/1 var(--wis-font-body); }

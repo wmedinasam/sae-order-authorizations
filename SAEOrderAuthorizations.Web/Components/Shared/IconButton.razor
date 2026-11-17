@@ -5,6 +5,7 @@
         aria-disabled="@(Deshabilitado ? "true" : null)"
         disabled="@(Deshabilitado && Tipo == "submit")"
         data-tooltip="@Texto"
+        @ref="boton"
         @onclick="Clic">
     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
@@ -59,5 +60,9 @@
     [Parameter] public EventCallback OnClick { get; set; }
 
     // Deshabilitado usa aria-disabled (no el atributo disabled) para que el tooltip siga visible.
+    private ElementReference boton;
+
+    public ValueTask EnfocarAsync() => boton.FocusAsync();
+
     private Task Clic() => Deshabilitado ? Task.CompletedTask : OnClick.InvokeAsync();
 }
