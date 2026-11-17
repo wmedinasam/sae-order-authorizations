@@ -19,7 +19,7 @@ Reglas: solo create y update; soft delete (`Estado = false`), nunca `DELETE`. So
 - [x] I1 Ramas revisadas y fusionadas (sin conflictos, sin archivos compartidos)
 - [ ] I2 Build integrado + recorrido en navegador (admin) de los 4 módulos
 - [ ] I3 Accesos denegados para operador/aprobador; pruebas cruzadas (usuario/rol/empresa inactivos)
-- [ ] I4 `CLAUDE.md` actualizado
+- [x] I4 `CLAUDE.md` actualizado (estado de autenticación/páginas, migración `Estado`)
 
 ## Fase 3 · Pulido de UI
 - [ ] U1 Componente `IconButton` + tokens de color y tooltip

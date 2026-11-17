@@ -1,0 +1,15 @@
+@inject NavigationManager Navegacion
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    // Navegación interactiva: AuthorizeRouteView no hace cumplir [Authorize] de la página por sí solo.
+    protected override async Task OnInitializedAsync()
+    {
+        var autenticado = AuthState is not null && (await AuthState).User.Identity?.IsAuthenticated == true;
+        if (autenticado)
+            Navegacion.NavigateTo("/acceso-denegado");
+        else
+            Navegacion.NavigateTo("/login", forceLoad: true);
+    }
+}

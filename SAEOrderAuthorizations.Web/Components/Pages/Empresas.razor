@@ -93,7 +93,8 @@
         confirmacion = null;
         try
         {
-            empresas = await EmpresasSvc.ListarAsync(mostrarInactivas);
+            var usuario = AuthState is null ? null : (await AuthState).User;
+            empresas = usuario is null ? new() : await EmpresasSvc.ListarAsync(usuario, mostrarInactivas);
         }
         catch (Exception ex)
         {

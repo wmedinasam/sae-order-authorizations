@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using SAEOrderAuthorizations.Web.Components;
 using SAEOrderAuthorizations.Web.Data;
+using SAEOrderAuthorizations.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AuthenticationStateProvider, RevalidacionSesionProvider>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>
@@ -19,6 +22,16 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         o.AccessDeniedPath = "/acceso-denegado";
         o.Cookie.HttpOnly = true;
         o.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        // Usuario o rol desactivados después del login: se rechaza la cookie en la siguiente petición.
+        o.Events.OnValidatePrincipal = async ctx =>
+        {
+            var sesion = ctx.HttpContext.RequestServices.GetRequiredService<SesionService>();
+            if (await sesion.EsActivaAsync(ctx.Principal!))
+                return;
+
+            ctx.RejectPrincipal();
+            await ctx.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        };
     });
 
 // Todo requiere sesión por defecto; solo lo marcado con [AllowAnonymous] es público.
