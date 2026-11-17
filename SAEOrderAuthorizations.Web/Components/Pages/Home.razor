@@ -1,10 +1,13 @@
 @page "/"
 @attribute [Authorize]
+@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using SAEOrderAuthorizations.Web.Data.Entities
 @using SAEOrderAuthorizations.Web.Services
 @inject OrdenesService OrdenesSvc
+@inject OrdenesMonitor Monitor
+@implements IDisposable
 
 <TituloPagina Texto="Inicio" />
 
@@ -16,6 +19,10 @@
     @if (!string.IsNullOrEmpty(error))
     {
         <div class="wis-alert-error wis-mb-5" role="alert">@error</div>
+    }
+    @if (actualizado is not null)
+    {
+        <p class="wis-muted wis-mb-5" aria-live="polite">Actualizado a las @actualizado.Value.ToString("HH:mm:ss")</p>
     }
 
     <div class="wis-seccion">
@@ -58,6 +65,8 @@
 
     private string nombre = string.Empty;
     private string? error;
+    private DateTime? actualizado;
+    private int rolId;
     private readonly List<Resumen> resumenes = new();
 
     private sealed record Resumen(Empresa Empresa, int Pendientes, int Autorizadas, int Rechazadas, string? Error);
@@ -67,28 +76,49 @@
         if (AuthState is null) return;
         var usuario = (await AuthState).User;
         nombre = usuario.Identity?.Name ?? string.Empty;
+        int.TryParse(usuario.FindFirst("RolId")?.Value, out rolId);
 
+        Monitor.Refrescar += AlRefrescar;
+        await CargarAsync();
+    }
+
+    public void Dispose() => Monitor.Refrescar -= AlRefrescar;
+
+    // Llega desde el monitor (otro hilo): se vuelve al circuito con InvokeAsync.
+    private Task AlRefrescar() => InvokeAsync(async () =>
+    {
+        await CargarAsync();
+        StateHasChanged();
+    });
+
+    // Arma la lista completa antes de reemplazar la anterior: la pantalla nunca se ve a medio cargar.
+    private async Task CargarAsync()
+    {
+        var nuevos = new List<Resumen>();
         try
         {
-            var rolId = int.Parse(usuario.FindFirst("RolId")?.Value ?? "0");
             foreach (var e in await OrdenesSvc.EmpresasDelRolAsync(rolId))
             {
                 try
                 {
-                    var p = (await OrdenesSvc.ListarAsync(e, "P")).Count;
-                    var o = (await OrdenesSvc.ListarAsync(e, "O")).Count;
-                    var r = (await OrdenesSvc.ListarAsync(e, "R")).Count;
-                    resumenes.Add(new Resumen(e, p, o, r, null));
+                    var p = await OrdenesSvc.ContarAsync(e, "P");
+                    var o = await OrdenesSvc.ContarAsync(e, "O");
+                    var r = await OrdenesSvc.ContarAsync(e, "R");
+                    nuevos.Add(new Resumen(e, p, o, r, null));
                 }
                 catch (Exception ex)
                 {
-                    resumenes.Add(new Resumen(e, 0, 0, 0, $"No se pudieron leer las órdenes: {ex.Message}"));
+                    nuevos.Add(new Resumen(e, 0, 0, 0, $"No se pudieron leer las órdenes: {ex.Message}"));
                 }
             }
+            error = null;
         }
         catch (Exception ex)
         {
             error = $"No se pudo cargar el resumen: {ex.Message}";
         }
+        resumenes.Clear();
+        resumenes.AddRange(nuevos);
+        actualizado = DateTime.Now;
     }
 }

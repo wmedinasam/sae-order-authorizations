@@ -5,6 +5,8 @@
 @using SAEOrderAuthorizations.Web.Data.Entities
 @using SAEOrderAuthorizations.Web.Services
 @inject OrdenesService OrdenesSvc
+@inject OrdenesMonitor Monitor
+@implements IDisposable
 
 <TituloPagina Texto="Órdenes" />
 
@@ -34,6 +36,10 @@
     @if (!string.IsNullOrEmpty(mensaje))
     {
         <div class="@(mensajeOk ? "wis-alert-ok" : "wis-alert-error") wis-mb-5" role="@(mensajeOk ? "status" : "alert")">@mensaje</div>
+    }
+    @if (!string.IsNullOrEmpty(aviso))
+    {
+        <p class="wis-muted wis-mb-5" aria-live="polite">@aviso</p>
     }
 
     <div class="wis-card wis-seccion-tabla">
@@ -67,7 +73,13 @@
                     @foreach (var o in ordenesPagina)
                     {
                         <tr class="wis-row-link" @onclick="() => Abrir(o)">
-                            <td data-label="Documento">@o.IdOrder.Trim()</td>
+                            <td data-label="Documento">
+                                @o.IdOrder.Trim()
+                                @if (o.ReservadaPor is not null)
+                                {
+                                    <EstadoBadge Texto="@($"En revisión por {o.ReservadaPor}")" Tipo="pendiente" />
+                                }
+                            </td>
                             <td data-label="Proveedor">@o.Vendor?.Trim()</td>
                             <td data-label="Fecha">@o.OrdDate.ToString("d")</td>
                             <td data-label="Total" class="wis-num">@o.Total.ToString("N2")</td>
@@ -118,6 +130,7 @@
     private bool mensajeOk;
     private bool cargando = true;
     private bool esAprobador;
+    private string? aviso;
     private OrdenSae? seleccionada;
     private readonly Dictionary<string, IconButton?> botonesConsulta = new();
 
@@ -132,13 +145,42 @@
         var rolId = int.Parse(usuario.FindFirst("RolId")?.Value ?? "0");
         empresas = await OrdenesSvc.EmpresasDelRolAsync(rolId);
         empresaId = empresas.FirstOrDefault()?.Id ?? 0;
+        Monitor.Refrescar += AlRefrescar;
         await CargarAsync();
+    }
+
+    public void Dispose() => Monitor.Refrescar -= AlRefrescar;
+
+    // Llega desde el monitor (otro hilo): se vuelve al circuito con InvokeAsync.
+    private Task AlRefrescar() => InvokeAsync(async () =>
+    {
+        if (!cargando && empresaSeleccionada is not null)
+            await RecargarSilenciosoAsync();
+    });
+
+    // Recarga sin skeleton ni reinicio de página: no interrumpe al aprobador que está leyendo.
+    private async Task RecargarSilenciosoAsync()
+    {
+        var paginaActual = pagina;
+        try
+        {
+            ordenes = await OrdenesSvc.ListarAsync(empresaSeleccionada!, estado);
+            pagina = Math.Clamp(paginaActual, 1, TotalPaginas);
+            aviso = $"Lista actualizada a las {DateTime.Now:HH:mm}.";
+        }
+        catch (Exception ex)
+        {
+            aviso = $"No se pudo actualizar la lista: {ex.Message}";
+        }
+        // InvokeAsync no vuelve a pintar por sí solo; sin esto la lista cambia en memoria pero no en pantalla.
+        StateHasChanged();
     }
 
     private async Task CargarAsync()
     {
         mensaje = null;
         mensajeOk = false;
+        aviso = null;
         ordenes = new();
         pagina = 1;
         if (empresaSeleccionada is null)

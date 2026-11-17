@@ -195,6 +195,39 @@ namespace SAEOrderAuthorizations.Web.Migrations
                     b.ToTable("WIS_BRANDING", (string)null);
                 });
 
+            modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.OrdenBloqueo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Actualizado")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Expira")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IdOrder")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId", "IdOrder")
+                        .IsUnique();
+
+                    b.ToTable("WIS_ORDER_LOCK", (string)null);
+                });
+
             modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.OrdenCompra", b =>
                 {
                     b.Property<int>("Id")

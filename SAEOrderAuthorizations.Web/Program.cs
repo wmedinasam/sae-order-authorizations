@@ -52,6 +52,9 @@ foreach (var tipo in typeof(Program).Assembly.GetTypes()
 {
     builder.Services.AddScoped(tipo);
 }
+// Sondeo de órdenes en segundo plano: un solo proceso para toda la app.
+builder.Services.AddSingleton<OrdenesMonitor>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<OrdenesMonitor>());
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 // Servicios que atienden componentes concurrentes: cada operación usa su propio contexto.

@@ -4,8 +4,9 @@
 @using SAEOrderAuthorizations.Web.Components.Shared
 @using SAEOrderAuthorizations.Web.Services
 @inject OrdenesService Ordenes
+@implements IAsyncDisposable
 
-<WisModal Titulo="@($"Orden {Orden.IdOrder.Trim()}")" OnCerrar="OnCerrar">
+<WisModal Titulo="@($"Orden {IdOrden}")" OnCerrar="OnCerrar">
 
         @if (cabecera is not null)
         {
@@ -19,6 +20,10 @@
         @if (!string.IsNullOrEmpty(mensaje))
         {
             <div class="wis-alert-error" role="alert">@mensaje</div>
+        }
+        @if (puedeProcesar && !reservaMia && reservadaPor is not null)
+        {
+            <div class="wis-alert-error" role="status">En revisión por @reservadaPor. Solo puedes consultarla.</div>
         }
 
         <div class="wis-tabs" role="tablist" aria-label="Detalle de la orden" @onkeydown="TeclaPestana">
@@ -80,7 +85,7 @@
         }
         </div>
 
-        @if (puedeProcesar)
+        @if (puedeProcesar && reservaMia)
         {
             <div class="wis-accion wis-modal-acciones-fijas">
                 <label class="wis-field-label" for="comentario">Comentario (obligatorio para rechazar, máx. 150)</label>
@@ -110,6 +115,15 @@
     private string comentario = string.Empty;
     private string? mensaje;
     private bool procesando;
+    private bool reservaMia;
+    private string? reservadaPor;
+    private System.Threading.Timer? latido;
+    private bool cerrada;
+
+    private string IdOrden => Orden.IdOrder.Trim();
+
+    // Latido de la reserva: mientras el modal esté abierto, nadie más puede procesar la orden.
+    private static readonly TimeSpan IntervaloLatido = TimeSpan.FromMinutes(1);
 
     private void TeclaPestana(KeyboardEventArgs e)
     {
@@ -123,15 +137,49 @@
         usuario = AuthState is null ? null : (await AuthState).User;
         try
         {
-            var (cab, partidasSae) = await Ordenes.DetalleAsync(Empresa, Orden.IdOrder.Trim());
+            if (puedeProcesar && usuario is not null)
+            {
+                var reserva = await Ordenes.ReservarAsync(usuario, Empresa, IdOrden);
+                reservaMia = reserva.Exito;
+                reservadaPor = reserva.ReservadaPor;
+                if (reservaMia)
+                    latido = new System.Threading.Timer(_ => _ = InvokeAsync(LatidoAsync), null, IntervaloLatido, IntervaloLatido);
+            }
+
+            var (cab, partidasSae) = await Ordenes.DetalleAsync(Empresa, IdOrden);
             cabecera = cab;
             partidas = partidasSae;
-            historial = await Ordenes.HistorialAsync(Empresa, Orden.IdOrder.Trim());
+            historial = await Ordenes.HistorialAsync(Empresa, IdOrden);
         }
         catch (Exception ex)
         {
             mensaje = $"No se pudo cargar el detalle: {ex.Message}";
         }
+    }
+
+    private async Task LatidoAsync()
+    {
+        if (cerrada || usuario is null) return;
+        var reserva = await Ordenes.ReservarAsync(usuario, Empresa, IdOrden);
+        if (reserva.Exito) return;
+
+        // Si la reserva se perdió (p. ej. el circuito estuvo caído más de 5 min), se deja de renovar.
+        reservaMia = false;
+        reservadaPor = reserva.ReservadaPor;
+        latido?.Dispose();
+        latido = null;
+        mensaje = "Perdiste la reserva de esta orden. Ciérrala y vuelve a abrirla.";
+        // Fuera de un evento de usuario Blazor no re-renderiza solo.
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // Al cerrar el modal se libera la orden para el siguiente aprobador. Si el circuito murió, expira sola.
+        cerrada = true;
+        if (latido is not null) await latido.DisposeAsync();
+        if (reservaMia && usuario is not null)
+            await Ordenes.LiberarAsync(usuario, Empresa, IdOrden);
     }
 
     private async Task Autorizar() => await Procesar(true);
@@ -145,7 +193,7 @@
         mensaje = null;
         try
         {
-            var resultado = await Ordenes.ProcesarAsync(usuario, Empresa, Orden.IdOrder.Trim(), aprobar, comentario);
+            var resultado = await Ordenes.ProcesarAsync(usuario, Empresa, IdOrden, aprobar, comentario);
             if (resultado.Exito)
             {
                 await OnProcesada.InvokeAsync(resultado.Mensaje);

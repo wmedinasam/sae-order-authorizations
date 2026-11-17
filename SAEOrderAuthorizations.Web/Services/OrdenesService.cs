@@ -11,6 +11,8 @@ public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionSer
 {
     // La BD y el sufijo vienen de la tabla EMPRESA, pero se validan antes de armar nombres de tabla.
     private static readonly Regex Identificador = new(@"^[A-Za-z0-9_]+$", RegexOptions.Compiled);
+    // Tiempo sin latido antes de que otro aprobador pueda tomar la orden.
+    public const int MinutosReserva = 5;
 
     public async Task<List<Empresa>> EmpresasDelRolAsync(int rolId)
     {
@@ -35,9 +37,90 @@ public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionSer
             WHERE wo.EmpresaId = @empresaId AND wo.Status = @status
             ORDER BY wo.OrdDate
             """;
-        return await db.Database.SqlQueryRaw<OrdenSae>(sql,
+        var ordenes = await db.Database.SqlQueryRaw<OrdenSae>(sql,
             new SqlParameter("@empresaId", empresa.Id),
             new SqlParameter("@status", status)).ToListAsync();
+
+        var ahora = DateTime.Now;
+        var reservas = await db.Bloqueos
+            .Where(b => b.EmpresaId == empresa.Id && b.Expira > ahora)
+            .Select(b => new { b.IdOrder, b.UsuarioId })
+            .ToListAsync();
+        var nombres = await db.Usuarios
+            .ToDictionaryAsync(u => u.Id, u => u.FullName ?? u.NickName ?? string.Empty);
+        foreach (var o in ordenes)
+        {
+            var reserva = reservas.FirstOrDefault(r => r.IdOrder == o.IdOrder.Trim());
+            o.ReservadaPor = reserva is null ? null : nombres.GetValueOrDefault(reserva.UsuarioId);
+        }
+        return ordenes;
+    }
+
+    // Reserva exclusiva: el índice único de WIS_ORDER_LOCK decide quién se queda con la orden.
+    // Renueva si la reserva es mía o venció; si otro la tiene vigente, la inserción choca y se informa quién.
+    public async Task<ResultadoReserva> ReservarAsync(ClaimsPrincipal usuario, Empresa empresa, string idOrder)
+    {
+        if (!usuario.IsInRole("Aprobador")) return new(false, null);
+
+        var usuarioId = int.Parse(usuario.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var ahora = DateTime.Now;
+        await using (var db = await dbFactory.CreateDbContextAsync())
+        {
+            var renovadas = await db.Bloqueos
+                .Where(b => b.EmpresaId == empresa.Id && b.IdOrder == idOrder && (b.UsuarioId == usuarioId || b.Expira <= ahora))
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(b => b.UsuarioId, usuarioId)
+                    .SetProperty(b => b.Expira, ahora.AddMinutes(MinutosReserva))
+                    .SetProperty(b => b.Actualizado, ahora));
+            if (renovadas > 0) return new(true, null);
+        }
+
+        await using (var db = await dbFactory.CreateDbContextAsync())
+        {
+            db.Bloqueos.Add(new OrdenBloqueo
+            {
+                EmpresaId = empresa.Id,
+                IdOrder = idOrder,
+                UsuarioId = usuarioId,
+                Expira = ahora.AddMinutes(MinutosReserva),
+                Actualizado = ahora
+            });
+            try
+            {
+                await db.SaveChangesAsync();
+                return new(true, null);
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 2601 or 2627 })
+            {
+                // Otro aprobador ganó la inserción; la consulta se hace en un contexto nuevo.
+            }
+        }
+        return new(false, await ReservadaPorAsync(empresa, idOrder) ?? "otro aprobador");
+    }
+
+    public async Task LiberarAsync(ClaimsPrincipal usuario, Empresa empresa, string idOrder)
+    {
+        var usuarioId = int.Parse(usuario.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        await using var db = await dbFactory.CreateDbContextAsync();
+        await db.Bloqueos
+            .Where(b => b.EmpresaId == empresa.Id && b.IdOrder == idOrder && b.UsuarioId == usuarioId)
+            .ExecuteDeleteAsync();
+    }
+
+    // Mismos JOIN que ListarAsync para que el conteo coincida con lo que se ve en la lista.
+    public async Task<int> ContarAsync(Empresa empresa, string status)
+    {
+        await using var db = await dbFactory.CreateDbContextAsync();
+        var sql = $"""
+            SELECT COUNT(*) AS Value
+            FROM dbo.WIS_Orders wo
+            INNER JOIN {Tabla(empresa, "PROV")} p ON p.CLAVE COLLATE DATABASE_DEFAULT = wo.IdSupplier
+            INNER JOIN {Tabla(empresa, "COMPO")} o ON o.CVE_DOC COLLATE DATABASE_DEFAULT = wo.IdOrder
+            WHERE wo.EmpresaId = @empresaId AND wo.Status = @status
+            """;
+        return await db.Database.SqlQueryRaw<int>(sql,
+            new SqlParameter("@empresaId", empresa.Id),
+            new SqlParameter("@status", status)).SingleAsync();
     }
 
     public async Task<(OrdenCabeceraSae? Cabecera, List<OrdenPartidaSae> Partidas)> DetalleAsync(Empresa empresa, string idOrder)
@@ -107,6 +190,12 @@ public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionSer
 
         await using var tx = await db.Database.BeginTransactionAsync();
 
+        // Solo procesa quien tiene la reserva vigente: un segundo aprobador no puede actuar sobre la misma orden.
+        var reservaMia = await db.Bloqueos.AnyAsync(b => b.EmpresaId == empresa.Id && b.IdOrder == idOrder
+            && b.UsuarioId == usuarioId && b.Expira > DateTime.Now);
+        if (!reservaMia)
+            return new(false, "La orden está en revisión por otro aprobador o tu reserva expiró. Vuelve a abrirla.");
+
         // El filtro Status = 'P' evita procesar dos veces la misma orden.
         var estado = aprobar ? "O" : "R";
         var filas = await db.OrdenesCompra
@@ -134,6 +223,10 @@ public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionSer
             UserId = usuarioId.ToString(),
             IdSupplier = orden.IdSupplier
         });
+
+        await db.Bloqueos
+            .Where(b => b.EmpresaId == empresa.Id && b.IdOrder == idOrder)
+            .ExecuteDeleteAsync();
 
         await db.SaveChangesAsync();
         await tx.CommitAsync();
@@ -167,6 +260,18 @@ public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionSer
         {
             return null;
         }
+    }
+
+    private async Task<string?> ReservadaPorAsync(Empresa empresa, string idOrder)
+    {
+        await using var db = await dbFactory.CreateDbContextAsync();
+        var ahora = DateTime.Now;
+        var usuarioId = await db.Bloqueos
+            .Where(b => b.EmpresaId == empresa.Id && b.IdOrder == idOrder && b.Expira > ahora)
+            .Select(b => (int?)b.UsuarioId)
+            .FirstOrDefaultAsync();
+        if (usuarioId is null) return null;
+        return await db.Usuarios.Where(u => u.Id == usuarioId).Select(u => u.FullName ?? u.NickName).FirstOrDefaultAsync();
     }
 
     private async Task<string?> EmailUsuarioAsync(int usuarioId)

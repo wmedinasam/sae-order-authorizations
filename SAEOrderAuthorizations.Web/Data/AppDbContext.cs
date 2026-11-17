@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Configuracion> Configuraciones => Set<Configuracion>();
     public DbSet<OrdenCompra> OrdenesCompra => Set<OrdenCompra>();
     public DbSet<BitacoraEntrada> Bitacora => Set<BitacoraEntrada>();
+    public DbSet<OrdenBloqueo> Bloqueos => Set<OrdenBloqueo>();
     public DbSet<Marca> Marcas => Set<Marca>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -113,6 +114,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Status).HasMaxLength(1).IsRequired();
             e.Property(x => x.Total).IsRequired();
             e.Property(x => x.OrdDate).IsRequired();
+        });
+
+        modelBuilder.Entity<OrdenBloqueo>(e =>
+        {
+            e.ToTable("WIS_ORDER_LOCK");
+            e.Property(x => x.IdOrder).HasMaxLength(25).IsRequired();
+            // El índice único es lo que hace atómica la reserva entre aprobadores concurrentes.
+            e.HasIndex(x => new { x.EmpresaId, x.IdOrder }).IsUnique();
         });
 
         modelBuilder.Entity<BitacoraEntrada>(e =>
