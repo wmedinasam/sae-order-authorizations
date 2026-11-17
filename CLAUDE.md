@@ -30,7 +30,7 @@ Legacy: solo Windows + Visual Studio; sin tests, linter ni CI. Depende de `Newto
 
 ## Estado del proyecto nuevo
 
-`Data/AppDbContext.cs` mapea las 7 tablas legacy de `ORDENES_COMPRA` (`EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USER`, `WIS_CONFIGURATION`, `WIS_Orders`, `WIS_WorkLog`) con entidades en `Data/Entities/`. La migración `InicialLegacy` crea esas tablas y `AgregarSemillaLegacy` inserta la semilla del script maestro (rol Admin, usuario `administrador` y 4 claves de correo vacías). `SemillaEmpresa` agrega la empresa 01 (`DB_SAE` = `SAE80Empre01`, sufijo `01`) y la asocia al rol Admin en `ROL_EMPRESA`. Ambas se aplicaron sobre una BD vacía. Pendiente: vistas y SPs legacy (`WIS_viewLogView`, `Sp_GetOrders`, `Sp_OrderHeader`, `Sp_OrderDetail`), autenticación (la contraseña semilla es el cifrado AES legacy, no un hash), páginas y correo.
+`Data/AppDbContext.cs` mapea las 7 tablas legacy de `ORDENES_COMPRA` (`EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USER`, `WIS_CONFIGURATION`, `WIS_Orders`, `WIS_WorkLog`) con entidades en `Data/Entities/`. La migración `InicialLegacy` crea esas tablas y `AgregarSemillaLegacy` inserta la semilla del script maestro (rol Admin, usuario `administrador` y 4 claves de correo vacías). `SemillaEmpresa` agrega la empresa 01 (`DB_SAE` = `SAE80Empre01`, sufijo `01`) y la asocia al rol Admin en `ROL_EMPRESA`. Ambas se aplicaron sobre una BD vacía. Ya implementado: autenticación por cookie, páginas de administración y de órdenes (la contraseña sigue en claro, ver deuda temporal). Pendiente: vistas y SPs legacy (`WIS_viewLogView`, `Sp_GetOrders`, `Sp_OrderHeader`, `Sp_OrderDetail`; las órdenes hoy se leen con consultas parametrizadas en `OrdenesService`) y correo.
 - El script maestro es la fuente de verdad del esquema; los `SCRIPTS/TABLE/*.sql` apuntan a `SAE70Empre01` y no coinciden (p. ej. `WIS_USER` usa `ROL` ahí, `ROL_ID` en el maestro).
 - Una BD legacy con tablas ya existentes no puede correr `InicialLegacy` tal cual: fallaría al crear tablas. Antes de aplicarla ahí, marcarla como aplicada en `__EFMigrationsHistory` o añadir guardas.
 
@@ -79,6 +79,8 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 - Política `Administrador` = claim `EsAdministrador` = `True` (lo emite `Login.razor` desde `Rol.EsAdministrador`). Las páginas de administración (`Empresas`, `Usuarios`, `Roles`, `Configuracion`) llevan `[Authorize(Policy = "Administrador")]`. Un usuario sin permiso va a `/acceso-denegado`.
 - Layouts: `AuthLayout` (login, solo cabecera con logo) y `MainLayout` (barra lateral `NavMenu` + contenido). Todo módulo nuevo usa `MainLayout` por defecto.
 - El claim se fija al iniciar sesión: si cambia el rol de un usuario, debe volver a ingresar.
+- Usuario o rol desactivados: `SesionService.EsActivaAsync` se consulta en cada petición (`OnValidatePrincipal` de la cookie) y cada minuto por circuito (`RevalidacionSesionProvider`). `ProcesarAsync` también valida usuario, rol y empresa activos.
+- `Routes.razor` usa `AuthorizeRouteView`; el `NotAuthorized` lo maneja `Components/Shared/RedirigirAcceso.razor`.
 - El menú oculta los enlaces de administración, pero la protección real está en la política de cada página.
 - Usuarios de prueba (dev, contraseña `123` en claro): `admin` (rol Admin, acceso total) y `operador` (rol Operador, sin acceso a módulos de administración). Ambos asignados a la empresa 01 en `ROL_EMPRESA`. Migración `SemillaOperador`.
 
@@ -92,7 +94,7 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 
 ## Módulos de administración (proyecto nuevo)
 
-- Empresas, Roles, Usuarios y Configuración: solo alta y edición, con **soft delete** (`Estado = false`). No hay `Remove`/`DELETE`; la única eliminación es el reemplazo de filas de `ROL_EMPRESA` al guardar un rol (tabla de relación sin estado).
+- Empresas, Roles, Usuarios y Configuración: solo alta y edición, con **soft delete** (`Estado = false`). No hay `Remove`/`DELETE`; la única eliminación es el reemplazo de filas de `ROL_EMPRESA` al guardar un rol (tabla de relación sin estado). La columna `Estado` en `WIS_USER` y `WIS_CONFIGURATION` la agrega la migración `AgregarEstadoUsuarioYConfiguracion`.
 - Cada servicio valida permisos (`EsAdministrador()`), longitudes y unicidad en servidor; la UI solo ayuda.
 - Salvaguardas: no renombrar `Admin` ni `Aprobador`; no desactivar roles con usuarios activos; no quitar el último administrador activo; un usuario no puede desactivarse a sí mismo; las claves base del correo no se desactivan; `MailPassword` nunca sale a la UI.
 - Los servicios en `Services/` que terminen en `Service` se registran solos (`Program.cs`).

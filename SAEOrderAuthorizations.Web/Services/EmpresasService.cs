@@ -8,11 +8,16 @@ namespace SAEOrderAuthorizations.Web.Services;
 
 public class EmpresasService(AppDbContext db)
 {
-    public async Task<List<Empresa>> ListarAsync(bool incluirInactivas) =>
-        await db.Empresas
+    public async Task<List<Empresa>> ListarAsync(ClaimsPrincipal usuario, bool incluirInactivas)
+    {
+        if (!usuario.EsAdministrador())
+            return new();
+
+        return await db.Empresas
             .Where(e => incluirInactivas || e.Estado == true)
             .OrderBy(e => e.Nombre)
             .ToListAsync();
+    }
 
     public async Task<ResultadoOperacion> GuardarAsync(ClaimsPrincipal usuario, EmpresaEdicion modelo)
     {

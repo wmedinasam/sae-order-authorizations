@@ -7,7 +7,7 @@ using SAEOrderAuthorizations.Web.Data.Entities;
 
 namespace SAEOrderAuthorizations.Web.Services;
 
-public class OrdenesService(AppDbContext db)
+public class OrdenesService(AppDbContext db, SesionService sesion)
 {
     // La BD y el sufijo vienen de la tabla EMPRESA, pero se validan antes de armar nombres de tabla.
     private static readonly Regex Identificador = new(@"^[A-Za-z0-9_]+$", RegexOptions.Compiled);
@@ -77,6 +77,12 @@ public class OrdenesService(AppDbContext db)
         // Validación de servidor: la UI también la aplica, pero no es suficiente.
         if (!usuario.IsInRole("Aprobador"))
             return new(false, "Solo el rol Aprobador puede procesar órdenes.");
+
+        // El circuito puede seguir abierto después de desactivar al usuario, rol o empresa.
+        if (!await sesion.EsActivaAsync(usuario))
+            return new(false, "Tu usuario o rol está inactivo.");
+        if (!await db.Empresas.AnyAsync(e => e.Id == empresa.Id && e.Estado == true))
+            return new(false, "La empresa está inactiva.");
 
         var usuarioId = int.Parse(usuario.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var rolId = int.Parse(usuario.FindFirstValue("RolId")!);
