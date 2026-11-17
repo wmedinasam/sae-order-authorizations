@@ -165,6 +165,93 @@ namespace SAEOrderAuthorizations.Web.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.InstalacionLicencia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("InstallationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UltimoVisto")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WIS_LICENCIA_INSTALACION", (string)null);
+                });
+
+            modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.Licencia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Archivo")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<int>("CargadaPor")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CargadaUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Cliente")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Edicion")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("Emitida")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GraceDays")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("LicenseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MaxEmpresas")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxUsuarios")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MaxVersionMayor")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Plan")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<long>("Serial")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ValidFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ValidTo")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LicenseId", "Serial")
+                        .IsUnique();
+
+                    b.ToTable("WIS_LICENCIA", (string)null);
+                });
+
             modelBuilder.Entity("SAEOrderAuthorizations.Web.Data.Entities.Marca", b =>
                 {
                     b.Property<string>("Slot")

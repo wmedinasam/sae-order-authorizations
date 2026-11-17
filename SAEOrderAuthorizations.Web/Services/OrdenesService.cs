@@ -7,7 +7,7 @@ using SAEOrderAuthorizations.Web.Data.Entities;
 
 namespace SAEOrderAuthorizations.Web.Services;
 
-public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionService sesion, CorreoOrdenService correo)
+public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionService sesion, CorreoOrdenService correo, LicenciaService licencia)
 {
     // La BD y el sufijo vienen de la tabla EMPRESA, pero se validan antes de armar nombres de tabla.
     private static readonly Regex Identificador = new(@"^[A-Za-z0-9_]+$", RegexOptions.Compiled);
@@ -164,6 +164,9 @@ public class OrdenesService(IDbContextFactory<AppDbContext> dbFactory, SesionSer
     public async Task<ResultadoOperacion> ProcesarAsync(ClaimsPrincipal usuario, Empresa empresa, string idOrder, bool aprobar, string? comentario)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
+        // Autorizar o rechazar es escritura de negocio: en modo solo lectura no se procesa.
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo)
+            return new(false, bloqueo);
         // Validación de servidor: la UI también la aplica, pero no es suficiente.
         if (!usuario.IsInRole("Aprobador"))
             return new(false, "Solo el rol Aprobador puede procesar órdenes.");

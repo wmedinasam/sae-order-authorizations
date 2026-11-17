@@ -8,7 +8,7 @@ using SAEOrderAuthorizations.Web.Data.Entities;
 namespace SAEOrderAuthorizations.Web.Services;
 
 // Módulo Usuarios: solo create/update y soft delete (Estado). Un único rol por usuario.
-public class UsuariosService(IDbContextFactory<AppDbContext> dbFactory)
+public class UsuariosService(IDbContextFactory<AppDbContext> dbFactory, LicenciaService licencia)
 {
     private static readonly ResultadoOperacion SinPermiso = new(false, "Solo un administrador puede gestionar usuarios.");
 
@@ -61,6 +61,9 @@ public class UsuariosService(IDbContextFactory<AppDbContext> dbFactory)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!actor.EsAdministrador()) return SinPermiso;
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
+        if (id is null && datos.Estado && await licencia.MotivoLimiteAsync(LimiteLicencia.Usuarios) is { } limite)
+            return new(false, limite);
 
         var nombre = datos.FullName.Trim();
         var nick = datos.NickName.Trim();
@@ -108,6 +111,10 @@ public class UsuariosService(IDbContextFactory<AppDbContext> dbFactory)
             var error = await ErrorCambioAsync(db, actor, u, datos.Estado, datos.RolId);
             if (error is not null) return new(false, error);
 
+            // Reactivar desde la edición también cuenta contra el límite de la licencia.
+            if (datos.Estado && !u.Estado && await licencia.MotivoLimiteAsync(LimiteLicencia.Usuarios) is { } limiteEdicion)
+                return new(false, limiteEdicion);
+
             u.FullName = nombre;
             u.NickName = nick;
             u.Email = email;
@@ -126,6 +133,8 @@ public class UsuariosService(IDbContextFactory<AppDbContext> dbFactory)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!actor.EsAdministrador()) return SinPermiso;
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
+        if (activo && await licencia.MotivoLimiteAsync(LimiteLicencia.Usuarios) is { } limite) return new(false, limite);
 
         await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
 

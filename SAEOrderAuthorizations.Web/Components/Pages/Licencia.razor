@@ -1,0 +1,155 @@
+@page "/licencia"
+@attribute [Authorize(Policy = "Administrador")]
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using SAEOrderAuthorizations.Web.Services
+@inject LicenciaService LicenciaSvc
+
+<TituloPagina Texto="Licencia" />
+
+<section class="wis-container">
+    <PaginaEncabezado Titulo="Licencia" Subtitulo="Estado de la licencia de esta instalación y carga del archivo .lic." />
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="wis-alert-error wis-mb-5" role="alert">@mensaje</div>
+    }
+    @if (!string.IsNullOrEmpty(confirmacion))
+    {
+        <div class="wis-alert-ok wis-mb-5" role="status">@confirmacion</div>
+    }
+
+    @if (estado is not null)
+    {
+        <div class="wis-card wis-mb-5">
+            <p><EstadoBadge Tipo="@TipoBadge(estado.Estado)" Texto="@EtiquetaEstado(estado.Estado)" /></p>
+            <p>@estado.Mensaje</p>
+            @if (estado.Datos is { } d)
+            {
+                <ul class="wis-lista-datos">
+                    <li><strong>Cliente:</strong> @d.Cliente</li>
+                    <li><strong>Plan:</strong> @d.Plan</li>
+                    <li><strong>Edición:</strong> @d.Edicion</li>
+                    <li><strong>Empresas activas permitidas:</strong> @d.MaxEmpresas</li>
+                    <li><strong>Usuarios activos permitidos:</strong> @d.MaxUsuarios</li>
+                    <li><strong>Vigente desde:</strong> @Fecha(d.ValidFrom)</li>
+                    <li><strong>Vence:</strong> @(d.ValidTo is { } fin ? Fecha(fin) : "Sin vencimiento")</li>
+                    <li><strong>Días de gracia:</strong> @d.GraceDays</li>
+                    <li><strong>Versión cubierta:</strong> @(d.MaxVersionMayor is { } tope ? $"{tope}.x" : "Sin tope")</li>
+                </ul>
+            }
+        </div>
+    }
+
+    <div class="wis-card wis-mb-5">
+        <h2 class="wis-h2">Identificador de instalación</h2>
+        <p class="wis-muted">Envíalo al proveedor al solicitar o renovar la licencia.</p>
+        <input class="wis-input" id="instalacion" type="text" readonly value="@(instalacion?.ToString() ?? "No disponible")" />
+    </div>
+
+    <div class="wis-card">
+        <h2 class="wis-h2">Cargar licencia</h2>
+        <p class="wis-muted">Selecciona el archivo .lic entregado por el proveedor. Sin licencia vigente la aplicación queda en modo solo lectura.</p>
+        <label for="archivo-licencia">Archivo de licencia (.lic)</label>
+        <InputFile id="archivo-licencia" accept=".lic" OnChange="Seleccionado" />
+        <div class="wis-form-acciones">
+            <button type="button" class="wis-button" disabled="@(archivo is null || cargando)" @onclick="CargarAsync">
+                Cargar licencia
+            </button>
+        </div>
+    </div>
+</section>
+
+@code {
+    private const long MaxBytes = 16 * 1024;
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private EstadoLicenciaInfo? estado;
+    private Guid? instalacion;
+    private IBrowserFile? archivo;
+    private bool cargando;
+    private string? mensaje;
+    private string? confirmacion;
+
+    protected override async Task OnInitializedAsync() => await RecargarAsync();
+
+    private async Task RecargarAsync()
+    {
+        try
+        {
+            estado = await LicenciaSvc.ObtenerEstadoAsync();
+            instalacion = await LicenciaSvc.ObtenerInstalacionAsync();
+        }
+        catch (Exception ex)
+        {
+            estado = null;
+            mensaje = $"No se pudo leer la licencia: {ex.Message}";
+        }
+    }
+
+    private void Seleccionado(InputFileChangeEventArgs e)
+    {
+        mensaje = null;
+        confirmacion = null;
+        archivo = e.File.Size > MaxBytes ? null : e.File;
+        if (archivo is null)
+            mensaje = $"El archivo supera el máximo de {MaxBytes / 1024} KB.";
+    }
+
+    private async Task CargarAsync()
+    {
+        if (archivo is null || AuthState is null) return;
+
+        cargando = true;
+        mensaje = null;
+        confirmacion = null;
+        try
+        {
+            var usuario = (await AuthState).User;
+            await using var flujo = archivo.OpenReadStream(MaxBytes);
+            var resultado = await LicenciaSvc.CargarAsync(usuario, flujo);
+            if (resultado.Exito)
+            {
+                confirmacion = resultado.Mensaje;
+                archivo = null;
+                await RecargarAsync();
+            }
+            else
+            {
+                mensaje = resultado.Mensaje;
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"No se pudo cargar la licencia: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private static string Fecha(DateTimeOffset fecha) => fecha.ToLocalTime().ToString("dd/MM/yyyy");
+
+    // El estado siempre se muestra con texto; el color solo refuerza.
+    private static string TipoBadge(EstadoLicencia estado) => estado switch
+    {
+        EstadoLicencia.Vigente => "activo",
+        EstadoLicencia.EnGracia => "pendiente",
+        _ => "inactivo"
+    };
+
+    private static string EtiquetaEstado(EstadoLicencia estado) => estado switch
+    {
+        EstadoLicencia.Vigente => "Vigente",
+        EstadoLicencia.EnGracia => "En periodo de gracia",
+        EstadoLicencia.Vencida => "Vencida",
+        EstadoLicencia.VersionNoCubierta => "Versión no cubierta",
+        EstadoLicencia.RelojAlterado => "Fecha del equipo alterada",
+        EstadoLicencia.Invalida => "Licencia no válida",
+        _ => "Sin licencia"
+    };
+}

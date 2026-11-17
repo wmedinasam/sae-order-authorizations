@@ -15,9 +15,27 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<BitacoraEntrada> Bitacora => Set<BitacoraEntrada>();
     public DbSet<OrdenBloqueo> Bloqueos => Set<OrdenBloqueo>();
     public DbSet<Marca> Marcas => Set<Marca>();
+    public DbSet<Licencia> Licencias => Set<Licencia>();
+    public DbSet<InstalacionLicencia> Instalaciones => Set<InstalacionLicencia>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Licencia>(e =>
+        {
+            e.ToTable("WIS_LICENCIA");
+            e.Property(x => x.Cliente).HasMaxLength(100);
+            e.Property(x => x.Plan).HasMaxLength(10);
+            e.Property(x => x.Edicion).HasMaxLength(20);
+            e.Property(x => x.Archivo).HasColumnType("varbinary(max)");
+            // Una misma licencia no puede instalarse dos veces con el mismo serial.
+            e.HasIndex(x => new { x.LicenseId, x.Serial }).IsUnique();
+        });
+
+        modelBuilder.Entity<InstalacionLicencia>(e =>
+        {
+            e.ToTable("WIS_LICENCIA_INSTALACION");
+        });
+
         modelBuilder.Entity<Marca>(e =>
         {
             e.ToTable("WIS_BRANDING");

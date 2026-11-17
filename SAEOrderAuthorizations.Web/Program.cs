@@ -67,6 +67,8 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+    // Identificador de instalación para licencias: se crea aquí, una sola vez y antes de atender peticiones.
+    await scope.ServiceProvider.GetRequiredService<LicenciaService>().AsegurarInstalacionAsync();
 }
 
 if (!app.Environment.IsDevelopment())

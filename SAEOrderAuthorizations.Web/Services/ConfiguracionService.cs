@@ -25,7 +25,7 @@ public class CorreoConfigItem
     public string Plantilla { get; set; } = string.Empty;
 }
 
-public class ConfiguracionService(IDbContextFactory<AppDbContext> dbFactory)
+public class ConfiguracionService(IDbContextFactory<AppDbContext> dbFactory, LicenciaService licencia)
 {
     // Claves del correo: se editan en la sección Correo, no en la tabla. No se pueden desactivar ni borrar.
     // MailSubject ya no se usa en el envío (el destinatario es MailTo); se conserva oculta para no dejar huérfana la fila.
@@ -77,6 +77,8 @@ public class ConfiguracionService(IDbContextFactory<AppDbContext> dbFactory)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return Denegado;
+
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
 
         var host = datos.Host.Trim();
         var puerto = datos.Puerto.Trim();
@@ -146,6 +148,8 @@ public class ConfiguracionService(IDbContextFactory<AppDbContext> dbFactory)
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return Denegado;
 
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
+
         key = key?.Trim() ?? string.Empty;
         var error = ValidarClave(key) ?? ValidarValor(valor);
         if (error is not null) return new(false, error);
@@ -169,6 +173,8 @@ public class ConfiguracionService(IDbContextFactory<AppDbContext> dbFactory)
         var c = await db.Configuraciones.FirstOrDefaultAsync(x => x.Id == id);
         if (c is null) return new(false, "La configuración no existe.");
 
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
+
         // Se valida todo antes de tocar la entidad: un error no debe dejar cambios rastreados.
         if (!activo && EsBase(c.Key)) return new(false, "Las claves base del correo no se pueden desactivar.");
 
@@ -191,6 +197,8 @@ public class ConfiguracionService(IDbContextFactory<AppDbContext> dbFactory)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         if (!usuario.EsAdministrador()) return Denegado;
+
+        if (await licencia.MotivoBloqueoEscrituraAsync() is { } bloqueo) return new(false, bloqueo);
 
         var c = await db.Configuraciones.FirstOrDefaultAsync(x => x.Id == id);
         if (c is null) return new(false, "La configuración no existe.");
