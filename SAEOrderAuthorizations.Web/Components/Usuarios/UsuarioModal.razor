@@ -28,7 +28,7 @@
             </div>
             <div>
                 <label class="wis-field-label" for="u-nick">Nick (no distingue mayúsculas)</label>
-                <InputText id="u-nick" class="wis-input" @bind-Value="modelo.NickName" />
+                <InputText id="u-nick" class="wis-input" autocomplete="off" autocapitalize="none" spellcheck="false" @bind-Value="modelo.NickName" />
                 <ValidationMessage For="() => modelo.NickName" role="alert" />
             </div>
             <div>
@@ -39,7 +39,7 @@
             </div>
             <div>
                 <label class="wis-field-label" for="u-email">Email (opcional)</label>
-                <InputText id="u-email" class="wis-input" @bind-Value="modelo.Email" />
+                <InputText id="u-email" class="wis-input" type="email" autocomplete="off" inputmode="email" @bind-Value="modelo.Email" />
                 <ValidationMessage For="() => modelo.Email" role="alert" />
             </div>
             <div>
@@ -53,10 +53,10 @@
                 </InputSelect>
                 <ValidationMessage For="() => modelo.RolId" role="alert" />
             </div>
-            <label><InputCheckbox @bind-Value="modelo.SendMail" /> Enviar notificaciones por correo</label>
-            <label><InputCheckbox @bind-Value="modelo.Estado" /> Activo</label>
+            <label class="wis-check"><InputCheckbox @bind-Value="modelo.SendMail" /> Enviar notificaciones por correo</label>
+            <label class="wis-check"><InputCheckbox @bind-Value="modelo.Estado" /> Activo</label>
 
-            <div class="wis-modal-acciones">
+            <div class="wis-form-acciones">
                 <IconButton Icono="save" Variante="guardar" Texto="Guardar" Tipo="submit" Deshabilitado="@procesando" />
             </div>
         </EditForm>

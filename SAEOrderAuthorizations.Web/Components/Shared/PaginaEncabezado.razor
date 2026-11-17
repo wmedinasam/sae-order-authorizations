@@ -1,0 +1,20 @@
+@* Encabezado de página: título a la izquierda, acciones (ChildContent) a la derecha, sin caja. *@
+<header class="wis-page-header">
+    <div>
+        <h1 class="wis-h2">@Titulo</h1>
+        @if (!string.IsNullOrEmpty(Subtitulo))
+        {
+            <p class="wis-muted wis-page-subtitle">@Subtitulo</p>
+        }
+    </div>
+    @if (ChildContent is not null)
+    {
+        <div class="wis-acciones">@ChildContent</div>
+    }
+</header>
+
+@code {
+    [Parameter, EditorRequired] public string Titulo { get; set; } = string.Empty;
+    [Parameter] public string? Subtitulo { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

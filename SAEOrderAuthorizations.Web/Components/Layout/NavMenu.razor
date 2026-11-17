@@ -7,22 +7,30 @@
 </div>
 
 <nav class="wis-nav" aria-label="Principal">
-    <NavLink class="wis-nav-link" href="/" Match="NavLinkMatch.All">Inicio</NavLink>
-    <NavLink class="wis-nav-link" href="/ordenes">Órdenes</NavLink>
+    <NavLink class="wis-nav-link" href="/" Match="NavLinkMatch.All"><Icono Nombre="home" />Inicio</NavLink>
+    <NavLink class="wis-nav-link" href="/ordenes"><Icono Nombre="clipboard" />Órdenes</NavLink>
 
     <AuthorizeView Policy="Administrador">
         <p class="wis-nav-section">Administración</p>
-        <NavLink class="wis-nav-link" href="/empresas">Empresas</NavLink>
-        <NavLink class="wis-nav-link" href="/usuarios">Usuarios</NavLink>
-        <NavLink class="wis-nav-link" href="/roles">Roles</NavLink>
-        <NavLink class="wis-nav-link" href="/configuracion">Configuración</NavLink>
+        <NavLink class="wis-nav-link" href="/empresas"><Icono Nombre="building" />Empresas</NavLink>
+        <NavLink class="wis-nav-link" href="/usuarios"><Icono Nombre="users" />Usuarios</NavLink>
+        <NavLink class="wis-nav-link" href="/roles"><Icono Nombre="shield" />Roles</NavLink>
+        <NavLink class="wis-nav-link" href="/configuracion"><Icono Nombre="settings" />Configuración</NavLink>
     </AuthorizeView>
 </nav>
 
-<form method="post" action="/auth/logout" class="wis-sidebar-footer">
-    <AntiforgeryToken />
-    <button type="submit" class="wis-button wis-button--secondary">Cerrar sesión</button>
-</form>
+<div class="wis-sidebar-footer">
+    <AuthorizeView>
+        <div class="wis-sidebar-user">
+            <strong>@context.User.Identity?.Name</strong>
+            <span>@context.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</span>
+        </div>
+    </AuthorizeView>
+    <form method="post" action="/auth/logout">
+        <AntiforgeryToken />
+        <button type="submit" class="wis-button wis-button--secondary"><Icono Nombre="logout" Tamano="18" />Cerrar sesión</button>
+    </form>
+</div>
 
 @code {
     private MarcaInfo? _marca;
