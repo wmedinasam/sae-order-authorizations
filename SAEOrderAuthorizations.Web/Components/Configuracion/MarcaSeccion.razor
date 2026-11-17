@@ -19,8 +19,7 @@
         {
             <div class="wis-stack">
                 <h3 class="wis-h3">@s.Titulo</h3>
-                <img src="@UrlDe(s.Slot)" alt="Vista previa de @s.Titulo"
-                     style="max-height:96px;max-width:100%;align-self:flex-start;background:var(--wis-surface-subtle);padding:var(--wis-space-3)" />
+                <img class="wis-marca-preview" src="@UrlDe(s.Slot)" alt="Vista previa de @s.Titulo" />
                 <label class="wis-field-label" for="@IdDe(s.Slot)">Archivo nuevo</label>
                 <InputFile id="@IdDe(s.Slot)" class="wis-input" accept="@s.Accept"
                            OnChange="e => Seleccionar(s.Slot, e)" />

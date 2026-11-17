@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["SAEOrderAuthorizations.Web.styles.css"]" />
     <ImportMap />
-    <link rel="icon" type="@_marca.FaviconTipo" href="@_marca.FaviconUrl" />
+    <link rel="icon" type="@_marca?.FaviconTipo" href="@_marca?.FaviconUrl" />
     <HeadOutlet />
 </head>
 
@@ -27,7 +27,7 @@
 </html>
 
 @code {
-    private MarcaInfo _marca = null!;
+    private MarcaInfo? _marca;
 
     protected override async Task OnInitializedAsync() => _marca = await MarcaService.ObtenerAsync();
 }

@@ -21,6 +21,16 @@ html, body {
     padding: var(--wis-space-5) var(--wis-page-gutter) 0;
 }
 
+.wis-marca-preview {
+    display: block;
+    max-width: 100%;
+    max-height: 96px;
+    align-self: flex-start;
+    background: var(--wis-surface-subtle);
+    padding: var(--wis-space-3);
+    object-fit: contain;
+}
+
 .wis-logo-header img {
     display: block;
     max-width: 100%;

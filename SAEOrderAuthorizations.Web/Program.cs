@@ -68,7 +68,10 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+// /branding responde 404 real: re-ejecutar /not-found exigiría sesión y devolvería 302 al login.
+app.UseWhen(
+    ctx => !ctx.Request.Path.StartsWithSegments("/branding"),
+    b => b.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true));
 app.UseHttpsRedirection();
 
 app.UseStaticFiles(); // assets de marca públicos, antes de la autenticación

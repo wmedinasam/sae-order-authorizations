@@ -4,13 +4,13 @@
 
 <div class="wis-page">
     <header class="wis-logo-header">
-        <img src="@_marca.LogoLoginUrl" alt="@_marca.NombreEmpresa" />
+        <img src="@_marca?.LogoLoginUrl" alt="@_marca?.NombreEmpresa" />
     </header>
     @Body
 </div>
 
 @code {
-    private MarcaInfo _marca = null!;
+    private MarcaInfo? _marca;
 
     protected override async Task OnInitializedAsync() => _marca = await MarcaService.ObtenerAsync();
 }
