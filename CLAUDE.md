@@ -71,7 +71,11 @@ Una BD propia `ORDENES_COMPRA` (tablas `EMPRESA`, `ROL`, `ROL_EMPRESA`, `WIS_USE
 
 - Fuente: skill `wis-brand-kit` (`~/.claude/skills/wis-brand-kit/brand/`). Assets copiados a `SAEOrderAuthorizations.Web/wwwroot/brand/` (web, fonts, logos, web-icons).
 - Tema **oscuro por defecto**: `App.razor` fija `data-theme="dark"` y el `body` usa `wis-brand`. Las vistas usan las clases `wis-*` (`wis-card`, `wis-button`, `wis-input`, `wis-h2`…) y tokens `--wis-*` de `brand-tokens.css`.
-- Logo en fondo oscuro: `brand/logos/svg/wis-logo-horizontal-on-dark.svg`.
+- Logo por defecto en fondo oscuro: `brand/logos/svg/wis-logo-horizontal-on-dark.svg`; favicon por defecto `brand/web-icons/favicon.svg`. Son el respaldo cuando la empresa no sube nada.
+- **Marca personalizable** (Configuración → Marca, solo admin): logo del menú lateral, logo del login, favicon y nombre de la empresa. Los archivos van en la tabla `WIS_BRANDING` (`Data/Entities/Marca.cs`, `varbinary(max)`, soft delete con `Estado`); el nombre en la clave `CompanyName` de `WIS_CONFIGURATION`.
+- `Services/MarcaService.cs`: `ObtenerAsync()` (caché `IMemoryCache`, invalidada al guardar o restaurar), `GuardarAsync` (valida por firma del archivo: PNG, JPG, WebP; ICO solo en favicon; límites 512 KB logos y 128 KB favicon), `RestaurarAsync`, `GuardarNombreAsync`. Sin SVG: un SVG del mismo origen puede ejecutar scripts.
+- Endpoint `GET /branding/{slot}` (`Program.cs`) con `AllowAnonymous` para que el login vea el logo. Sirve `nosniff`, caché inmutable con `?v=` (ticks de `Actualizado`) y ETag. Está excluido de `UseStatusCodePagesWithReExecute` para que un slot vacío dé 404 real.
+- Títulos de pestaña con `Components/Shared/TituloPagina.razor` (`Texto · NombreEmpresa`); no usar `PageTitle` literal.
 - `UseStaticFiles()` va antes de `UseAuthentication()` para que los assets de marca sean públicos; el resto de rutas sigue protegido.
 
 ## Menú y autorización por rol (proyecto nuevo)

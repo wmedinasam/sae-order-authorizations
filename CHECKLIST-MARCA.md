@@ -22,7 +22,7 @@ Plan completo: `/home/wally/.claude/plans/lively-giggling-wave.md`
 - [x] I3 Migración `AgregarMarca` aplicada sobre la BD de dev (`WIS_BRANDING` creada)
 - [ ] I4 Pruebas de navegador (plan, verificación 1 a 10). Hecho: 2 (subida logo sidebar), 3 (`/branding/LogoSidebar` anónimo 200; login con fallback), 4 (favicon PNG, tipo dinámico), 5 (nombre de empresa en título y alt), 6 (restaurar: 404 y vuelve el logo WIS), 7 (SVG, falso PNG y >512 KB rechazados con mensaje), 8 (`operador` denegado en Configuración; `nosniff` presente), 9 (390px: sin scroll, logo dentro del panel abierto), 10 (BD devuelta a defaults). Pendiente: subida de logo de login con imagen real visible en `/login` (solo se probó el fallback)
 - [x] I4a Correcciones de integración: `App`, `AuthLayout` y `NavMenu` con `_marca` anulable (NRE en el render del `<head>`); `/branding` excluido de `UseStatusCodePagesWithReExecute` (404 real en vez de 302); clase `wis-marca-preview` en lugar de estilo inline; `Configuracion.razor` con `TituloPagina`
-- [ ] I5 `CLAUDE.md` actualizado (sección Marca: deja de ser fija)
+- [x] I5 `CLAUDE.md` actualizado (sección Marca) (sección Marca: deja de ser fija)
 - [ ] I6 PR a `main` y merge
 
 ## Pendientes conocidos (fuera de alcance)
